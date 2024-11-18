@@ -1,30 +1,31 @@
-import { useState } from "react";
-import LoadingPage from "./Pages/LoadingPage";
+// import { shortString } from "starknet";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
 import "./App.css";
 import HomePage from "./Pages/HomePage";
 import SelectCharacter from "./Pages/SelectCharacter";
 
-function App() {
-  const [loaded, setLoaded] = useState(false);
+// const CONTRACT_ADDRESS =
+//   "0x0548f0a62cf7d5cd0ad5d01e009d309a2bf53bb08e7b59bd696dcb146d4dfdcf";
 
+function App() {
   return (
     <>
-      {loaded ? (
-        <Router>
-          <Routes>
-            <Route path="/" Component={() => <HomePage />} />
+      {/* <StarknetConfig
+        autoConnect
+        chains={[sepolia]}
+        connectors={[connector]}
+        explorer={starkscan}
+        provider={provider}
+      > */}
+      <Router>
+        <Routes>
+          <Route path="/" Component={() => <HomePage />} />
 
-            <Route
-              path="/character-shop"
-              Component={() => <SelectCharacter />}
-            />
-          </Routes>
-        </Router>
-      ) : (
-        <LoadingPage onLoaded={() => setLoaded(true)} />
-      )}
+          <Route path="/character-shop" Component={() => <SelectCharacter />} />
+        </Routes>
+      </Router>
+      {/* </StarknetConfig> */}
     </>
   );
 }
