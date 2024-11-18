@@ -60,6 +60,7 @@ const useStore = create<State>((set, get) => ({
       const { connector } = get();
       const wallet = await connector.connect();
       set({ address: wallet.account });
+      alert(`"Address:", ${wallet.account}, "Username:", ${get().username}`);
       console.log("Wallet connected:", wallet.account);
     } catch (error) {
       console.error("Failed to connect wallet:", error);

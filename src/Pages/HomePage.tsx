@@ -42,9 +42,15 @@ const HomePage = () => {
           <div className=" h-full w-full max-w-[1024px] flex flex-col items-center gap-4 justify-center">
             <button
               onClick={async () => {
-                await connectWallet();
-                console.log("Address:", address, "Username:", username);
-                alert(`"Address:", ${address}, "Username:", ${username}`);
+                await connectWallet()
+                  .then(() => {
+                    console.log("Address:", address, "Username:", username);
+                    alert(`"Address:", ${address}, "Username:", ${username}`);
+                  })
+                  .catch((err) => {
+                    alert(`"error:", ${err}`);
+                  });
+
                 navigate("/battle");
               }}
               className="action_button"
