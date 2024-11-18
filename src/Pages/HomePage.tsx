@@ -44,7 +44,8 @@ const HomePage = () => {
               onClick={async () => {
                 await connectWallet();
                 console.log("Address:", address, "Username:", username);
-                // navigate("/battle")
+                alert(`"Address:", ${address}, "Username:", ${username}`);
+                navigate("/battle");
               }}
               className="action_button"
             >
