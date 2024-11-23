@@ -5,27 +5,59 @@ import "../styles/buttons.css";
 import bgImage from "../assets/placeholders/start_bg.svg";
 import LoadingPage from "./LoadingPage";
 import { useStore } from "../store/GameStore";
+import { useAccount, useConnect } from "@starknet-react/core";
+import { connector } from "../App";
 
 const HomePage = () => {
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
-  // const { connect, connectors } = useConnect();
-  // // const { disconnect } = useDisconnect();
-  // // const { address } = useAccount();
-
-  // const connector = connectors[0] as unknown as ControllerConnector;
 
   // const [username, setUsername] = useState<string>();
-  const connectWallet = useStore((state) => state.connectWallet);
-  const fetchUsername = useStore((state) => state.fetchUsername);
-  const address = useStore((state) => state.address);
-  const username = useStore((state) => state.username);
+  const { setLoading, setError, setAddress, setUsername } = useStore();
+  // const fetchUsername = useStore((state) => state.fetchUsername);
+  // const address = useStore((state) => state.address);
+  const { connect } = useConnect(); // Hook to connect wallets
+  // const username = useStore((state) => state.username);
+  const { address } = useAccount(); // Hook to get account address
+
+  const connectWallet = () => {
+    setLoading(true);
+    setError(null);
+    try {
+      connect({ connector: connector });
+
+      if (address) {
+        setLoading(false);
+        setAddress(address);
+        console.log("Wallet connected:", address);
+      }
+    } catch (error) {
+      setLoading(false);
+      setError(error?.toString() || "couldn't connect");
+
+      console.error("Failed to connect wallet:", error);
+    }
+  };
 
   useEffect(() => {
     if (address) {
-      fetchUsername();
+      try {
+        const { address } = useAccount();
+        if (!address) {
+          console.warn("No address available to fetch username.");
+          return;
+        }
+        const username = `User_${address.slice(-4)}`;
+        // set({ username });
+        setUsername(username);
+        console.log("Fetched username:", username);
+      } catch (error) {
+        setError(error?.toString() || "couldn't fetch username");
+
+        console.error("Failed to fetch username:", error);
+      }
     }
-  }, [address, fetchUsername]);
+  }, [address]);
 
   return (
     <>
@@ -42,16 +74,16 @@ const HomePage = () => {
           <div className=" h-full w-full max-w-[1024px] flex flex-col items-center gap-4 justify-center">
             <button
               onClick={async () => {
-                await connectWallet()
-                  .then(() => {
-                    console.log("Address:", address, "Username:", username);
-                    alert(`"Address:", ${address}, "Username:", ${username}`);
-                  })
-                  .catch((err) => {
-                    alert(`"error:", ${err}`);
-                  });
+                connectWallet();
+                // .then(() => {
+                //   console.log("Address:", address, "Username:", username);
+                //   alert(`"Address:", ${address}, "Username:", ${username}`);
+                // })
+                // .catch((err) => {
+                //   alert(`"error:", ${err}`);
+                // });
 
-                navigate("/battle");
+                // navigate("/maps");
               }}
               className="action_button"
             >

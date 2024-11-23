@@ -1,31 +1,82 @@
 // import { shortString } from "starknet";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { sepolia } from "@starknet-react/chains";
 
 import "./App.css";
 import HomePage from "./Pages/HomePage";
 import SelectCharacter from "./Pages/SelectCharacter";
+import Maps from "./Pages/Maps";
+import { Connector, StarknetConfig, starkscan } from "@starknet-react/core";
+import { RpcProvider } from "starknet";
+import ControllerConnector from "@cartridge/connector";
+import { CONTRACT_ADDRESS, RPC_URL } from "./constants";
+import { SDK } from "@dojoengine/sdk";
+import { LutteSchemaType } from "./Helpers/models.gen";
+import { useStore } from "./store/GameStore";
 
-// const CONTRACT_ADDRESS =
-//   "0x0548f0a62cf7d5cd0ad5d01e009d309a2bf53bb08e7b59bd696dcb146d4dfdcf";
+export const connector = new ControllerConnector({
+  policies: [
+    {
+      target: CONTRACT_ADDRESS,
+      method: "spawn",
+      description: "Replenish your health"
+    },
+    {
+      target: CONTRACT_ADDRESS,
+      method: "fetch_playable_characters",
+      description: "view characters onchain to select from"
+    },
+    {
+      target: CONTRACT_ADDRESS,
+      method: "get_user",
+      description: "view your character details onchain"
+    },
+    {
+      target: CONTRACT_ADDRESS,
+      method: "offensive_phase",
+      description: "take your stance and attack thine enemy"
+    },
+    {
+      target: CONTRACT_ADDRESS,
+      method: "defensive_phase",
+      description: "block enemmy's attack"
+    }
+  ],
+  rpc: RPC_URL,
+  theme: "dope-wars",
+  colorMode: "dark"
+}) as unknown as Connector;
 
-function App() {
+function provider() {
+  return new RpcProvider({
+    nodeUrl: RPC_URL
+  });
+}
+
+function App({ sdk }: { sdk: SDK<LutteSchemaType> }) {
+  const { setSDK } = useStore();
+  setSDK(sdk);
   return (
     <>
-      {/* <StarknetConfig
+      <StarknetConfig
         autoConnect
         chains={[sepolia]}
         connectors={[connector]}
         explorer={starkscan}
         provider={provider}
-      > */}
-      <Router>
-        <Routes>
-          <Route path="/" Component={() => <HomePage />} />
+      >
+        <Router>
+          <Routes>
+            <Route path="/" Component={() => <HomePage />} />
 
-          <Route path="/character-shop" Component={() => <SelectCharacter />} />
-        </Routes>
-      </Router>
-      {/* </StarknetConfig> */}
+            <Route
+              path="/character-shop"
+              Component={() => <SelectCharacter />}
+            />
+            <Route path="/maps" Component={() => <Maps />} />
+          </Routes>
+        </Router>
+      </StarknetConfig>
     </>
   );
 }

@@ -1,85 +1,73 @@
 import { create } from "zustand";
-import ControllerConnector from "@cartridge/connector";
-
-const CONTRACT_ADDRESS =
-  "0x0548f0a62cf7d5cd0ad5d01e009d309a2bf53bb08e7b59bd696dcb146d4dfdcf";
+import { createDojoStore } from "@dojoengine/sdk";
+import { LutteSchemaType } from "../Helpers/models.gen";
+// import { useStarknet, useAccount, useConnect } from "@starknet-react/core";
 
 interface State {
   globalMusic: boolean;
   address: string;
   username: string | null;
-  connector: ControllerConnector;
-  tokenDetailsOnBASE: any;
-  tokenDetailsOnETH: any;
-  tokenDetailsOnBSC: any;
+  tokens: {
+    BASE: any;
+    ETH: any;
+    BSC: any;
+  };
+  loading: boolean;
+  error: string | null;
   setSearchModal: (address: string) => void;
   toggleglobalMusic: (value: boolean) => void;
-  setTokenDetailOnBSC: (details: any) => void;
-  setTokenDetailOnBASE: (details: any) => void;
-  setTokenDetailOnETH: (details: any) => void;
-  connectWallet: () => Promise<void>;
-  fetchUsername: () => Promise<void>;
+  setTokenDetails: (chain: "BASE" | "ETH" | "BSC", details: any) => void;
+  setLoading: (value: boolean) => void;
+  setAddress: (value: string) => void;
+  setError: (error: string | null) => void;
+  setUsername: (value: string) => void;
+  sdk: any;
+  setSDK: (initSDK: any) => void;
 }
 
-const useStore = create<State>((set, get) => ({
+const useStore = create<State>((set) => ({
   globalMusic: false,
   address: "",
+  sdk: "",
   username: null,
-  connector: new ControllerConnector({
-    policies: [
-      {
-        target: CONTRACT_ADDRESS,
-        method: "spawn",
-        description: "Replenish your health"
-      }
-    ],
-    rpc: "https://api.cartridge.gg/x/starknet/sepolia",
-    theme: "dope-wars",
-    colorMode: "dark"
-  }),
-  tokenDetailsOnBASE: "",
-  tokenDetailsOnBSC: "",
-  tokenDetailsOnETH: "",
+  tokens: {
+    BASE: "",
+    ETH: "",
+    BSC: ""
+  },
+  loading: false,
+  error: null,
   setSearchModal: (address: string) => {
     set(() => ({ address }));
   },
-  setTokenDetailOnBASE: (details: any) => {
-    set(() => ({ tokenDetailsOnBASE: details }));
-  },
-  setTokenDetailOnETH: (details: any) => {
-    set(() => ({ tokenDetailsOnETH: details }));
-  },
-  setTokenDetailOnBSC: (details: any) => {
-    set(() => ({ tokenDetailsOnBSC: details }));
+  setTokenDetails: (chain, details) => {
+    set((state) => ({
+      tokens: {
+        ...state.tokens,
+        [chain]: details
+      }
+    }));
   },
   toggleglobalMusic: (newValue: boolean) => {
     set(() => ({ globalMusic: newValue }));
   },
-  connectWallet: async () => {
-    try {
-      const { connector } = get();
-      const wallet = await connector.connect();
-      set({ address: wallet.account });
-      alert(`"Address:", ${wallet.account}, "Username:", ${get().username}`);
-      console.log("Wallet connected:", wallet.account);
-    } catch (error) {
-      console.error("Failed to connect wallet:", error);
-    }
+  setLoading: (value) => {
+    set(() => ({ loading: value }));
   },
-  fetchUsername: async () => {
-    try {
-      const { connector, address } = get();
-      if (!address) {
-        console.warn("No address available for username fetch");
-        return;
-      }
-      const username = await connector.username();
-      set({ username });
-      console.log("Fetched username:", username);
-    } catch (error) {
-      console.error("Failed to fetch username:", error);
-    }
+  setSDK: (value) => {
+    set(() => ({ sdk: value }));
+  },
+  setError: (error) => {
+    set(() => ({ error }));
+  },
+  setAddress: (value: string) => {
+    set(() => ({ address: value }));
+  },
+  setUsername: (value: string) => {
+    set(() => ({ username: value }));
   }
 }));
 
-export { useStore };
+const useDojoStore = createDojoStore<LutteSchemaType>();
+
+export { useStore, useDojoStore };
