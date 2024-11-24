@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { createDojoStore } from "@dojoengine/sdk";
-import { LutteSchemaType } from "../Helpers/models.gen";
+import { createDojoStore, init, SDK } from "@dojoengine/sdk";
+import { LutteSchemaType, schema } from "../Helpers/models.gen";
+import { RPC_URL, WORLD_ADDRESS } from "../constants";
 // import { useStarknet, useAccount, useConnect } from "@starknet-react/core";
 
 interface State {
@@ -21,14 +22,14 @@ interface State {
   setAddress: (value: string) => void;
   setError: (error: string | null) => void;
   setUsername: (value: string) => void;
-  sdk: any;
-  setSDK: (initSDK: any) => void;
+  sdk: SDK<LutteSchemaType> | undefined;
+  setSDK: () => void;
 }
 
 const useStore = create<State>((set) => ({
   globalMusic: false,
   address: "",
-  sdk: "",
+  sdk: undefined,
   username: null,
   tokens: {
     BASE: "",
@@ -54,8 +55,25 @@ const useStore = create<State>((set) => ({
   setLoading: (value) => {
     set(() => ({ loading: value }));
   },
-  setSDK: (value) => {
-    set(() => ({ sdk: value }));
+  setSDK: async () => {
+    const sdk = await init<LutteSchemaType>(
+      {
+        client: {
+          rpcUrl: RPC_URL,
+          toriiUrl: "http://127.0.0.1:8080",
+          relayUrl: "",
+          worldAddress: WORLD_ADDRESS
+        },
+        domain: {
+          name: "Lutte",
+          version: "1.0",
+          chainId: "1",
+          revision: "1"
+        }
+      },
+      schema
+    );
+    set(() => ({ sdk: sdk }));
   },
   setError: (error) => {
     set(() => ({ error }));

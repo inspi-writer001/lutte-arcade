@@ -1,6 +1,6 @@
 import { DojoProvider } from "@dojoengine/core";
 import { Account } from "starknet";
-import * as models from "./models.gen";
+// import * as models from "./models.gen";
 
 export async function setupWorld(provider: DojoProvider) {
   const actions_offensivePhase = async (snAccount: Account) => {

@@ -10,9 +10,8 @@ import { Connector, StarknetConfig, starkscan } from "@starknet-react/core";
 import { RpcProvider } from "starknet";
 import ControllerConnector from "@cartridge/connector";
 import { CONTRACT_ADDRESS, RPC_URL } from "./constants";
-import { SDK } from "@dojoengine/sdk";
-import { LutteSchemaType } from "./Helpers/models.gen";
 import { useStore } from "./store/GameStore";
+import { useEffect } from "react";
 
 export const connector = new ControllerConnector({
   policies: [
@@ -53,9 +52,13 @@ function provider() {
   });
 }
 
-function App({ sdk }: { sdk: SDK<LutteSchemaType> }) {
+// function App({ sdk }: { sdk: SDK<LutteSchemaType> }) {
+
+function App() {
   const { setSDK } = useStore();
-  setSDK(sdk);
+  useEffect(() => {
+    setSDK();
+  }, []);
   return (
     <>
       <StarknetConfig
