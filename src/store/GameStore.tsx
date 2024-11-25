@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createDojoStore, init, SDK } from "@dojoengine/sdk";
 import { LutteSchemaType, schema } from "../Helpers/models.gen";
-import { RPC_URL, WORLD_ADDRESS } from "../constants";
+import { RPC_URL, TORII_URL, WORLD_ADDRESS } from "../constants";
 // import { useStarknet, useAccount, useConnect } from "@starknet-react/core";
 
 interface State {
@@ -60,7 +60,7 @@ const useStore = create<State>((set) => ({
       {
         client: {
           rpcUrl: RPC_URL,
-          toriiUrl: "http://127.0.0.1:8080",
+          toriiUrl: TORII_URL,
           relayUrl: "",
           worldAddress: WORLD_ADDRESS
         },
