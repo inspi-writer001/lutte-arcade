@@ -23,37 +23,37 @@ const Fight = () => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      <div className="__fight_canvas w-full h-full flex flex-row justify-between px-1 md:px-40 relative">
+      <div className="__fight_canvas w-full h-full flex flex-row justify-between px-1 md:px-20 relative max-w-[1500px]">
         <div className="__left_character flex items-end relative gap-0 h-fit self-end">
-          <div className="__action_buttons flex flex-col relative top-0 w-32 gap-4 self-center">
+          <div className="__action_buttons flex flex-col absolute top-0 w-[150px] gap-4 self-center z-10 bottom-0">
             <img
               src={red_icon}
               alt="red_icon"
-              className="h-20 w-20 self-end hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+              className="h-15 w-16 self-end hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
             />
             <img
               src={blue_icon}
               alt="blue_icon"
-              className="h-20 w-20 self-start hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+              className="h-15 w-16 self-start hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
             />
             <img
               src={green_icon}
               alt="green_icon"
-              className="h-20 w-20 self-end hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+              className="h-15 w-16 self-end hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
             />
           </div>
 
           <img
             src={playable_character.characterImage}
             alt=""
-            className="player_img h-[30rem]"
+            className="player_img max-h-[30rem] relative left-2"
           />
         </div>
         <div className="__right_character flex items-end relative h-fit self-end">
           <img
             src={playable_character?.enemyImage}
             alt=""
-            className="enemy_img h-[30rem]"
+            className="enemy_img max-h-[30rem]"
           />
         </div>
       </div>
