@@ -4,6 +4,8 @@ import bgImage from "../assets/placeholders/start_plain.svg";
 import "../styles/cards.css";
 import { useStore } from "../store/GameStore";
 import { useNavigate } from "react-router-dom";
+import { useAccount } from "@starknet-react/core";
+import { CONTRACT_ADDRESS } from "../constants";
 
 const SelectCharacter = () => {
   // const contract = useContractInstance();
@@ -12,7 +14,7 @@ const SelectCharacter = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   // let [error, setError] = useState();
   // const [isSuccess, setIsSuccess] = useState(false);
-  // const { account } = useAccount();
+  const { account } = useAccount();
   const { sdk } = useStore();
   const navigate = useNavigate();
 
@@ -98,13 +100,29 @@ const SelectCharacter = () => {
                         position: "relative"
                       }}
                       onClick={() => {
-                        navigate("/fight", {
-                          state: {
-                            id: player.uid,
-                            characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.skin}`,
-                            enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0]?.models?.lutte?.PlayableCharacterList?.players[0].skin}`
-                          }
-                        });
+                        account
+                          ?.execute([
+                            {
+                              contractAddress: CONTRACT_ADDRESS,
+                              entrypoint: "spawn",
+                              calldata: []
+                            }
+                          ])
+                          .then((e) => {
+                            console.log(e.transaction_hash);
+                            console.log("spawn successful");
+                            navigate("/fight", {
+                              state: {
+                                id: player.uid,
+                                characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.skin}`,
+                                enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0]?.models?.lutte?.PlayableCharacterList?.players[0].skin}`
+                              }
+                            });
+                          })
+                          .catch((error) => {
+                            console.log("error spawning character");
+                            console.log(error);
+                          });
                       }}
                     >
                       <img
