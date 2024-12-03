@@ -5,7 +5,7 @@ import { sepolia } from "@starknet-react/chains";
 import "./App.css";
 import HomePage from "./Pages/HomePage";
 import SelectCharacter from "./Pages/SelectCharacter";
-import Maps from "./Pages/Maps";
+import Fight from "./Pages/Fight";
 import { Connector, StarknetConfig, starkscan } from "@starknet-react/core";
 import { RpcProvider } from "starknet";
 import ControllerConnector from "@cartridge/connector";
@@ -76,7 +76,7 @@ function App() {
               path="/character-shop"
               Component={() => <SelectCharacter />}
             />
-            <Route path="/maps" Component={() => <Maps />} />
+            <Route path="/fight" Component={() => <Fight />} />
           </Routes>
         </Router>
       </StarknetConfig>

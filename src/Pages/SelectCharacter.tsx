@@ -1,11 +1,9 @@
-// import player1 from "../assets/placeholders/players/lutte_player1.png";
-// import player2 from "../assets/placeholders/players/lutte_player2.png";
-// import player3 from "../assets/placeholders/players/lutte_player3.png";
 import { useEffect, useState } from "react";
 import bgImage from "../assets/placeholders/start_plain.svg";
 // import { useContractInstance } from "../hooks/useContract";
 import "../styles/cards.css";
 import { useStore } from "../store/GameStore";
+import { useNavigate } from "react-router-dom";
 
 const SelectCharacter = () => {
   // const contract = useContractInstance();
@@ -16,6 +14,7 @@ const SelectCharacter = () => {
   // const [isSuccess, setIsSuccess] = useState(false);
   // const { account } = useAccount();
   const { sdk } = useStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     sdk?.getEntities(
@@ -58,7 +57,7 @@ const SelectCharacter = () => {
         {isLoading ? (
           // Spinner Placeholder
           <div className="spinner">
-            <div className="loading"></div>
+            <div className="loading"> </div>
           </div>
         ) : (
           // Render Characters
@@ -97,6 +96,15 @@ const SelectCharacter = () => {
                         borderRadius: "0.5rem",
                         overflow: "hidden", // Ensures the image is cropped
                         position: "relative"
+                      }}
+                      onClick={() => {
+                        navigate("/fight", {
+                          state: {
+                            id: player.uid,
+                            characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.skin}`,
+                            enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0]?.models?.lutte?.PlayableCharacterList?.players[0].skin}`
+                          }
+                        });
                       }}
                     >
                       <img
