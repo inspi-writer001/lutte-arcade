@@ -7,6 +7,8 @@ import { useStore } from "../store/GameStore";
 import { useEffect, useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Player } from "../Helpers/models.gen";
+import { AccountInterface } from "starknet";
+import { CONTRACT_ADDRESS } from "../constants";
 
 interface IplayableCharacter {
   uid: number;
@@ -16,19 +18,20 @@ interface IplayableCharacter {
 const Fight = () => {
   const { state } = useLocation();
   const { sdk } = useStore();
-  const { address } = useAccount();
+  const { address, account } = useAccount();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
   const [playerDetails, setPlayerDetails] = useState<Player>();
+  const [fightTxHash, setFightTxHash] = useState<string>();
 
   useEffect(() => {
     if (address) {
-      sdk?.subscribeEntityQuery(
+      sdk?.getEntities(
         {
           lutte: {
             Player: {
               $: {
                 where: {
-                  address: { $is: address }
+                  address: { $eq: address }
                 }
               }
             }
@@ -45,7 +48,7 @@ const Fight = () => {
         }
       );
     }
-  }, []);
+  }, [fightTxHash]);
 
   const playable_character = state as IplayableCharacter;
   return (
@@ -91,16 +94,31 @@ const Fight = () => {
                 src={red_icon}
                 alt="red_icon"
                 className="h-15 w-16 self-end hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                onClick={() => {
+                  fightAction(account, 0).then((e) => {
+                    setFightTxHash(e);
+                  });
+                }}
               />
               <img
                 src={blue_icon}
                 alt="blue_icon"
                 className="h-15 w-16 self-start hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                onClick={() => {
+                  fightAction(account, 2).then((e) => {
+                    setFightTxHash(e);
+                  });
+                }}
               />
               <img
                 src={green_icon}
                 alt="green_icon"
                 className="h-15 w-16 self-end hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                onClick={() => {
+                  fightAction(account, 1).then((e) => {
+                    setFightTxHash(e);
+                  });
+                }}
               />
             </div>
 
@@ -125,3 +143,28 @@ const Fight = () => {
 };
 
 export default Fight;
+
+const fightAction = async (
+  account: AccountInterface | undefined,
+  id: number
+): Promise<string | undefined> => {
+  if (account)
+    return account
+      ?.execute([
+        {
+          contractAddress: CONTRACT_ADDRESS,
+          entrypoint: "offensive_phase",
+          calldata: [id]
+        }
+      ])
+      .then((e) => {
+        console.log(e.transaction_hash);
+        console.log("fight successful");
+        return e.transaction_hash;
+      })
+      .catch((error) => {
+        console.log("error spawning character");
+        console.log(error);
+        throw error;
+      });
+};
