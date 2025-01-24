@@ -2340,6 +2340,11 @@ jsonfile@^6.0.1:
     object.assign "^4.1.4"
     object.values "^1.1.6"
 
+kaboom@^3000.1.17:
+  version "3000.1.17"
+  resolved "https://registry.yarnpkg.com/kaboom/-/kaboom-3000.1.17.tgz#a05491f9a80a42155276020cd0c024cd4af96e7c"
+  integrity sha512-npAtjGxj9Oj9vLpXfURck9eUPHR2ac1Lhc1bNcZ0NWcs+Lgs40Ty+wjujv1C2DwjWvxaX+3r2G64M35BS/Ry2g==
+
 keyv@^4.5.4:
   version "4.5.4"
   resolved "https://registry.yarnpkg.com/keyv/-/keyv-4.5.4.tgz#a879a99e29452f942439f2a405e3af8b31d4de93"
