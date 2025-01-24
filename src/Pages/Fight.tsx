@@ -1,8 +1,5 @@
 import { useLocation } from "react-router-dom";
 import fight_bg from "../assets/placeholders/fight_bg.png";
-import blue_icon from "../assets/placeholders/blueIcon.png";
-import green_icon from "../assets/placeholders/greenIcon.png";
-import red_icon from "../assets/placeholders/redIcon.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
 import turn_wrapper from "../assets/bottom_components/endturn.png";
 import { useStore } from "../store/GameStore";
@@ -12,6 +9,13 @@ import { Player } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
 import HealthBar from "../Components/Healthbar";
+
+import {
+  red_buttons,
+  blue_buttons,
+  green_buttons,
+  other_buttons
+} from "../Components/Buttons";
 
 interface IplayableCharacter {
   uid: number;
@@ -158,14 +162,88 @@ const Fight = () => {
       </div>
       <div className="__bottom_tab bg-black h-[17vh] w-full relative bottom-0 flex flex-row justify-between px-10">
         <div
-          className="__actions flex w-[450px] relative"
+          className="__actions_buttons flex w-[450px] relative flex-row items-center"
           style={{
             backgroundImage: `url(${component_wrapper})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat"
           }}
-        ></div>
+        >
+          <div className="__character_headshot h-20  w-36"></div>
+          <div className="__buttons_container flex flex-row relative gap-0 left-6">
+            <div
+              className="__red w-[50px] h-[50px] relative "
+              style={{
+                backgroundImage: `url(${red_buttons[0]})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+              }}
+              onClick={() => {
+                fightAction(account, 0).then((e) => {
+                  setFightTxHash(e);
+                });
+              }}
+            ></div>
+            <div
+              className="__green w-[50px] h-[50px] relative"
+              style={{
+                backgroundImage: `url(${green_buttons[0]})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+              }}
+              onClick={() => {
+                fightAction(account, 0).then((e) => {
+                  setFightTxHash(e);
+                });
+              }}
+            ></div>
+            <div
+              className="__blue w-[50px] h-[50px] relative"
+              style={{
+                backgroundImage: `url(${blue_buttons[0]})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+              }}
+              onClick={() => {
+                fightAction(account, 0).then((e) => {
+                  setFightTxHash(e);
+                });
+              }}
+            ></div>
+            <div
+              className="__other w-[50px] h-[50px] relative"
+              style={{
+                backgroundImage: `url(${other_buttons.block})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+              }}
+              onClick={() => {
+                fightAction(account, 0).then((e) => {
+                  setFightTxHash(e);
+                });
+              }}
+            ></div>
+            <div
+              className="__critical w-[50px] h-[50px] relative"
+              style={{
+                backgroundImage: `url(${other_buttons.specialAttack})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+              }}
+              onClick={() => {
+                fightAction(account, 0).then((e) => {
+                  setFightTxHash(e);
+                });
+              }}
+            ></div>
+          </div>
+        </div>
         <div
           className="__turn flex w-[150px] relative"
           style={{
