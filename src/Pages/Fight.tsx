@@ -173,7 +173,7 @@ const Fight = () => {
           <div className="__character_headshot h-20  w-36"></div>
           <div className="__buttons_container flex flex-row relative gap-0 left-6">
             <div
-              className="__red w-[50px] h-[50px] relative "
+              className="__red w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${red_buttons[0]})`,
                 backgroundSize: "cover",
@@ -187,7 +187,7 @@ const Fight = () => {
               }}
             ></div>
             <div
-              className="__green w-[50px] h-[50px] relative"
+              className="__green w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${green_buttons[0]})`,
                 backgroundSize: "cover",
@@ -201,7 +201,7 @@ const Fight = () => {
               }}
             ></div>
             <div
-              className="__blue w-[50px] h-[50px] relative"
+              className="__blue w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${blue_buttons[0]})`,
                 backgroundSize: "cover",
@@ -215,7 +215,7 @@ const Fight = () => {
               }}
             ></div>
             <div
-              className="__other w-[50px] h-[50px] relative"
+              className="__other w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${other_buttons.block})`,
                 backgroundSize: "cover",
@@ -229,7 +229,7 @@ const Fight = () => {
               }}
             ></div>
             <div
-              className="__critical w-[50px] h-[50px] relative"
+              className="__critical w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${other_buttons.specialAttack})`,
                 backgroundSize: "cover",
@@ -245,7 +245,7 @@ const Fight = () => {
           </div>
         </div>
         <div
-          className="__turn flex w-[150px] relative"
+          className="__turn flex w-[150px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
           style={{
             backgroundImage: `url(${turn_wrapper})`,
             backgroundSize: "cover",
