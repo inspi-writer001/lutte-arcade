@@ -57,7 +57,7 @@ const Fight = () => {
   return (
     <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
       <div
-        className="flex h-[83vh] relative"
+        className="flex h-[83vh] w-full relative"
         style={{
           backgroundImage: `url(${fight_bg})`,
           backgroundSize: "cover",
@@ -103,9 +103,10 @@ const Fight = () => {
           </div>
 
           {/* Ensure the characters' container does not overflow */}
-          <div className="__characters flex flex-row w-full h-[calc(100%-120px)] justify-between">
-            <div className="__left_character flex items-end relative gap-0 h-fit self-end">
-              <div className="__action_buttons flex flex-col absolute top-0 w-[150px] gap-4 self-center z-10 bottom-0">
+          {/* h-[calc(100%-120px)] */}
+          <div className="__characters flex flex-row w-full justify-between relative">
+            <div className="__left_character flex items-end relative gap-0 h-fit self-end bottom-0">
+              {/* <div className="__action_buttons flex flex-col absolute top-0 w-[150px] gap-4 self-center z-10 bottom-0">
                 <img
                   src={red_icon}
                   alt="red_icon"
@@ -136,12 +137,12 @@ const Fight = () => {
                     });
                   }}
                 />
-              </div>
+              </div> */}
 
               <img
                 src={playable_character.characterImage}
                 alt=""
-                className="player_img max-h-[30rem] relative left-2"
+                className="player_img max-h-[30rem] relative"
               />
             </div>
 
@@ -155,9 +156,9 @@ const Fight = () => {
           </div>
         </div>
       </div>
-      <div className="__bottom_tab bg-black h-[17vh] w-full relative bottom-0 flex flex-row space-between px-10">
+      <div className="__bottom_tab bg-black h-[17vh] w-full relative bottom-0 flex flex-row justify-between px-10">
         <div
-          className="__actions flex min-w-[450px] relative"
+          className="__actions flex w-[450px] relative"
           style={{
             backgroundImage: `url(${component_wrapper})`,
             backgroundSize: "cover",
@@ -166,7 +167,7 @@ const Fight = () => {
           }}
         ></div>
         <div
-          className="__turn flex min-w-[150px] relative"
+          className="__turn flex w-[150px] relative"
           style={{
             backgroundImage: `url(${turn_wrapper})`,
             backgroundSize: "cover",
