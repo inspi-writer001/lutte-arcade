@@ -3,7 +3,7 @@ import fight_bg from "../assets/placeholders/fight_bg.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
 import turn_wrapper from "../assets/bottom_components/endturn.png";
 // import { useStore } from "../store/GameStore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Player } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
@@ -25,10 +25,10 @@ interface IplayableCharacter {
 const Fight = () => {
   const { state } = useLocation();
   // const { sdk } = useStore();
-  const { address, account } = useAccount();
-  const [isPlayerLoading, setIsPlayerLoading] = useState(true);
-  const [playerDetails, setPlayerDetails] = useState<Player>();
-  const [fightTxHash, setFightTxHash] = useState<string>();
+  const { account } = useAccount();
+  const [isPlayerLoading, _setIsPlayerLoading] = useState(true);
+  const [playerDetails, _setPlayerDetails] = useState<Player>();
+  const [_fightTxHash, setFightTxHash] = useState<string>();
 
   // useEffect(() => {
   //   if (address) {

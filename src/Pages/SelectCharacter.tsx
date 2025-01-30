@@ -2,20 +2,20 @@ import { useEffect, useState } from "react";
 import bgImage from "../assets/placeholders/start_plain.svg";
 // import { useContractInstance } from "../hooks/useContract";
 import "../styles/cards.css";
-import { useStore } from "../store/GameStore";
+// import { useStore } from "../store/GameStore";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "../constants";
-import { useDojoSDK } from "@dojoengine/sdk/react";
-import { QueryBuilder } from "@dojoengine/sdk";
+// import { useDojoSDK } from "@dojoengine/sdk/react";
+// import { QueryBuilder } from "@dojoengine/sdk";
 
 const SelectCharacter = () => {
   // const contract = useContractInstance();
 
-  const { sdk } = useDojoSDK();
+  // const { sdk } = useDojoSDK();
 
-  const [data, setData] = useState<Array<Entity>>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [data, _setData] = useState<Array<Entity>>();
+  const [isLoading, _setIsLoading] = useState<boolean>(true);
 
   // let [error, setError] = useState();
   // const [isSuccess, setIsSuccess] = useState(false);

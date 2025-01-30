@@ -1,8 +1,8 @@
 import { create } from "zustand";
 // import { init, SDK } from "@dojoengine/sdk";
 // import { createDojoStore } from "@dojoengine/sdk/state";
-import { LutteSchemaType, schema } from "../Helpers/models.gen";
-import { RPC_URL, TORII_URL, WORLD_ADDRESS } from "../constants";
+// import { LutteSchemaType, schema } from "../Helpers/models.gen";
+// import { RPC_URL, TORII_URL, WORLD_ADDRESS } from "../constants";
 // import { useStarknet, useAccount, useConnect } from "@starknet-react/core";
 
 interface State {
