@@ -6,8 +6,9 @@ import bgImage from "../assets/placeholders/start_bg.svg";
 // import LoadingPage from "./LoadingPage";
 import { useStore } from "../store/GameStore";
 import { useAccount, useConnect } from "@starknet-react/core";
-import { cartridgeConnector as connector } from "../App";
+// import { cartridgeConnector as connector } from "../App";
 import LoadingPage from "./LoadingPage";
+import { connector } from "../StarknetProvider";
 
 const HomePage = () => {
   const [loaded, setLoaded] = useState(false);
@@ -15,7 +16,12 @@ const HomePage = () => {
 
   const { address } = useAccount(); // Move hook here to avoid invalid hook call error
   const { connect } = useConnect();
-  const { setLoading, setError, setAddress } = useStore();
+  const {
+    setLoading,
+    setError,
+    setAddress,
+    address: store_address
+  } = useStore();
 
   // setSDK(sdk);
 
@@ -28,7 +34,12 @@ const HomePage = () => {
       try {
         connect({ connector });
         console.log("Wallet connected:", address);
-        setAddress(address || "");
+
+        if (address) {
+          console.log(address);
+          setAddress(address);
+          return address;
+        }
         // const username = `User_${address?.slice(-4)}`;
         // setUsername(username);
       } catch (error) {
@@ -36,9 +47,11 @@ const HomePage = () => {
         setError(error?.toString() || "Couldn't connect wallet");
       } finally {
         setLoading(false);
+        return address;
       }
+    } else {
+      navigate("/character-shop");
     }
-    console.log(address);
   };
 
   return (
@@ -53,24 +66,17 @@ const HomePage = () => {
             backgroundRepeat: "no-repeat"
           }}
         >
-          <div className=" h-full w-full max-w-[1024px] flex flex-col justify-end relative bottom-0">
+          <div className=" h-full w-[100vw] flex flex-col justify-end relative bottom-0">
             <button
-              onClick={connectWallet}
-              className="action_button h-16 w-full"
+              onClick={() => {
+                connectWallet();
+                if (store_address) {
+                  navigate("/character-shop");
+                }
+              }}
+              className="action_button h-16 w-full max-w-full"
             >
               Click Here to Start
-            </button>
-            <button
-              onClick={() => navigate("/character-shop")}
-              className="action_button"
-            >
-              Select Character
-            </button>
-            <button
-              onClick={() => navigate("/settings")}
-              className="action_button"
-            >
-              Settings
             </button>
           </div>
         </div>

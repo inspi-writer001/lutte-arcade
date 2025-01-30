@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import fight_bg from "../assets/placeholders/fight_bg.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
 import turn_wrapper from "../assets/bottom_components/endturn.png";
-import { useStore } from "../store/GameStore";
+// import { useStore } from "../store/GameStore";
 import { useEffect, useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Player } from "../Helpers/models.gen";
@@ -24,38 +24,38 @@ interface IplayableCharacter {
 }
 const Fight = () => {
   const { state } = useLocation();
-  const { sdk } = useStore();
+  // const { sdk } = useStore();
   const { address, account } = useAccount();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
   const [playerDetails, setPlayerDetails] = useState<Player>();
   const [fightTxHash, setFightTxHash] = useState<string>();
 
-  useEffect(() => {
-    if (address) {
-      sdk?.getEntities(
-        {
-          lutte: {
-            Player: {
-              $: {
-                where: {
-                  address: { $eq: address }
-                }
-              }
-            }
-          }
-        },
-        (response) => {
-          if (response.data) {
-            setIsPlayerLoading(false);
-            console.log("Fetched player:", response.data);
-            setPlayerDetails(response.data[0].models.lutte.Player as Player);
-          } else if (response.error) {
-            console.error("Fetch error:", response.error);
-          }
-        }
-      );
-    }
-  }, [fightTxHash]);
+  // useEffect(() => {
+  //   if (address) {
+  //     sdk?.getEntities(
+  //       {
+  //         lutte: {
+  //           Player: {
+  //             $: {
+  //               where: {
+  //                 address: { $eq: address }
+  //               }
+  //             }
+  //           }
+  //         }
+  //       },
+  //       (response) => {
+  //         if (response.data) {
+  //           setIsPlayerLoading(false);
+  //           console.log("Fetched player:", response.data);
+  //           setPlayerDetails(response.data[0].models.lutte.Player as Player);
+  //         } else if (response.error) {
+  //           console.error("Fetch error:", response.error);
+  //         }
+  //       }
+  //     );
+  //   }
+  // }, [fightTxHash]);
 
   const playable_character = state as IplayableCharacter;
   return (

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
 import "./App.css";
@@ -5,75 +7,91 @@ import HomePage from "./Pages/HomePage";
 import SelectCharacter from "./Pages/SelectCharacter";
 import Fight from "./Pages/Fight";
 
-import { sepolia, mainnet } from "@starknet-react/chains";
+import { Chain, mainnet, sepolia } from "@starknet-react/chains";
 import {
+  jsonRpcProvider,
   StarknetConfig,
-  voyager,
-  Connector,
-  cartridgeProvider
+  starkscan
 } from "@starknet-react/core";
+import ControllerConnector from "@cartridge/connector/controller";
+import { SessionPolicies } from "@cartridge/controller";
 
-import { ControllerConnector } from "@cartridge/connector";
+const rpc = "https://api.cartridge.gg/x/starknet/sepolia";
+
 import { CONTRACT_ADDRESS } from "./constants";
-import { useStore } from "./store/GameStore";
-import { useEffect } from "react";
-import { CallPolicy, SessionPolicies } from "@cartridge/controller";
+import StarknetProvider from "./StarknetProvider";
 
-let policies = [
-  {
-    target: CONTRACT_ADDRESS,
-    method: "spawn",
-    description: "Replenish your health"
+const policies: SessionPolicies = {
+  contracts: {
+    [CONTRACT_ADDRESS]: {
+      methods: [
+        {
+          entrypoint: "spawn",
+          description: "Replenish your health",
+          name: "spawn"
+        },
+
+        {
+          name: "offensive_phase",
+          entrypoint: "offensive_phase",
+          description: "take your stance and attack thine enemy"
+        },
+        {
+          name: "defensive_phase",
+          entrypoint: "defensive_phase",
+          description: "block enemmy's attack"
+        }
+      ]
+    }
   },
-  {
-    target: CONTRACT_ADDRESS,
-    method: "fetch_playable_characters",
-    description: "view characters onchain to select from"
-  },
-  {
-    target: CONTRACT_ADDRESS,
-    method: "get_user",
-    description: "view your character details onchain"
-  },
-  {
-    target: CONTRACT_ADDRESS,
-    method: "offensive_phase",
-    description: "take your stance and attack thine enemy"
-  },
-  {
-    target: CONTRACT_ADDRESS,
-    method: "defensive_phase",
-    description: "block enemmy's attack"
+  messages: [
+    {
+      types: {
+        StarknetDomain: [
+          { name: "name", type: "shortstring" },
+          { name: "version", type: "shortstring" },
+          { name: "chainId", type: "shortstring" },
+          { name: "revision", type: "shortstring" }
+        ],
+        Person: [
+          { name: "name", type: "felt" },
+          { name: "wallet", type: "felt" }
+        ],
+        Mail: [
+          { name: "from", type: "Person" },
+          { name: "to", type: "Person" },
+          { name: "contents", type: "felt" }
+        ]
+      },
+      primaryType: "Mail",
+      domain: {
+        name: "StarkNet Mail",
+        version: "1",
+        revision: "1",
+        chainId: "SN_SEPOLIA"
+      }
+    }
+  ]
+};
+
+// Configure RPC provider
+const provider = jsonRpcProvider({
+  rpc: (chain: Chain) => {
+    switch (chain) {
+      case mainnet:
+        return { nodeUrl: "https://api.cartridge.gg/x/starknet/mainnet" };
+      case sepolia:
+      default:
+        return { nodeUrl: "https://api.cartridge.gg/x/starknet/sepolia" };
+    }
   }
-] as CallPolicy[];
-
-// export const cartridgeConnector = new ControllerConnector({
-//   policies,
-//   url: "",
-//   chains: [sepolia]
-// });
-
-export const cartridgeConnector = new ControllerConnector({
-  rpc: cartridgeProvider().nodeUrl,
-  policies
 });
 
-// function App({ sdk }: { sdk: SDK<LutteSchemaType> }) {
-
 function App() {
-  const { setSDK } = useStore();
-  useEffect(() => {
-    setSDK();
-  }, []);
   return (
     <>
-      <StarknetConfig
-        autoConnect
-        chains={[mainnet, sepolia]}
-        provider={cartridgeProvider()}
-        connectors={[cartridgeConnector as never as Connector]}
-        explorer={voyager}
-      >
+      <StarknetProvider>
+        {" "}
         <Router>
           <Routes>
             <Route path="/" Component={() => <HomePage />} />
@@ -85,9 +103,22 @@ function App() {
             <Route path="/fight" Component={() => <Fight />} />
           </Routes>
         </Router>
-      </StarknetConfig>
+      </StarknetProvider>
     </>
   );
 }
+
+// @ts-ignore
+// const controller = new ControllerConnector({
+//   policies,
+//   rpc,
+//   url: "https://lutte-arcade.vercel.app",
+//   profileUrl: "https://lutte-arcade.vercel.app",
+//   slot: "lutte-arcade",
+//   preset: "eternum",
+//   namespace: "lutte",
+//   // defaultChainId: "0x534e5f5345504f4c4941",
+//   chains: [sepolia]
+// });
 
 export default App;

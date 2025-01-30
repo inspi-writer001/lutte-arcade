@@ -3,7 +3,7 @@
   color: #e4e2dc; /* Light text color */
   font-family: "Times New Roman", serif;
   font-size: 18px;
-  width: 100%;
+  min-width: 100%;
   /* max-width: 35%; */
   font-weight: bold;
   padding: 12px 24px;

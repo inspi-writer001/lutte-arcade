@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { init, SDK } from "@dojoengine/sdk";
-import { createDojoStore } from "@dojoengine/sdk/state";
+// import { init, SDK } from "@dojoengine/sdk";
+// import { createDojoStore } from "@dojoengine/sdk/state";
 import { LutteSchemaType, schema } from "../Helpers/models.gen";
 import { RPC_URL, TORII_URL, WORLD_ADDRESS } from "../constants";
 // import { useStarknet, useAccount, useConnect } from "@starknet-react/core";
@@ -16,8 +16,8 @@ interface State {
   setAddress: (value: string) => void;
   setError: (error: string | null) => void;
   setUsername: (value: string) => void;
-  sdk: SDK<LutteSchemaType> | undefined;
-  setSDK: () => void;
+  // sdk: SDK<LutteSchemaType> | undefined;
+  // setSDK: () => void;
 }
 
 const useStore = create<State>((set) => ({
@@ -34,26 +34,26 @@ const useStore = create<State>((set) => ({
   setLoading: (value) => {
     set(() => ({ loading: value }));
   },
-  setSDK: async () => {
-    const sdk = await init<LutteSchemaType>(
-      {
-        client: {
-          rpcUrl: RPC_URL,
-          toriiUrl: TORII_URL,
-          relayUrl: "",
-          worldAddress: WORLD_ADDRESS
-        },
-        domain: {
-          name: "Lutte Arcade",
-          version: "1.0",
-          chainId: "1",
-          revision: "1"
-        }
-      },
-      schema
-    );
-    set(() => ({ sdk: sdk }));
-  },
+  // setSDK: async () => {
+  //   const sdk = await init<LutteSchemaType>(
+  //     {
+  //       client: {
+  //         rpcUrl: RPC_URL,
+  //         toriiUrl: TORII_URL,
+  //         relayUrl: "/ip4/127.0.0.1/tcp/9090/tcp/80",
+  //         worldAddress: WORLD_ADDRESS
+  //       },
+  //       domain: {
+  //         name: "Lutte Arcade",
+  //         version: "1.0",
+  //         chainId: "1",
+  //         revision: "1"
+  //       }
+  //     },
+  //     schema
+  //   );
+  //   set(() => ({ sdk: sdk }));
+  // },
   setError: (error) => {
     set(() => ({ error }));
   },
@@ -65,6 +65,6 @@ const useStore = create<State>((set) => ({
   }
 }));
 
-const useDojoStore = createDojoStore<LutteSchemaType>();
+// const useDojoStore = createDojoStore<LutteSchemaType>();
 
-export { useStore, useDojoStore };
+export { useStore };

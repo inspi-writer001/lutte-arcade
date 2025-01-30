@@ -6,28 +6,39 @@ import { useStore } from "../store/GameStore";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "../constants";
+import { useDojoSDK } from "@dojoengine/sdk/react";
+import { QueryBuilder } from "@dojoengine/sdk";
 
 const SelectCharacter = () => {
   // const contract = useContractInstance();
 
+  const { sdk } = useDojoSDK();
+
   const [data, setData] = useState<Array<Entity>>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
   // let [error, setError] = useState();
   // const [isSuccess, setIsSuccess] = useState(false);
   const { account } = useAccount();
-  const { sdk } = useStore();
+
   const navigate = useNavigate();
 
+  // const query = new QueryBuilder()
+  //   .namespace("lutte", (n) => {
+  //     return n.entity("PlayableCharacterList", (e) => e.eq("id", "1"));
+  //   }).build
+  //   ;
+
   useEffect(() => {
-    sdk?.getEntities({
-      lutte: {
-        PlayableCharacterList: {
-          $: {
-            where: { id: { $eq: 0 } }
-          }
-        }
-      }
-    });
+    // await sdk?.getEntities({
+    //   // lutte: {
+    //   //   PlayableCharacterList: {
+    //   //     $: {
+    //   //       where: { id: { $eq: 0 } }
+    //   //     }
+    //   //   }
+    //   // }
+    // });
   }, []);
 
   return (
