@@ -19,26 +19,15 @@ const SelectCharacter = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    sdk?.getEntities(
-      {
-        lutte: {
-          PlayableCharacterList: {
-            $: {
-              where: { id: { $eq: 0 } }
-            }
+    sdk?.getEntities({
+      lutte: {
+        PlayableCharacterList: {
+          $: {
+            where: { id: { $eq: 0 } }
           }
         }
-      },
-      (response) => {
-        if (response.data) {
-          setIsLoading(false);
-          console.log("Fetched entities:", response.data);
-          setData(response.data as Entity[]);
-        } else if (response.error) {
-          console.error("Fetch error:", response.error);
-        }
       }
-    );
+    });
   }, []);
 
   return (

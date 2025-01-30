@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import "../styles/buttons.css";
 import bgImage from "../assets/placeholders/start_bg.svg";
-import LoadingPage from "./LoadingPage";
+// import LoadingPage from "./LoadingPage";
 import { useStore } from "../store/GameStore";
 import { useAccount, useConnect } from "@starknet-react/core";
-import { connector } from "../App";
+import { cartridgeConnector as connector } from "../App";
+import LoadingPage from "./LoadingPage";
 
 const HomePage = () => {
   const [loaded, setLoaded] = useState(false);
@@ -52,9 +53,12 @@ const HomePage = () => {
             backgroundRepeat: "no-repeat"
           }}
         >
-          <div className=" h-full w-full max-w-[1024px] flex flex-col items-center gap-4 justify-center">
-            <button onClick={connectWallet} className="action_button">
-              Quick Battle
+          <div className=" h-full w-full max-w-[1024px] flex flex-col justify-end relative bottom-0">
+            <button
+              onClick={connectWallet}
+              className="action_button h-16 w-full"
+            >
+              Click Here to Start
             </button>
             <button
               onClick={() => navigate("/character-shop")}
@@ -72,7 +76,7 @@ const HomePage = () => {
         </div>
       ) : (
         <LoadingPage onLoaded={() => setLoaded(true)} />
-      )}{" "}
+      )}
     </>
   );
 };

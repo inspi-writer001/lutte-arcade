@@ -1,56 +1,62 @@
-// import { shortString } from "starknet";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { sepolia } from "@starknet-react/chains";
 
 import "./App.css";
 import HomePage from "./Pages/HomePage";
 import SelectCharacter from "./Pages/SelectCharacter";
 import Fight from "./Pages/Fight";
-import { Connector, StarknetConfig, starkscan } from "@starknet-react/core";
-import { RpcProvider } from "starknet";
-import ControllerConnector from "@cartridge/connector";
-import { CONTRACT_ADDRESS, RPC_URL } from "./constants";
+
+import { sepolia, mainnet } from "@starknet-react/chains";
+import {
+  StarknetConfig,
+  voyager,
+  Connector,
+  cartridgeProvider
+} from "@starknet-react/core";
+
+import { ControllerConnector } from "@cartridge/connector";
+import { CONTRACT_ADDRESS } from "./constants";
 import { useStore } from "./store/GameStore";
 import { useEffect } from "react";
+import { CallPolicy, SessionPolicies } from "@cartridge/controller";
 
-export const connector = new ControllerConnector({
-  policies: [
-    {
-      target: CONTRACT_ADDRESS,
-      method: "spawn",
-      description: "Replenish your health"
-    },
-    {
-      target: CONTRACT_ADDRESS,
-      method: "fetch_playable_characters",
-      description: "view characters onchain to select from"
-    },
-    {
-      target: CONTRACT_ADDRESS,
-      method: "get_user",
-      description: "view your character details onchain"
-    },
-    {
-      target: CONTRACT_ADDRESS,
-      method: "offensive_phase",
-      description: "take your stance and attack thine enemy"
-    },
-    {
-      target: CONTRACT_ADDRESS,
-      method: "defensive_phase",
-      description: "block enemmy's attack"
-    }
-  ],
-  rpc: RPC_URL,
-  theme: "dope-wars",
-  colorMode: "dark"
-}) as unknown as Connector;
+let policies = [
+  {
+    target: CONTRACT_ADDRESS,
+    method: "spawn",
+    description: "Replenish your health"
+  },
+  {
+    target: CONTRACT_ADDRESS,
+    method: "fetch_playable_characters",
+    description: "view characters onchain to select from"
+  },
+  {
+    target: CONTRACT_ADDRESS,
+    method: "get_user",
+    description: "view your character details onchain"
+  },
+  {
+    target: CONTRACT_ADDRESS,
+    method: "offensive_phase",
+    description: "take your stance and attack thine enemy"
+  },
+  {
+    target: CONTRACT_ADDRESS,
+    method: "defensive_phase",
+    description: "block enemmy's attack"
+  }
+] as CallPolicy[];
 
-function provider() {
-  return new RpcProvider({
-    nodeUrl: RPC_URL
-  });
-}
+// export const cartridgeConnector = new ControllerConnector({
+//   policies,
+//   url: "",
+//   chains: [sepolia]
+// });
+
+export const cartridgeConnector = new ControllerConnector({
+  rpc: cartridgeProvider().nodeUrl,
+  policies
+});
 
 // function App({ sdk }: { sdk: SDK<LutteSchemaType> }) {
 
@@ -63,10 +69,10 @@ function App() {
     <>
       <StarknetConfig
         autoConnect
-        chains={[sepolia]}
-        connectors={[connector]}
-        explorer={starkscan}
-        provider={provider}
+        chains={[mainnet, sepolia]}
+        provider={cartridgeProvider()}
+        connectors={[cartridgeConnector as never as Connector]}
+        explorer={voyager}
       >
         <Router>
           <Routes>

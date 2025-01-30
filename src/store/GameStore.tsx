@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { createDojoStore, init, SDK } from "@dojoengine/sdk";
+import { init, SDK } from "@dojoengine/sdk";
+import { createDojoStore } from "@dojoengine/sdk/state";
 import { LutteSchemaType, schema } from "../Helpers/models.gen";
 import { RPC_URL, TORII_URL, WORLD_ADDRESS } from "../constants";
 // import { useStarknet, useAccount, useConnect } from "@starknet-react/core";
@@ -8,16 +9,9 @@ interface State {
   globalMusic: boolean;
   address: string;
   username: string | null;
-  tokens: {
-    BASE: any;
-    ETH: any;
-    BSC: any;
-  };
   loading: boolean;
   error: string | null;
-  setSearchModal: (address: string) => void;
   toggleglobalMusic: (value: boolean) => void;
-  setTokenDetails: (chain: "BASE" | "ETH" | "BSC", details: any) => void;
   setLoading: (value: boolean) => void;
   setAddress: (value: string) => void;
   setError: (error: string | null) => void;
@@ -31,24 +25,9 @@ const useStore = create<State>((set) => ({
   address: "",
   sdk: undefined,
   username: null,
-  tokens: {
-    BASE: "",
-    ETH: "",
-    BSC: ""
-  },
   loading: false,
   error: null,
-  setSearchModal: (address: string) => {
-    set(() => ({ address }));
-  },
-  setTokenDetails: (chain, details) => {
-    set((state) => ({
-      tokens: {
-        ...state.tokens,
-        [chain]: details
-      }
-    }));
-  },
+
   toggleglobalMusic: (newValue: boolean) => {
     set(() => ({ globalMusic: newValue }));
   },
@@ -65,7 +44,7 @@ const useStore = create<State>((set) => ({
           worldAddress: WORLD_ADDRESS
         },
         domain: {
-          name: "Lutte",
+          name: "Lutte Arcade",
           version: "1.0",
           chainId: "1",
           revision: "1"
