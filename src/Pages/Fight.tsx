@@ -3,7 +3,7 @@ import fight_bg from "../assets/placeholders/fight_bg.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
 import turn_wrapper from "../assets/bottom_components/endturn.png";
 // import { useStore } from "../store/GameStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "@starknet-react/core";
 import { Player } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
@@ -27,8 +27,30 @@ const Fight = () => {
   // const { sdk } = useStore();
   const { account } = useAccount();
   const [isPlayerLoading, _setIsPlayerLoading] = useState(true);
-  const [playerDetails, _setPlayerDetails] = useState<Player>();
+  const [playerDetails, setPlayerDetails] = useState<Player>();
   const [_fightTxHash, setFightTxHash] = useState<string>();
+  let n_address = "0x0";
+  if (account && account.address) {
+    n_address = account.address.split("0x")[1];
+    n_address = "0x" + "0" + n_address;
+  }
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const response = await account?.callContract({
+        contractAddress: CONTRACT_ADDRESS,
+        entrypoint: "get_user",
+        calldata: ["0x0", n_address]
+      });
+
+      return response;
+    };
+
+    fetchUser().then((response) => {
+      console.log(response);
+      setPlayerDetails(response);
+    });
+  }, []);
 
   // useEffect(() => {
   //   if (address) {
@@ -57,6 +79,7 @@ const Fight = () => {
   //   }
   // }, [fightTxHash]);
 
+  console.log(state);
   const playable_character = state as IplayableCharacter;
   return (
     <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">

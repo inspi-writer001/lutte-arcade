@@ -6,16 +6,24 @@ import "../styles/cards.css";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "../constants";
+import {
+  ClauseBuilder,
+  QueryBuilder,
+  ToriiQueryBuilder
+} from "@dojoengine/sdk";
+import { useDojoSDK } from "@dojoengine/sdk/react";
+import { useStore } from "../store/GameStore";
+import { LutteSchemaType } from "../Helpers/models.gen";
 // import { useDojoSDK } from "@dojoengine/sdk/react";
 // import { QueryBuilder } from "@dojoengine/sdk";
 
 const SelectCharacter = () => {
   // const contract = useContractInstance();
 
-  // const { sdk } = useDojoSDK();
+  const { sdk } = useDojoSDK();
 
-  const [data, _setData] = useState<Array<Entity>>();
-  const [isLoading, _setIsLoading] = useState<boolean>(true);
+  const [data, setData] = useState<Array<IPlayableCharacter>>();
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // let [error, setError] = useState();
   // const [isSuccess, setIsSuccess] = useState(false);
@@ -23,22 +31,30 @@ const SelectCharacter = () => {
 
   const navigate = useNavigate();
 
-  // const query = new QueryBuilder()
-  //   .namespace("lutte", (n) => {
-  //     return n.entity("PlayableCharacterList", (e) => e.eq("id", "1"));
-  //   }).build
-  //   ;
-
   useEffect(() => {
-    // await sdk?.getEntities({
-    //   // lutte: {
-    //   //   PlayableCharacterList: {
-    //   //     $: {
-    //   //       where: { id: { $eq: 0 } }
-    //   //     }
-    //   //   }
-    //   // }
-    // });
+    async function fetchToriiClause() {
+      const res = await sdk.client.getEntities(
+        new ToriiQueryBuilder()
+          .withClause(
+            new ClauseBuilder<LutteSchemaType>()
+              .keys(["lutte-PlayableCharacterList"], ["0x0"], "VariableLen")
+              .build()
+          )
+          .withLimit(2)
+          .build()
+      );
+      return res;
+    }
+    fetchToriiClause().then((result) => {
+      console.log(result);
+      console.log(result["0x0"]["lutte-PlayableCharacterList"]?.players.value);
+      setData(
+        result["0x0"]["lutte-PlayableCharacterList"]?.players
+          .value as unknown as Array<IPlayableCharacter>
+      );
+      setIsLoading(false);
+      console.log(data);
+    });
   }, []);
 
   return (
@@ -73,72 +89,73 @@ const SelectCharacter = () => {
               justifyItems: "center" // Center items in their columns
             }}
           >
+            {!data && (
+              <div
+                onClick={() => {
+                  console.log(data);
+                }}
+              >
+                press
+              </div>
+            )}
             {data &&
-              data[0]?.models?.lutte?.PlayableCharacterList?.players?.map(
-                (player: any, index: number) => {
-                  // Determine if this is the last item and adjust its position
-                  const isLastItem =
-                    index ===
-                    data[0]?.models?.lutte?.PlayableCharacterList?.players
-                      ?.length -
-                      1;
-                  const totalItems =
-                    data[0]?.models?.lutte?.PlayableCharacterList?.players
-                      ?.length;
+              data.map((player, index: number) => {
+                // Determine if this is the last item and adjust its position
+                const isLastItem = index === data.length - 1;
+                const totalItems = data.length;
 
-                  return (
-                    <div
-                      key={player.uid} // Use `uid` as a unique key
-                      className="__selectable_player player_card flex relative bg-red-500 border-black border-4 min-w-72"
-                      style={{
-                        gridColumn:
-                          isLastItem && totalItems % 3 !== 0
-                            ? "2 / span 1"
-                            : "auto", // Center the last item if it's alone in the row
-                        borderRadius: "0.5rem",
-                        overflow: "hidden", // Ensures the image is cropped
-                        position: "relative"
-                      }}
-                      onClick={() => {
-                        account
-                          ?.execute([
-                            {
-                              contractAddress: CONTRACT_ADDRESS,
-                              entrypoint: "spawn",
-                              calldata: []
+                return (
+                  <div
+                    key={player.value.uid.toString()} // Use `uid` as a unique key
+                    className="__selectable_player player_card flex relative bg-red-500 border-black border-4 min-w-72"
+                    style={{
+                      gridColumn:
+                        isLastItem && totalItems % 3 !== 0
+                          ? "2 / span 1"
+                          : "auto", // Center the last item if it's alone in the row
+                      borderRadius: "0.5rem",
+                      overflow: "hidden", // Ensures the image is cropped
+                      position: "relative"
+                    }}
+                    onClick={() => {
+                      account
+                        ?.execute([
+                          {
+                            contractAddress: CONTRACT_ADDRESS,
+                            entrypoint: "spawn",
+                            calldata: []
+                          }
+                        ])
+                        .then((e) => {
+                          console.log(e.transaction_hash);
+                          console.log("spawn successful");
+                          navigate("/fight", {
+                            state: {
+                              id: player.value.uid,
+                              characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`,
+                              enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0].value.skin.value}`
                             }
-                          ])
-                          .then((e) => {
-                            console.log(e.transaction_hash);
-                            console.log("spawn successful");
-                            navigate("/fight", {
-                              state: {
-                                id: player.uid,
-                                characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.skin}`,
-                                enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0]?.models?.lutte?.PlayableCharacterList?.players[0].skin}`
-                              }
-                            });
-                          })
-                          .catch((error) => {
-                            console.log("error spawning character");
-                            console.log(error);
                           });
+                        })
+                        .catch((error) => {
+                          console.log("error spawning character");
+                          console.log(error);
+                        });
+                    }}
+                  >
+                    <img
+                      className="absolute top-0 left-0 w-full h-full object-cover"
+                      style={{
+                        objectPosition: "center top",
+                        transform: "scale(2)", // Optional zoom effect
+                        marginTop: "10rem" // Adjust to center the desired portion
                       }}
-                    >
-                      <img
-                        className="absolute top-0 left-0 w-full h-full object-cover"
-                        style={{
-                          objectPosition: "center top",
-                          transform: "scale(2)", // Optional zoom effect
-                          marginTop: "10rem" // Adjust to center the desired portion
-                        }}
-                        src={`https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.skin}`}
-                        alt={player.skin}
-                      />
-                    </div>
-                  );
-                }
-              )}
+                      src={`https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`}
+                      alt={player.value.skin.value}
+                    />
+                  </div>
+                );
+              })}
           </div>
         )}
       </div>
@@ -177,4 +194,41 @@ interface Models {
 interface Entity {
   entityId: string;
   models: Models;
+}
+
+interface MetadataField<T> {
+  type: string;
+  type_name: string;
+  value: T;
+  key: boolean;
+}
+
+// More specific interfaces for known field types (optional)
+interface PrimitiveField<T> extends MetadataField<T> {
+  type: "primitive";
+  // We list the expected type names here, adjust as needed.
+  type_name: "u8" | "u32" | "bool";
+}
+
+interface ByteArrayField extends MetadataField<string> {
+  type: "bytearray";
+  type_name: "ByteArray";
+}
+
+// Interface representing the inner value of a PlayableCharacter.
+export interface PlayableCharacterValue {
+  uid: PrimitiveField<number>;
+  health: PrimitiveField<number>;
+  attack_power: PrimitiveField<number>;
+  skin: ByteArrayField;
+  special_attack: PrimitiveField<boolean>;
+  level: PrimitiveField<number>;
+}
+
+// The wrapper interface that represents a PlayableCharacter in the JSON.
+export interface IPlayableCharacter {
+  type: "struct";
+  type_name: "PlayableCharacter";
+  value: PlayableCharacterValue;
+  key: boolean;
 }

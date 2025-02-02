@@ -16,37 +16,28 @@ const HomePage = () => {
 
   const { address } = useAccount(); // Move hook here to avoid invalid hook call error
   const { connect } = useConnect();
-  const {
-    setLoading,
-    setError,
-    setAddress,
-    address: store_address
-  } = useStore();
 
   // setSDK(sdk);
 
   // Connect Wallet Function
   const connectWallet = () => {
     if (!address) {
-      setLoading(true);
-      setError(null);
-
       try {
         connect({ connector });
         console.log("Wallet connected:", address);
 
         if (address) {
           console.log(address);
-          setAddress(address);
+
           return address;
         }
         // const username = `User_${address?.slice(-4)}`;
         // setUsername(username);
       } catch (error) {
         console.error("Failed to connect wallet:", error);
-        setError(error?.toString() || "Couldn't connect wallet");
+        // setError(error?.toString() || "Couldn't connect wallet");
       } finally {
-        setLoading(false);
+        // setLoading(false);
         return address;
       }
     } else {
@@ -70,7 +61,7 @@ const HomePage = () => {
             <button
               onClick={() => {
                 connectWallet();
-                if (store_address) {
+                if (address) {
                   navigate("/character-shop");
                 }
               }}
