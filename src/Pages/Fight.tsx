@@ -26,16 +26,6 @@ interface IplayableCharacter {
   enemyImage: string;
 }
 const Fight = () => {
-  const { account } = useAccount();
-  const { state } = useLocation();
-  const { sdk } = useDojoSDK();
-  const PlayerAnimation = createRef<Spritesheet>();
-  // const PlayerAnimation = useRef<any>(null); // Store instance reference
-
-  const [isPlayerLoading, setIsPlayerLoading] = useState(true);
-  const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
-  const [_fightTxHash, setFightTxHash] = useState<string>();
-
   async function fetchUser(address: string) {
     const res = await sdk.client.getEntities(
       new ToriiQueryBuilder()
@@ -50,6 +40,82 @@ const Fight = () => {
     console.log(res);
     return res;
   }
+  const { account } = useAccount();
+  const { state } = useLocation();
+  const { sdk } = useDojoSDK();
+  const PlayerAnimation = createRef<Spritesheet>();
+  // const PlayerAnimation = useRef<any>(null); // Store instance reference
+
+  const [isPlayerLoading, setIsPlayerLoading] = useState(true);
+  const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
+  const [_fightTxHash, setFightTxHash] = useState<string>();
+
+  const fightAction = async (
+    account: AccountInterface | undefined,
+    id: number
+  ): Promise<string | undefined> => {
+    if (account)
+      return account
+        ?.execute([
+          {
+            contractAddress: CONTRACT_ADDRESS,
+            entrypoint: "offensive_phase",
+            calldata: [id]
+          }
+        ])
+        .then((e) => {
+          console.log(e.transaction_hash);
+          console.log("fight successful");
+
+          fetchUser(state.address).then((response) => {
+            console.log("account user");
+            console.log(response);
+            setPlayerDetails(
+              response["0x0"]["lutte-Player"] as unknown as LuttePlayer
+            );
+            setIsPlayerLoading(false);
+          });
+          return e.transaction_hash;
+        })
+        .catch((error) => {
+          console.log("error atttacking character");
+          console.log(error);
+          throw error;
+        });
+  };
+
+  const defendAction = async (
+    account: AccountInterface | undefined
+  ): Promise<string | undefined> => {
+    if (account)
+      return account
+        ?.execute([
+          {
+            contractAddress: CONTRACT_ADDRESS,
+            entrypoint: "defensive_phase",
+            calldata: []
+          }
+        ])
+        .then((e) => {
+          console.log(e.transaction_hash);
+          console.log("defebnse successful");
+
+          fetchUser(state.address).then((response) => {
+            console.log("account user");
+            console.log(response);
+            setPlayerDetails(
+              response["0x0"]["lutte-Player"] as unknown as LuttePlayer
+            );
+            setIsPlayerLoading(false);
+          });
+          return e.transaction_hash;
+        })
+        .catch((error) => {
+          console.log("error defending character");
+          console.log(error);
+          throw error;
+        });
+  };
 
   useEffect(() => {
     // if (account && account.address) {
@@ -267,7 +333,7 @@ const Fight = () => {
                 backgroundRepeat: "no-repeat"
               }}
               onClick={() => {
-                fightAction(account, 0).then((e) => {
+                fightAction(account, 1).then((e) => {
                   setFightTxHash(e);
                 });
               }}
@@ -281,7 +347,7 @@ const Fight = () => {
                 backgroundRepeat: "no-repeat"
               }}
               onClick={() => {
-                fightAction(account, 0).then((e) => {
+                fightAction(account, 2).then((e) => {
                   setFightTxHash(e);
                 });
               }}
@@ -309,7 +375,7 @@ const Fight = () => {
                 backgroundRepeat: "no-repeat"
               }}
               onClick={() => {
-                fightAction(account, 0).then((e) => {
+                defendAction(account).then((e) => {
                   setFightTxHash(e);
                 });
               }}
@@ -331,31 +397,6 @@ const Fight = () => {
 };
 
 export default Fight;
-
-const fightAction = async (
-  account: AccountInterface | undefined,
-  id: number
-): Promise<string | undefined> => {
-  if (account)
-    return account
-      ?.execute([
-        {
-          contractAddress: CONTRACT_ADDRESS,
-          entrypoint: "offensive_phase",
-          calldata: [id]
-        }
-      ])
-      .then((e) => {
-        console.log(e.transaction_hash);
-        console.log("fight successful");
-        return e.transaction_hash;
-      })
-      .catch((error) => {
-        console.log("error spawning character");
-        console.log(error);
-        throw error;
-      });
-};
 
 // Generic metadata structure for a field
 interface MetadataField<T> {

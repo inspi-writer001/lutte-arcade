@@ -1,9 +1,9 @@
 const CONTRACT_ADDRESS =
-  "0x00dfc0b05213539e2b70756b30d423bdb5689c9ea956f782eae55cfbe7f9934f";
+  "0x079621b3b5c759b9da9830df5e8ab4ce5a2557443710ac9ff2abef28fe808ae0";
 
 const RPC_URL = "https://api.cartridge.gg/x/starknet/sepolia";
 const WORLD_ADDRESS =
-  "0x014cad07ef5c507b8fc6f47faa5eea385fa712eef54901eedc49048a8c71a7f9";
-const TORII_URL = "https://api.cartridge.gg/x/lutte-arcade-testnet/torii";
+  "0x07275fce1e724769cb46384fc190efdd849d3322b2d90216718bd3f3e51f32f1";
+const TORII_URL = "https://api.cartridge.gg/x/lutte-arcade/torii";
 
 export { CONTRACT_ADDRESS, RPC_URL, WORLD_ADDRESS, TORII_URL };

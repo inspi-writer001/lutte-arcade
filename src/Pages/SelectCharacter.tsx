@@ -98,7 +98,7 @@ const SelectCharacter = () => {
 
                 return (
                   <div
-                    key={player.value.uid.toString()} // Use `uid` as a unique key
+                    key={player.value.uid.value.toString()} // Use `uid` as a unique key
                     className="__selectable_player player_card flex relative bg-red-500 border-black border-4 min-w-72"
                     style={{
                       gridColumn:
@@ -115,7 +115,7 @@ const SelectCharacter = () => {
                           {
                             contractAddress: CONTRACT_ADDRESS,
                             entrypoint: "spawn",
-                            calldata: []
+                            calldata: [player.value.uid.value.toString()]
                           }
                         ])
                         .then((e) => {
@@ -125,7 +125,8 @@ const SelectCharacter = () => {
                             state: {
                               id: player.value.uid,
                               address: account.address,
-                              characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`,
+                              // characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`,
+                              characterImage: `${player.value.skin.value}`,
                               enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0].value.skin.value}`
                             }
                           });
@@ -143,7 +144,8 @@ const SelectCharacter = () => {
                         transform: "scale(2)", // Optional zoom effect
                         marginTop: "10rem" // Adjust to center the desired portion
                       }}
-                      src={`https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`}
+                      // src={`https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`}
+                      src={`${player.value.skin.value}`}
                       alt={player.value.skin.value}
                     />
                   </div>
