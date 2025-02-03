@@ -6,20 +6,12 @@ import "../styles/cards.css";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "../constants";
-import {
-  ClauseBuilder,
-  QueryBuilder,
-  ToriiQueryBuilder
-} from "@dojoengine/sdk";
+import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
 import { useDojoSDK } from "@dojoengine/sdk/react";
-import { useStore } from "../store/GameStore";
+
 import { LutteSchemaType } from "../Helpers/models.gen";
-// import { useDojoSDK } from "@dojoengine/sdk/react";
-// import { QueryBuilder } from "@dojoengine/sdk";
 
 const SelectCharacter = () => {
-  // const contract = useContractInstance();
-
   const { sdk } = useDojoSDK();
 
   const [data, setData] = useState<Array<IPlayableCharacter>>();
@@ -132,6 +124,7 @@ const SelectCharacter = () => {
                           navigate("/fight", {
                             state: {
                               id: player.value.uid,
+                              address: account.address,
                               characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`,
                               enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0].value.skin.value}`
                             }
@@ -164,37 +157,6 @@ const SelectCharacter = () => {
 };
 
 export default SelectCharacter;
-
-interface PlayableCharacter {
-  skin: string;
-  level: number;
-  attack_power: number;
-  special_attack: boolean;
-  uid: number;
-  health: number;
-}
-
-// Interface for the PlayableCharacterList
-interface PlayableCharacterList {
-  players: PlayableCharacter[];
-  id: number;
-}
-
-// Interface for the lutte models
-interface LutteModels {
-  PlayableCharacterList: PlayableCharacterList;
-}
-
-// Interface for the models
-interface Models {
-  lutte: LutteModels;
-}
-
-// Interface for the entire entity
-interface Entity {
-  entityId: string;
-  models: Models;
-}
 
 interface MetadataField<T> {
   type: string;

@@ -1,14 +1,15 @@
 import { useLocation } from "react-router-dom";
+import { useAccount } from "@starknet-react/core";
 import fight_bg from "../assets/placeholders/fight_bg.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
 import turn_wrapper from "../assets/bottom_components/endturn.png";
-// import { useStore } from "../store/GameStore";
-import { useEffect, useState } from "react";
-import { useAccount } from "@starknet-react/core";
-import { Player } from "../Helpers/models.gen";
+import { createRef, useEffect, useRef, useState } from "react";
+import { LutteSchemaType } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
 import HealthBar from "../Components/Healthbar";
+import Spritesheet from "react-responsive-spritesheet";
+import png_sprite from "../assets/placeholders/idlesprite.png";
 
 import {
   red_buttons,
@@ -16,6 +17,8 @@ import {
   green_buttons,
   other_buttons
 } from "../Components/Buttons";
+import { useDojoSDK } from "@dojoengine/sdk/react";
+import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
 
 interface IplayableCharacter {
   uid: number;
@@ -23,32 +26,56 @@ interface IplayableCharacter {
   enemyImage: string;
 }
 const Fight = () => {
-  const { state } = useLocation();
-  // const { sdk } = useStore();
   const { account } = useAccount();
-  const [isPlayerLoading, _setIsPlayerLoading] = useState(true);
-  const [playerDetails, setPlayerDetails] = useState<Player>();
+  const { state } = useLocation();
+  const { sdk } = useDojoSDK();
+  const PlayerAnimation = createRef<Spritesheet>();
+  // const PlayerAnimation = useRef<any>(null); // Store instance reference
+
+  const [isPlayerLoading, setIsPlayerLoading] = useState(true);
+  const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
   const [_fightTxHash, setFightTxHash] = useState<string>();
-  let n_address = "0x0";
-  if (account && account.address) {
-    n_address = account.address.split("0x")[1];
-    n_address = "0x" + "0" + n_address;
+
+  async function fetchUser(address: string) {
+    const res = await sdk.client.getEntities(
+      new ToriiQueryBuilder()
+        .withClause(
+          new ClauseBuilder<LutteSchemaType>()
+            .keys(["lutte-Player"], [address], "VariableLen")
+            .build()
+        )
+        .withLimit(2)
+        .build()
+    );
+    console.log(res);
+    return res;
   }
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const response = await account?.callContract({
-        contractAddress: CONTRACT_ADDRESS,
-        entrypoint: "get_user",
-        calldata: ["0x0", n_address]
-      });
+    // if (account && account.address) {
+    //   n_address = account.address.split("0x")[1];
+    //   n_address = "0x" + "0" + n_address;
+    // }
 
-      return response;
-    };
+    // const fetchUser = async () => {
+    //   const response = await account?.callContract({
+    //     contractAddress: CONTRACT_ADDRESS,
+    //     entrypoint: "get_user",
+    //     calldata: [n_address]
+    //   });
 
-    fetchUser().then((response) => {
+    //   console.log(response);
+
+    //   return response;
+    // };
+
+    fetchUser(state.address).then((response) => {
+      console.log("account user");
       console.log(response);
-      setPlayerDetails(response);
+      setPlayerDetails(
+        response["0x0"]["lutte-Player"] as unknown as LuttePlayer
+      );
+      setIsPlayerLoading(false);
     });
   }, []);
 
@@ -79,8 +106,9 @@ const Fight = () => {
   //   }
   // }, [fightTxHash]);
 
-  console.log(state);
+  // console.log(state);
   const playable_character = state as IplayableCharacter;
+
   return (
     <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
       <div
@@ -96,21 +124,23 @@ const Fight = () => {
           <div className="__health flex flex-row justify-between w-full">
             <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-start">
               <HealthBar
-                percentage={((playerDetails?.health || 100) / 200) * 100}
+                percentage={((playerDetails?.health.value || 100) / 200) * 100}
               />
               {/* <p>
                 Health: {isPlayerLoading ? "Loading..." : playerDetails?.health}
               </p> */}
               <p>
                 Demeanor:{" "}
-                {isPlayerLoading ? "Loading..." : playerDetails?.demeanor}
+                {isPlayerLoading ? "Loading..." : playerDetails?.demeanor.value}
               </p>
             </div>
             <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-end">
               <div className="__flipped_appearance transform scale-x-[-1]">
                 <HealthBar
                   percentage={
-                    ((playerDetails?.current_enemy.health || 100) / 200) * 100
+                    ((playerDetails?.current_enemy.value.health.value || 100) /
+                      200) *
+                    100
                   }
                 />
               </div>
@@ -124,7 +154,7 @@ const Fight = () => {
                 Attack Power:{" "}
                 {isPlayerLoading
                   ? "Loading..."
-                  : playerDetails?.current_enemy.attack_power}
+                  : playerDetails?.current_enemy.value.attack_power.value}
               </p>
             </div>
           </div>
@@ -170,6 +200,25 @@ const Fight = () => {
                 src={playable_character.characterImage}
                 alt=""
                 className="player_img max-h-[30rem] relative"
+                onClick={() => {
+                  PlayerAnimation.current?.goToAndPlay(1);
+                }}
+              />
+
+              <Spritesheet
+                ref={PlayerAnimation}
+                image={png_sprite}
+                widthFrame={1200}
+                heightFrame={734}
+                steps={6}
+                fps={4}
+                autoplay
+                loop
+                style={{
+                  width: "700px",
+                  height: "700px"
+                }}
+                direction="forward"
               />
             </div>
 
@@ -307,3 +356,36 @@ const fightAction = async (
         throw error;
       });
 };
+
+// Generic metadata structure for a field
+interface MetadataField<T> {
+  type: string;
+  type_name: string;
+  value: T;
+  key: boolean;
+}
+
+// Specific field types
+type PrimitiveField<T> = MetadataField<T>;
+type ContractAddressField = MetadataField<string>;
+type StructField<T> = MetadataField<T>;
+
+// Define the UEnemy structure
+interface UEnemy {
+  health: PrimitiveField<number>; // u32
+  uid: PrimitiveField<number>; // u32
+  attack_power: PrimitiveField<number>; // u8
+  special_attack: PrimitiveField<boolean>; // bool
+  level: PrimitiveField<number>; // u8
+}
+
+// Define the Player structure
+export interface LuttePlayer {
+  demeanor: PrimitiveField<number>; // u8
+  address: ContractAddressField; // ContractAddress (key)
+  attack_power: PrimitiveField<number>; // u8
+  current_enemy: StructField<UEnemy>; // Struct: UEnemy
+  skin: PrimitiveField<number>; // u8
+  health: PrimitiveField<number>; // u32
+  special_attack: PrimitiveField<boolean>; // bool
+}

@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import "../styles/buttons.css";
 import bgImage from "../assets/placeholders/start_bg.svg";
-// import LoadingPage from "./LoadingPage";
-import { useStore } from "../store/GameStore";
+
 import { useAccount, useConnect } from "@starknet-react/core";
 // import { cartridgeConnector as connector } from "../App";
 import LoadingPage from "./LoadingPage";
