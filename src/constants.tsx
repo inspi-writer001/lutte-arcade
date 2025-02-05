@@ -4,6 +4,6 @@ const CONTRACT_ADDRESS =
 const RPC_URL = "https://api.cartridge.gg/x/starknet/sepolia";
 const WORLD_ADDRESS =
   "0x07275fce1e724769cb46384fc190efdd849d3322b2d90216718bd3f3e51f32f1";
-const TORII_URL = "https://api.cartridge.gg/x/lutte-arcade/torii";
+const TORII_URL = "https://api.cartridge.gg/x/lutte-arcade-testne/torii";
 
 export { CONTRACT_ADDRESS, RPC_URL, WORLD_ADDRESS, TORII_URL };

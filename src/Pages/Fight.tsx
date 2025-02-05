@@ -3,13 +3,14 @@ import { useAccount } from "@starknet-react/core";
 import fight_bg from "../assets/placeholders/fight_bg.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
 import turn_wrapper from "../assets/bottom_components/endturn.png";
-import { createRef, useEffect, useRef, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import { LutteSchemaType } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
 import HealthBar from "../Components/Healthbar";
 import Spritesheet from "react-responsive-spritesheet";
-import png_sprite from "../assets/placeholders/idlesprite.png";
+import png_sprite from "../assets/placeholders/correct_idlesprite.png";
+import player_attack_sprite from "../assets/placeholders/attacksprite.png";
 
 import {
   red_buttons,
@@ -49,11 +50,16 @@ const Fight = () => {
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
   const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
   const [_fightTxHash, setFightTxHash] = useState<string>();
+  const [isPlayerAttacking, setIsPlayerAttacking] = useState<boolean>(false);
 
   const fightAction = async (
     account: AccountInterface | undefined,
     id: number
   ): Promise<string | undefined> => {
+    // playerDetails &&
+    //   playerDetails.last_attack.value == false &&
+    setIsPlayerAttacking(true);
+    // PlayerAnimation.current?.goToAndPlay(1);
     if (account)
       return account
         ?.execute([
@@ -73,8 +79,8 @@ const Fight = () => {
             setPlayerDetails(
               response["0x0"]["lutte-Player"] as unknown as LuttePlayer
             );
-            setIsPlayerLoading(false);
           });
+
           return e.transaction_hash;
         })
         .catch((error) => {
@@ -118,23 +124,6 @@ const Fight = () => {
   };
 
   useEffect(() => {
-    // if (account && account.address) {
-    //   n_address = account.address.split("0x")[1];
-    //   n_address = "0x" + "0" + n_address;
-    // }
-
-    // const fetchUser = async () => {
-    //   const response = await account?.callContract({
-    //     contractAddress: CONTRACT_ADDRESS,
-    //     entrypoint: "get_user",
-    //     calldata: [n_address]
-    //   });
-
-    //   console.log(response);
-
-    //   return response;
-    // };
-
     fetchUser(state.address).then((response) => {
       console.log("account user");
       console.log(response);
@@ -144,33 +133,6 @@ const Fight = () => {
       setIsPlayerLoading(false);
     });
   }, []);
-
-  // useEffect(() => {
-  //   if (address) {
-  //     sdk?.getEntities(
-  //       {
-  //         lutte: {
-  //           Player: {
-  //             $: {
-  //               where: {
-  //                 address: { $eq: address }
-  //               }
-  //             }
-  //           }
-  //         }
-  //       },
-  //       (response) => {
-  //         if (response.data) {
-  //           setIsPlayerLoading(false);
-  //           console.log("Fetched player:", response.data);
-  //           setPlayerDetails(response.data[0].models.lutte.Player as Player);
-  //         } else if (response.error) {
-  //           console.error("Fetch error:", response.error);
-  //         }
-  //       }
-  //     );
-  //   }
-  // }, [fightTxHash]);
 
   // console.log(state);
   const playable_character = state as IplayableCharacter;
@@ -190,7 +152,7 @@ const Fight = () => {
           <div className="__health flex flex-row justify-between w-full">
             <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-start">
               <HealthBar
-                percentage={((playerDetails?.health.value || 100) / 200) * 100}
+                percentage={((playerDetails?.health.value || 0) / 200) * 100}
               />
               {/* <p>
                 Health: {isPlayerLoading ? "Loading..." : playerDetails?.health}
@@ -204,7 +166,7 @@ const Fight = () => {
               <div className="__flipped_appearance transform scale-x-[-1]">
                 <HealthBar
                   percentage={
-                    ((playerDetails?.current_enemy.value.health.value || 100) /
+                    ((playerDetails?.current_enemy.value.health.value || 0) /
                       200) *
                     100
                   }
@@ -229,60 +191,37 @@ const Fight = () => {
           {/* h-[calc(100%-120px)] */}
           <div className="__characters flex flex-row w-full justify-between relative">
             <div className="__left_character flex items-end relative gap-0 h-fit self-end bottom-0">
-              {/* <div className="__action_buttons flex flex-col absolute top-0 w-[150px] gap-4 self-center z-10 bottom-0">
-                <img
-                  src={red_icon}
-                  alt="red_icon"
-                  className="h-15 w-16 self-end hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                  onClick={() => {
-                    fightAction(account, 0).then((e) => {
-                      setFightTxHash(e);
-                    });
-                  }}
-                />
-                <img
-                  src={blue_icon}
-                  alt="blue_icon"
-                  className="h-15 w-16 self-start hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                  onClick={() => {
-                    fightAction(account, 2).then((e) => {
-                      setFightTxHash(e);
-                    });
-                  }}
-                />
-                <img
-                  src={green_icon}
-                  alt="green_icon"
-                  className="h-15 w-16 self-end hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                  onClick={() => {
-                    fightAction(account, 1).then((e) => {
-                      setFightTxHash(e);
-                    });
-                  }}
-                />
-              </div> */}
-
-              <img
+              {/* <img
                 src={playable_character.characterImage}
                 alt=""
                 className="player_img max-h-[30rem] relative"
                 onClick={() => {
                   PlayerAnimation.current?.goToAndPlay(1);
                 }}
-              />
+              /> */}
 
               <Spritesheet
+                key={isPlayerAttacking ? "attack" : "idle"} // Force remount when state changes
                 ref={PlayerAnimation}
-                image={png_sprite}
+                image={isPlayerAttacking ? player_attack_sprite : png_sprite}
                 widthFrame={1200}
                 heightFrame={734}
-                steps={6}
-                fps={4}
+                steps={isPlayerAttacking ? 5 : 6}
+                fps={isPlayerAttacking ? 10 : 5}
                 autoplay
-                loop
+                loop={true}
+                onLoopComplete={(sprite) => {
+                  if (isPlayerAttacking) {
+                    // setIsPlayerAttacking(false);
+                    // sprite.goToAndPlay(1);
+                    // console.log("should reurn state o idle");
+                  } else {
+                    // console.log("loop compleed but player is idle");
+                  }
+                }}
                 style={{
-                  width: "700px",
-                  height: "700px"
+                  width: "800px",
+                  height: "800px"
                 }}
                 direction="forward"
               />
@@ -303,7 +242,7 @@ const Fight = () => {
           className="__actions_buttons flex w-[450px] relative flex-row items-center"
           style={{
             backgroundImage: `url(${component_wrapper})`,
-            backgroundSize: "cover",
+            backgroundSize: "contain",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat"
           }}
@@ -311,10 +250,10 @@ const Fight = () => {
           <div className="__character_headshot h-20  w-36"></div>
           <div className="__buttons_container flex flex-row relative gap-0 left-6">
             <div
-              className="__red w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+              className="__red h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${red_buttons[0]})`,
-                backgroundSize: "cover",
+                backgroundSize: "contain",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat"
               }}
@@ -325,10 +264,10 @@ const Fight = () => {
               }}
             ></div>
             <div
-              className="__green w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+              className="__green h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${green_buttons[0]})`,
-                backgroundSize: "cover",
+                backgroundSize: "contain",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat"
               }}
@@ -339,10 +278,10 @@ const Fight = () => {
               }}
             ></div>
             <div
-              className="__blue w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+              className="__blue h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${blue_buttons[0]})`,
-                backgroundSize: "cover",
+                backgroundSize: "contain",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat"
               }}
@@ -353,10 +292,10 @@ const Fight = () => {
               }}
             ></div>
             <div
-              className="__other w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+              className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${other_buttons.block})`,
-                backgroundSize: "cover",
+                backgroundSize: "contain",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat"
               }}
@@ -367,17 +306,12 @@ const Fight = () => {
               }}
             ></div>
             <div
-              className="__critical w-[50px] h-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+              className="__critical h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${other_buttons.specialAttack})`,
-                backgroundSize: "cover",
+                backgroundSize: "contain",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat"
-              }}
-              onClick={() => {
-                defendAction(account).then((e) => {
-                  setFightTxHash(e);
-                });
               }}
             ></div>
           </div>
@@ -386,9 +320,14 @@ const Fight = () => {
           className="__turn flex w-[150px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
           style={{
             backgroundImage: `url(${turn_wrapper})`,
-            backgroundSize: "cover",
+            backgroundSize: "contain",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat"
+          }}
+          onClick={() => {
+            defendAction(account).then((e) => {
+              setFightTxHash(e);
+            });
           }}
         ></div>
       </div>
@@ -410,23 +349,26 @@ interface MetadataField<T> {
 type PrimitiveField<T> = MetadataField<T>;
 type ContractAddressField = MetadataField<string>;
 type StructField<T> = MetadataField<T>;
+type ByteArrayField = MetadataField<string>; // For `skin` field in `UEnemy`
 
 // Define the UEnemy structure
 interface UEnemy {
-  health: PrimitiveField<number>; // u32
-  uid: PrimitiveField<number>; // u32
-  attack_power: PrimitiveField<number>; // u8
   special_attack: PrimitiveField<boolean>; // bool
   level: PrimitiveField<number>; // u8
+  uid: PrimitiveField<number>; // u32
+  health: PrimitiveField<number>; // u32
+  attack_power: PrimitiveField<number>; // u8
+  skin: ByteArrayField; // ByteArray (URL)
 }
 
 // Define the Player structure
 export interface LuttePlayer {
   demeanor: PrimitiveField<number>; // u8
-  address: ContractAddressField; // ContractAddress (key)
-  attack_power: PrimitiveField<number>; // u8
-  current_enemy: StructField<UEnemy>; // Struct: UEnemy
-  skin: PrimitiveField<number>; // u8
   health: PrimitiveField<number>; // u32
+  skin_id: PrimitiveField<number>; // u8
   special_attack: PrimitiveField<boolean>; // bool
+  last_attack: PrimitiveField<boolean>; // bool
+  attack_power: PrimitiveField<number>; // u8
+  address: ContractAddressField; // ContractAddress (key)
+  current_enemy: StructField<UEnemy>; // Struct: UEnemy
 }
