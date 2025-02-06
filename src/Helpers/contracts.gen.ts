@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { DojoProvider } from "@dojoengine/core";
 import { Account } from "starknet";
 // import * as models from "./models.gen";

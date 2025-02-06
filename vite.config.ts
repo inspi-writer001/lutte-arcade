@@ -10,5 +10,8 @@ export default defineConfig({
   plugins: [react(), wasm(), topLevelAwait(), tailwindcss(), mkcert()],
   server: {
     allowedHosts: [".ngrok-free.app"] // ✅ Correct way to allow *.ngrok-free.app
+  },
+  build: {
+    target: "esnext" // ✅ Ensures top-level await support
   }
 });

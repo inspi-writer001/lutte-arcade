@@ -21,11 +21,6 @@ import {
 import { useDojoSDK } from "@dojoengine/sdk/react";
 import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
 
-interface IplayableCharacter {
-  uid: number;
-  characterImage: string;
-  enemyImage: string;
-}
 const Fight = () => {
   async function fetchUser(address: string) {
     const res = await sdk.client.getEntities(
@@ -135,7 +130,7 @@ const Fight = () => {
   }, []);
 
   // console.log(state);
-  const playable_character = state as IplayableCharacter;
+  // const playable_character = state as IplayableCharacter;
 
   return (
     <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
@@ -218,12 +213,28 @@ const Fight = () => {
               />
             </div>
 
-            <div className="__right_character flex items-end relative h-fit self-end">
-              <img
+            <div className="__right_character flex items-end relative h-fit self-end transform scale-x-[-1]">
+              <Spritesheet
+                key={isPlayerAttacking ? "attack" : "idle"} // Force remount when state changes
+                ref={PlayerAnimation}
+                image={isPlayerAttacking ? player_attack_sprite : png_sprite}
+                widthFrame={1200}
+                heightFrame={734}
+                steps={isPlayerAttacking ? 5 : 6}
+                fps={isPlayerAttacking ? 10 : 5}
+                autoplay
+                loop={isPlayerAttacking ? false : true}
+                style={{
+                  width: "800px",
+                  height: "800px"
+                }}
+                direction="forward"
+              />
+              {/* <img
                 src={playerDetails?.current_enemy.value.skin.value}
                 alt=""
                 className="enemy_img max-h-[30rem]"
-              />
+              /> */}
             </div>
           </div>
         </div>
