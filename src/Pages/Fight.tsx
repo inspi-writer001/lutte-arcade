@@ -11,6 +11,7 @@ import HealthBar from "../Components/Healthbar";
 import Spritesheet from "react-responsive-spritesheet";
 import png_sprite from "../assets/placeholders/correct_idlesprite.png";
 import player_attack_sprite from "../assets/placeholders/attacksprite.png";
+import pfp from "../assets/placeholders/female.png";
 
 import {
   red_buttons,
@@ -249,7 +250,12 @@ const Fight = () => {
             backgroundRepeat: "no-repeat"
           }}
         >
-          <div className="__character_headshot h-20  w-36"></div>
+          <div className="__character_headshot h-20  w-36 flex flex-row">
+            <img src={pfp} alt="profilee picture" className="h-20 ml-2 p-1" />
+            <div className="__excitement text-amber-300 self-end mb-1">
+              Depressed
+            </div>
+          </div>
           <div className="__buttons_container flex flex-row relative gap-0 left-6">
             <div
               className="__red h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
