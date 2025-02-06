@@ -1,0 +1,12 @@
+.unifrakturmaguntia {
+  font-family: "UnifrakturMaguntia", serif;
+}
+
+.pirata-one {
+  font-family: "Pirata One", serif;
+}
+
+.large-stroke {
+  -webkit-text-stroke: 2px black;
+  font-weight: 700;
+}

@@ -59,7 +59,7 @@ const SelectCharacter = () => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      <div className="__upper_text text-center font-bold text-7xl mb-7">
+      <div className="__upper_text text-center text-8xl mb-7 unifrakturmaguntia text-red-600 large-stroke">
         Choose Your Warrior
       </div>
 
@@ -72,7 +72,7 @@ const SelectCharacter = () => {
         ) : (
           // Render Characters
           <div
-            className="__player_boxed grid gap-4 max-w-[1024px] hover:cursor-pointer overflow-y-scroll"
+            className="__player_boxed grid gap-4 max-w-[1024px] hover:cursor-pointer overflow-y-scroll p-3"
             style={{
               gridTemplateColumns: "repeat(3, 1fr)", // 3 items per row
               gridAutoRows: "minmax(20rem, auto)", // Ensure rows adapt to content
@@ -81,7 +81,7 @@ const SelectCharacter = () => {
               justifyItems: "center" // Center items in their columns
             }}
           >
-            {!data && (
+            {/* {!data && (
               <div
                 onClick={() => {
                   console.log(data);
@@ -89,7 +89,7 @@ const SelectCharacter = () => {
               >
                 press
               </div>
-            )}
+            )} */}
             {data &&
               data.map((player, index: number) => {
                 // Determine if this is the last item and adjust its position
@@ -99,7 +99,7 @@ const SelectCharacter = () => {
                 return (
                   <div
                     key={player.value.uid.value.toString()} // Use `uid` as a unique key
-                    className="__selectable_player player_card flex relative bg-red-500 border-black border-4 min-w-72"
+                    className="__selectable_player player_card flex relative bg-red-500 border-black border-4 min-w-96 min-h-96"
                     style={{
                       gridColumn:
                         isLastItem && totalItems % 3 !== 0

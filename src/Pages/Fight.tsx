@@ -12,6 +12,7 @@ import Spritesheet from "react-responsive-spritesheet";
 import png_sprite from "../assets/placeholders/correct_idlesprite.png";
 import player_attack_sprite from "../assets/placeholders/attacksprite.png";
 import pfp from "../assets/placeholders/female.png";
+import "../styles/fonts.css";
 
 import {
   red_buttons,
@@ -251,8 +252,12 @@ const Fight = () => {
           }}
         >
           <div className="__character_headshot h-20  w-36 flex flex-row">
-            <img src={pfp} alt="profilee picture" className="h-20 ml-2 p-1" />
-            <div className="__excitement text-amber-300 self-end mb-1">
+            <img
+              src={pfp}
+              alt="profilee picture"
+              className="h-20 ml-2 p-1 pirata-one"
+            />
+            <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
               Depressed
             </div>
           </div>

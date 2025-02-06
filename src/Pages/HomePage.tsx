@@ -64,7 +64,7 @@ const HomePage = () => {
                   navigate("/character-shop");
                 }
               }}
-              className="action_button h-16 w-full max-w-full"
+              className="action_button h-16 w-full max-w-full pirata-one"
             >
               Click Here to Start
             </button>
