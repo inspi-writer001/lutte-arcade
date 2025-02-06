@@ -57,7 +57,7 @@ const Fight = () => {
     id: number
   ): Promise<string | undefined> => {
     // playerDetails &&
-    //   playerDetails.last_attack.value == false &&
+    //   playerDetails.last_attack.value == true &&
     setIsPlayerAttacking(true);
     // PlayerAnimation.current?.goToAndPlay(1);
     if (account)
@@ -72,7 +72,7 @@ const Fight = () => {
         .then((e) => {
           console.log(e.transaction_hash);
           console.log("fight successful");
-
+          setIsPlayerAttacking(false);
           fetchUser(state.address).then((response) => {
             console.log("account user");
             console.log(response);
@@ -209,16 +209,7 @@ const Fight = () => {
                 steps={isPlayerAttacking ? 5 : 6}
                 fps={isPlayerAttacking ? 10 : 5}
                 autoplay
-                loop={true}
-                onLoopComplete={(sprite) => {
-                  if (isPlayerAttacking) {
-                    // setIsPlayerAttacking(false);
-                    // sprite.goToAndPlay(1);
-                    // console.log("should reurn state o idle");
-                  } else {
-                    // console.log("loop compleed but player is idle");
-                  }
-                }}
+                loop={isPlayerAttacking ? false : true}
                 style={{
                   width: "800px",
                   height: "800px"
@@ -229,7 +220,7 @@ const Fight = () => {
 
             <div className="__right_character flex items-end relative h-fit self-end">
               <img
-                src={playable_character?.enemyImage}
+                src={playerDetails?.current_enemy.value.skin.value}
                 alt=""
                 className="enemy_img max-h-[30rem]"
               />
