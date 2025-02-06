@@ -37,6 +37,9 @@ const HomePage = () => {
         // setError(error?.toString() || "Couldn't connect wallet");
       } finally {
         // setLoading(false);
+        if (address) {
+          navigate("/character-shop");
+        }
         return address;
       }
     } else {
@@ -64,7 +67,7 @@ const HomePage = () => {
                   navigate("/character-shop");
                 }
               }}
-              className="action_button h-16 w-full max-w-full pirata-one"
+              className="action_butto h-20 w-full max-w-full pirata-one text-5xl hover:cursor-pointer"
             >
               Click Here to Start
             </button>
