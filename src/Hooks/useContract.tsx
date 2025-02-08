@@ -5,7 +5,7 @@ import { CONTRACT_ADDRESS } from "../constants";
 export const useContractInstance = () => {
   const { contract } = useContract({
     abi: contractABI.world.abi as Abi,
-    address: CONTRACT_ADDRESS
+    address: CONTRACT_ADDRESS as `0x${string}`
   });
 
   return contract;

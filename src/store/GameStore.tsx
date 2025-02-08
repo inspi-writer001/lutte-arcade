@@ -1,5 +1,5 @@
 import { createDojoStore } from "@dojoengine/sdk/state";
-import { LutteSchemaType } from "../Helpers/models.gen";
+import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
 
 // interface State {
 //   globalMusic: boolean;
