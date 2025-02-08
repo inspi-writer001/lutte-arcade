@@ -17,7 +17,7 @@ import App from "./App.tsx";
 // Dojo related imports
 import { init } from "@dojoengine/sdk";
 import { DojoSdkProvider } from "@dojoengine/sdk/react";
-import { LutteSchemaType, schema } from "./Helpers/models.gen";
+import { SchemaType as LutteSchemaType, schema } from "./Helpers/models.gen";
 import { setupWorld } from "./Helpers/contracts.gen";
 
 import "./index.css";

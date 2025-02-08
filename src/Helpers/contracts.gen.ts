@@ -1,11 +1,14 @@
 // @ts-nocheck
 
 import { DojoProvider } from "@dojoengine/core";
-import { Account } from "starknet";
-// import * as models from "./models.gen";
+import { Account, AccountInterface, BigNumberish } from "starknet";
+import * as models from "./models.gen";
 
 export async function setupWorld(provider: DojoProvider) {
-  const actions_offensivePhase = async (snAccount: Account, color: number) => {
+  const actions_offensivePhase = async (
+    snAccount: Account | AccountInterface,
+    color: BigNumberish
+  ) => {
     try {
       return await provider.execute(
         snAccount,
@@ -21,39 +24,33 @@ export async function setupWorld(provider: DojoProvider) {
     }
   };
 
-  const actions_fetchPlayableCharacters = async (snAccount: Account) => {
+  const actions_fetchPlayableCharacters = async () => {
     try {
-      return await provider.execute(
-        snAccount,
-        {
-          contractName: "actions",
-          entrypoint: "fetch_playable_characters",
-          calldata: []
-        },
-        "lutte"
-      );
+      return await provider.call("lutte", {
+        contractName: "actions",
+        entrypoint: "fetch_playable_characters",
+        calldata: []
+      });
     } catch (error) {
       console.error(error);
     }
   };
 
-  const actions_fetchEnemies = async (snAccount: Account) => {
+  const actions_fetchEnemies = async () => {
     try {
-      return await provider.execute(
-        snAccount,
-        {
-          contractName: "actions",
-          entrypoint: "fetch_enemies",
-          calldata: []
-        },
-        "lutte"
-      );
+      return await provider.call("lutte", {
+        contractName: "actions",
+        entrypoint: "fetch_enemies",
+        calldata: []
+      });
     } catch (error) {
       console.error(error);
     }
   };
 
-  const actions_defensivePhase = async (snAccount: Account) => {
+  const actions_defensivePhase = async (
+    snAccount: Account | AccountInterface
+  ) => {
     try {
       return await provider.execute(
         snAccount,
@@ -69,27 +66,27 @@ export async function setupWorld(provider: DojoProvider) {
     }
   };
 
-  const actions_getUser = async (snAccount: Account, player: string) => {
+  const actions_getUser = async (player: string) => {
     try {
-      return await provider.execute(
-        snAccount,
-        {
-          contractName: "actions",
-          entrypoint: "get_user",
-          calldata: [player]
-        },
-        "lutte"
-      );
+      return await provider.call("lutte", {
+        contractName: "actions",
+        entrypoint: "get_user",
+        calldata: [player]
+      });
     } catch (error) {
       console.error(error);
     }
   };
 
   const actions_createFirstEnemy = async (
-    snAccount: Account,
+    snAccount: Account | AccountInterface,
     skin: string,
-    health: number,
-    attackPower: number
+    health: BigNumberish,
+    attackPower: BigNumberish,
+    idleSprite: string,
+    attackSprite: string,
+    mugshot: string,
+    hitSprite: string
   ) => {
     try {
       return await provider.execute(
@@ -97,7 +94,15 @@ export async function setupWorld(provider: DojoProvider) {
         {
           contractName: "actions",
           entrypoint: "create_first_enemy",
-          calldata: [skin, health, attackPower]
+          calldata: [
+            skin,
+            health,
+            attackPower,
+            idleSprite,
+            attackSprite,
+            mugshot,
+            hitSprite
+          ]
         },
         "lutte"
       );
@@ -107,10 +112,14 @@ export async function setupWorld(provider: DojoProvider) {
   };
 
   const actions_createFirstCharacter = async (
-    snAccount: Account,
+    snAccount: Account | AccountInterface,
     skin: string,
-    health: number,
-    attackPower: number
+    health: BigNumberish,
+    attackPower: BigNumberish,
+    idleSprite: string,
+    attackSprite: string,
+    mugshot: string,
+    hitSprite: string
   ) => {
     try {
       return await provider.execute(
@@ -118,7 +127,15 @@ export async function setupWorld(provider: DojoProvider) {
         {
           contractName: "actions",
           entrypoint: "create_first_character",
-          calldata: [skin, health, attackPower]
+          calldata: [
+            skin,
+            health,
+            attackPower,
+            idleSprite,
+            attackSprite,
+            mugshot,
+            hitSprite
+          ]
         },
         "lutte"
       );
@@ -128,11 +145,15 @@ export async function setupWorld(provider: DojoProvider) {
   };
 
   const actions_createCharacter = async (
-    snAccount: Account,
+    snAccount: Account | AccountInterface,
     skin: string,
-    health: number,
-    attackPower: number,
-    level: number
+    health: BigNumberish,
+    attackPower: BigNumberish,
+    level: BigNumberish,
+    idleSprite: string,
+    attackSprite: string,
+    mugshot: string,
+    hitSprite: string
   ) => {
     try {
       return await provider.execute(
@@ -140,7 +161,16 @@ export async function setupWorld(provider: DojoProvider) {
         {
           contractName: "actions",
           entrypoint: "create_character",
-          calldata: [skin, health, attackPower, level]
+          calldata: [
+            skin,
+            health,
+            attackPower,
+            level,
+            idleSprite,
+            attackSprite,
+            mugshot,
+            hitSprite
+          ]
         },
         "lutte"
       );
@@ -150,11 +180,15 @@ export async function setupWorld(provider: DojoProvider) {
   };
 
   const actions_createEnemy = async (
-    snAccount: Account,
+    snAccount: Account | AccountInterface,
     skin: string,
-    health: number,
-    attackPower: number,
-    level: number
+    health: BigNumberish,
+    attackPower: BigNumberish,
+    level: BigNumberish,
+    idleSprite: string,
+    attackSprite: string,
+    mugshot: string,
+    hitSprite: string
   ) => {
     try {
       return await provider.execute(
@@ -162,7 +196,16 @@ export async function setupWorld(provider: DojoProvider) {
         {
           contractName: "actions",
           entrypoint: "create_enemy",
-          calldata: [skin, health, attackPower, level]
+          calldata: [
+            skin,
+            health,
+            attackPower,
+            level,
+            idleSprite,
+            attackSprite,
+            mugshot,
+            hitSprite
+          ]
         },
         "lutte"
       );
@@ -171,13 +214,34 @@ export async function setupWorld(provider: DojoProvider) {
     }
   };
 
-  const actions_spawn = async (snAccount: Account) => {
+  const actions_spawn = async (
+    snAccount: Account | AccountInterface,
+    skin: BigNumberish
+  ) => {
     try {
       return await provider.execute(
         snAccount,
         {
           contractName: "actions",
           entrypoint: "spawn",
+          calldata: [skin]
+        },
+        "lutte"
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const actions_specialAttack = async (
+    snAccount: Account | AccountInterface
+  ) => {
+    try {
+      return await provider.execute(
+        snAccount,
+        {
+          contractName: "actions",
+          entrypoint: "special_attack",
           calldata: []
         },
         "lutte"
@@ -198,7 +262,8 @@ export async function setupWorld(provider: DojoProvider) {
       createFirstCharacter: actions_createFirstCharacter,
       createCharacter: actions_createCharacter,
       createEnemy: actions_createEnemy,
-      spawn: actions_spawn
+      spawn: actions_spawn,
+      specialAttack: actions_specialAttack
     }
   };
 }

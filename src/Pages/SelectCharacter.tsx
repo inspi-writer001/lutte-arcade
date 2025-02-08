@@ -9,7 +9,7 @@ import { CONTRACT_ADDRESS } from "../constants";
 import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
 import { useDojoSDK } from "@dojoengine/sdk/react";
 
-import { LutteSchemaType } from "../Helpers/models.gen";
+import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
 
 const SelectCharacter = () => {
   const { sdk } = useDojoSDK();

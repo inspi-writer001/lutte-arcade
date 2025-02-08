@@ -4,7 +4,7 @@ import fight_bg from "../assets/placeholders/fight_bg.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
 import turn_wrapper from "../assets/bottom_components/endturn.png";
 import { createRef, useEffect, useState } from "react";
-import { LutteSchemaType } from "../Helpers/models.gen";
+import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
 import HealthBar from "../Components/Healthbar";
@@ -42,6 +42,7 @@ const Fight = () => {
   const { state } = useLocation();
   const { sdk } = useDojoSDK();
   const PlayerAnimation = createRef<Spritesheet>();
+  const EnemyAnimation = createRef<Spritesheet>();
   // const PlayerAnimation = useRef<any>(null); // Store instance reference
 
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
@@ -187,18 +188,9 @@ const Fight = () => {
           {/* Ensure the characters' container does not overflow */}
           {/* h-[calc(100%-120px)] */}
           <div className="__characters flex flex-row w-full justify-between relative">
-            <div className="__left_character flex items-end relative gap-0 h-fit self-end bottom-0">
-              {/* <img
-                src={playable_character.characterImage}
-                alt=""
-                className="player_img max-h-[30rem] relative"
-                onClick={() => {
-                  PlayerAnimation.current?.goToAndPlay(1);
-                }}
-              /> */}
-
+            <div className="__left_character flex justify-center items-center w-[600px] h-[600px] relative self-end ">
               <Spritesheet
-                key={isPlayerAttacking ? "attack" : "idle"} // Force remount when state changes
+                key={isPlayerAttacking ? "attack" : "idle"}
                 ref={PlayerAnimation}
                 image={isPlayerAttacking ? player_attack_sprite : png_sprite}
                 widthFrame={1200}
@@ -208,35 +200,44 @@ const Fight = () => {
                 autoplay
                 loop={isPlayerAttacking ? false : true}
                 style={{
-                  width: "800px",
-                  height: "800px"
+                  // width: "100%",
+                  // height: "100%",
+                  // display: "block",
+                  objectFit: "cover",
+                  transform: "scale(0.83)", // ✅ Slight zoom-in
+                  transformOrigin: "center center"
                 }}
                 direction="forward"
               />
             </div>
 
-            <div className="__right_character flex items-end relative h-fit self-end transform scale-x-[-1]">
+            <div className="__right_character flex justify-center items-center w-[600px] h-[600px] relative self-end">
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"} // Force remount when state changes
-                ref={PlayerAnimation}
-                image={isPlayerAttacking ? player_attack_sprite : png_sprite}
-                widthFrame={1200}
-                heightFrame={734}
+                ref={EnemyAnimation}
+                image={
+                  isPlayerAttacking
+                    ? (playerDetails?.current_enemy.value.idle_sprite
+                        .value as string)
+                    : (playerDetails?.current_enemy.value.hit_sprite
+                        .value as string)
+                }
+                widthFrame={1333}
+                heightFrame={750}
                 steps={isPlayerAttacking ? 5 : 6}
                 fps={isPlayerAttacking ? 10 : 5}
-                autoplay
-                loop={isPlayerAttacking ? false : true}
+                autoplay={true}
+                loop={true}
                 style={{
-                  width: "800px",
-                  height: "800px"
+                  // width: "100%",
+                  height: "100%",
+                  display: "block",
+                  objectFit: "cover",
+                  transform: "scale(0.83)", // ✅ Slight zoom-in
+                  transformOrigin: "center center"
                 }}
                 direction="forward"
               />
-              {/* <img
-                src={playerDetails?.current_enemy.value.skin.value}
-                alt=""
-                className="enemy_img max-h-[30rem]"
-              /> */}
             </div>
           </div>
         </div>
@@ -362,11 +363,16 @@ interface MetadataField<T> {
 type PrimitiveField<T> = MetadataField<T>;
 type ContractAddressField = MetadataField<string>;
 type StructField<T> = MetadataField<T>;
-type ByteArrayField = MetadataField<string>; // For `skin` field in `UEnemy`
+type ByteArrayField = MetadataField<string>; // For `skin`, `mugshot`, `sprites`
 
 // Define the UEnemy structure
 interface UEnemy {
+  idle_sprite: ByteArrayField; // ByteArray (URL)
+  mugshot: ByteArrayField; // ByteArray (URL)
   special_attack: PrimitiveField<boolean>; // bool
+  attack_sprite: ByteArrayField; // ByteArray (URL)
+  hit_sprite: ByteArrayField; // ByteArray (URL)
+  max_health: PrimitiveField<number>; // u32
   level: PrimitiveField<number>; // u8
   uid: PrimitiveField<number>; // u32
   health: PrimitiveField<number>; // u32
