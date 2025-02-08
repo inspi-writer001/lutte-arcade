@@ -83,6 +83,7 @@ const Fight = () => {
         })
         .catch((error) => {
           console.log("error atttacking character");
+          setIsPlayerAttacking(false);
           console.log(error);
           throw error;
         });
