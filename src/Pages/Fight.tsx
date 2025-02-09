@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAccount } from "@starknet-react/core";
 import fight_bg from "../assets/placeholders/fight_bg.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
@@ -45,10 +45,13 @@ const Fight = () => {
   const EnemyAnimation = createRef<Spritesheet>();
   // const PlayerAnimation = useRef<any>(null); // Store instance reference
 
+  const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
   const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
   const [_fightTxHash, setFightTxHash] = useState<string>();
   const [isPlayerAttacking, setIsPlayerAttacking] = useState<boolean>(false);
+
+  if (!state?.address) return navigate("/");
 
   const fightAction = async (
     account: AccountInterface | undefined,
