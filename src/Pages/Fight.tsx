@@ -43,7 +43,6 @@ const Fight = () => {
   const { sdk } = useDojoSDK();
   const PlayerAnimation = createRef<Spritesheet>();
   const EnemyAnimation = createRef<Spritesheet>();
-  // const PlayerAnimation = useRef<any>(null); // Store instance reference
 
   const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
@@ -191,8 +190,14 @@ const Fight = () => {
 
           {/* Ensure the characters' container does not overflow */}
           {/* h-[calc(100%-120px)] */}
-          <div className="__characters flex flex-row w-full justify-between relative">
-            <div className="__left_character flex justify-center items-center w-[600px] h-[600px] relative self-end ">
+          <div className="__characters flex flex-row w-full justify-between relative group">
+            <div
+              className={`__left_character flex justify-center items-center w-[600px] h-[600px] relative self-end transition-transform duration-500 ${
+                isPlayerAttacking
+                  ? "translate-x-[400px] scale-110"
+                  : "translate-x-0"
+              }`}
+            >
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"}
                 ref={PlayerAnimation}
@@ -204,11 +209,7 @@ const Fight = () => {
                 autoplay
                 loop={isPlayerAttacking ? false : true}
                 style={{
-                  // width: "100%",
-                  // height: "100%",
-                  // display: "block",
                   objectFit: "cover",
-                  transform: "scale(0.83)", // ✅ Slight zoom-in
                   transformOrigin: "center center"
                 }}
                 direction="forward"
@@ -217,7 +218,7 @@ const Fight = () => {
 
             <div className="__right_character flex justify-center items-center w-[600px] h-[600px] relative self-end">
               <Spritesheet
-                key={isPlayerAttacking ? "attack" : "idle"} // Force remount when state changes
+                key={isPlayerAttacking ? "attack" : "idle"}
                 ref={EnemyAnimation}
                 image={
                   isPlayerAttacking
@@ -233,7 +234,6 @@ const Fight = () => {
                 autoplay={true}
                 loop={true}
                 style={{
-                  // width: "100%",
                   height: "100%",
                   display: "block",
                   objectFit: "cover",
