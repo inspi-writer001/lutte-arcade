@@ -192,9 +192,9 @@ const Fight = () => {
           {/* h-[calc(100%-120px)] */}
           <div className="__characters flex flex-row w-full justify-between relative group">
             <div
-              className={`__left_character flex justify-center items-center w-[600px] h-[600px] relative self-end transition-transform duration-500 ${
+              className={`__left_character flex justify-center items-center w-[35vw] h-[35vw] relative self-end transition-transform duration-500 ${
                 isPlayerAttacking
-                  ? "translate-x-[400px] scale-110"
+                  ? "translate-x-[30vw] scale-100"
                   : "translate-x-0"
               }`}
             >
@@ -209,14 +209,21 @@ const Fight = () => {
                 autoplay
                 loop={isPlayerAttacking ? false : true}
                 style={{
+                  display: "block",
+                  height: "100%",
+                  width: "100%",
+                  maxHeight: "100%",
+                  maxWidth: "100%",
                   objectFit: "cover",
-                  transformOrigin: "center center"
+                  transform: "scale(2)",
+                  transformOrigin: "center center",
+                  marginBottom: "-30vw"
                 }}
                 direction="forward"
               />
             </div>
 
-            <div className="__right_character flex justify-center items-center w-[600px] h-[600px] relative self-end">
+            <div className="__right_character flex justify-center items-center w-[35vw] h-[35vw] relative self-end">
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"}
                 ref={EnemyAnimation}
@@ -236,9 +243,11 @@ const Fight = () => {
                 style={{
                   height: "100%",
                   display: "block",
+                  maxHeight: "100%",
                   objectFit: "cover",
                   transform: "scale(0.83)", // ✅ Slight zoom-in
-                  transformOrigin: "center center"
+                  transformOrigin: "center center",
+                  marginBottom: "17vw"
                 }}
                 direction="forward"
               />
