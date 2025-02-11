@@ -52,6 +52,19 @@ const Fight = () => {
 
   if (!state?.address) return navigate("/");
 
+  useEffect(() => {
+    fetchUser(state.address).then((response) => {
+      console.log("account user");
+      console.log(response);
+      setPlayerDetails(
+        response["0x0"]["lutte-Player"] as unknown as LuttePlayer
+      );
+      setIsPlayerLoading(false);
+    });
+  }, []);
+
+  const [playerTurn, setPlayerTurn] = useState(playerDetails?.last_attack);
+
   const fightAction = async (
     account: AccountInterface | undefined,
     id: number
@@ -80,7 +93,7 @@ const Fight = () => {
               response["0x0"]["lutte-Player"] as unknown as LuttePlayer
             );
           });
-
+          setPlayerTurn(false);
           return e.transaction_hash;
         })
         .catch((error) => {
@@ -115,6 +128,7 @@ const Fight = () => {
             );
             setIsPlayerLoading(false);
           });
+          setPlayerTurn(true);
           return e.transaction_hash;
         })
         .catch((error) => {
@@ -123,17 +137,6 @@ const Fight = () => {
           throw error;
         });
   };
-
-  useEffect(() => {
-    fetchUser(state.address).then((response) => {
-      console.log("account user");
-      console.log(response);
-      setPlayerDetails(
-        response["0x0"]["lutte-Player"] as unknown as LuttePlayer
-      );
-      setIsPlayerLoading(false);
-    });
-  }, []);
 
   // console.log(state);
   // const playable_character = state as IplayableCharacter;
@@ -266,7 +269,8 @@ const Fight = () => {
             backgroundImage: `url(${component_wrapper})`,
             backgroundSize: "contain",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
+            backgroundRepeat: "no-repeat",
+            display: playerTurn ? "flex" : "none"
           }}
         >
           <div className="__character_headshot h-20  w-36 flex flex-row">
@@ -353,7 +357,8 @@ const Fight = () => {
             backgroundImage: `url(${turn_wrapper})`,
             backgroundSize: "contain",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
+            backgroundRepeat: "no-repeat",
+            display: playerTurn ? "none" : "flex"
           }}
           onClick={() => {
             defendAction(account).then((e) => {
