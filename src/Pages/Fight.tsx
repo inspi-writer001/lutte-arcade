@@ -23,6 +23,10 @@ import {
 import { useDojoSDK } from "@dojoengine/sdk/react";
 import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
 
+const depressed = 0; // 0-5
+const neutral = 6; // 6-15
+const motivated = 16; // 16-20
+
 const Fight = () => {
   async function fetchUser(address: string) {
     const res = await sdk.client.getEntities(
@@ -63,7 +67,9 @@ const Fight = () => {
     });
   }, []);
 
-  const [playerTurn, setPlayerTurn] = useState(playerDetails?.last_attack);
+  const [playerTurn, setPlayerTurn] = useState(
+    playerDetails?.last_attack || false
+  );
 
   const fightAction = async (
     account: AccountInterface | undefined,
@@ -280,14 +286,28 @@ const Fight = () => {
               className="h-20 ml-2 p-1 pirata-one"
             />
             <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
-              Depressed
+              {playerDetails &&
+                playerDetails.demeanor.value &&
+                (playerDetails?.demeanor.value > neutral
+                  ? "Excited"
+                  : playerDetails?.demeanor.value < neutral
+                  ? "Depressed"
+                  : "Neutral")}
             </div>
           </div>
           <div className="__buttons_container flex flex-row relative gap-0 left-6">
             <div
               className="__red h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
-                backgroundImage: `url(${red_buttons[0]})`,
+                backgroundImage: `url(${
+                  playerDetails &&
+                  playerDetails.demeanor.value &&
+                  (playerDetails?.demeanor.value > neutral
+                    ? red_buttons[2]
+                    : playerDetails?.demeanor.value < neutral
+                    ? red_buttons[0]
+                    : red_buttons[1])
+                })`,
                 backgroundSize: "contain",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat"
@@ -301,7 +321,15 @@ const Fight = () => {
             <div
               className="__green h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
-                backgroundImage: `url(${green_buttons[0]})`,
+                backgroundImage: `url(${
+                  playerDetails &&
+                  playerDetails.demeanor.value &&
+                  (playerDetails?.demeanor.value > neutral
+                    ? green_buttons[2]
+                    : playerDetails?.demeanor.value < neutral
+                    ? green_buttons[0]
+                    : green_buttons[1])
+                })`,
                 backgroundSize: "contain",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat"
@@ -315,7 +343,15 @@ const Fight = () => {
             <div
               className="__blue h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
-                backgroundImage: `url(${blue_buttons[0]})`,
+                backgroundImage: `url(${
+                  playerDetails &&
+                  playerDetails.demeanor.value &&
+                  (playerDetails?.demeanor.value > neutral
+                    ? blue_buttons[2]
+                    : playerDetails?.demeanor.value < neutral
+                    ? blue_buttons[0]
+                    : blue_buttons[1])
+                })`,
                 backgroundSize: "contain",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat"
