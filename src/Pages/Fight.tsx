@@ -192,11 +192,11 @@ const Fight = () => {
           {/* h-[calc(100%-120px)] */}
           <div className="__characters flex flex-row w-full justify-between relative group">
             <div
-              className={`__left_character flex justify-center items-center w-[35vw] h-[35vw] relative self-end transition-transform duration-500 ${
+              className={`__left_character flex justify-center items-center w-[35vw] h-[35vw] max-h-[800px] max-w-[800px] relative self-end transition-transform duration-500 ${
                 isPlayerAttacking
                   ? "translate-x-[30vw] scale-100"
                   : "translate-x-0"
-              }`}
+              } ${isPlayerAttacking ? "z-10" : "z-0"}`}
             >
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"}
@@ -223,7 +223,11 @@ const Fight = () => {
               />
             </div>
 
-            <div className="__right_character flex justify-center items-center w-[35vw] h-[35vw] relative self-end">
+            <div
+              className={`__right_character flex justify-center items-center w-[35vw] h-[35vw] max-h-[800px] max-w-[800px] relative self-end ${
+                isPlayerAttacking ? "z-0" : "z-10"
+              }`}
+            >
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"}
                 ref={EnemyAnimation}
@@ -245,9 +249,9 @@ const Fight = () => {
                   display: "block",
                   maxHeight: "100%",
                   objectFit: "cover",
-                  transform: "scale(0.83)", // ✅ Slight zoom-in
+                  transform: "scale(0.73)", // ✅ Slight zoom-in
                   transformOrigin: "center center",
-                  marginBottom: "17vw"
+                  marginBottom: "35vh"
                 }}
                 direction="forward"
               />
