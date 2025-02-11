@@ -23,9 +23,9 @@ import {
 import { useDojoSDK } from "@dojoengine/sdk/react";
 import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
 
-const depressed = 0; // 0-5
-const neutral = 6; // 6-15
-const motivated = 16; // 16-20
+let depressed = 0; // 0-5
+let neutral = 6; // 6-15
+let motivated = 16; // 16-20
 
 const Fight = () => {
   async function fetchUser(address: string) {
@@ -53,6 +53,9 @@ const Fight = () => {
   const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
   const [_fightTxHash, setFightTxHash] = useState<string>();
   const [isPlayerAttacking, setIsPlayerAttacking] = useState<boolean>(false);
+  const [_demeanor, _setDemeanor] = useState<
+    typeof motivated | typeof neutral | typeof motivated
+  >(depressed);
 
   if (!state?.address) return navigate("/");
 
@@ -289,7 +292,7 @@ const Fight = () => {
               {playerDetails &&
                 playerDetails.demeanor.value &&
                 (playerDetails?.demeanor.value > neutral
-                  ? "Excited"
+                  ? "Motivated"
                   : playerDetails?.demeanor.value < neutral
                   ? "Depressed"
                   : "Neutral")}
