@@ -204,7 +204,7 @@ const Fight = () => {
           {/* h-[calc(100%-120px)] */}
           <div className="__characters flex flex-row w-full justify-between relative group">
             <div
-              className={`__left_character flex justify-center items-center w-[35vw] h-[35vw] max-h-[800px] max-w-[800px] relative self-end transition-transform duration-500 ${
+              className={`__left_character aspect-[1200/734] flex justify-center items-center w-[35vw] h-[35vw] max-h-[800px] max-w-[800px] relative self-end transition-transform duration-500 ${
                 isPlayerAttacking
                   ? "translate-x-[30vw] scale-100"
                   : "translate-x-0"
@@ -228,15 +228,15 @@ const Fight = () => {
                   maxWidth: "100%",
                   objectFit: "cover",
                   transform: "scale(2)",
-                  transformOrigin: "center center",
-                  marginBottom: "-30vw"
+                  transformOrigin: "center center"
+                  // marginBottom: "-30vw"
                 }}
                 direction="forward"
               />
             </div>
 
             <div
-              className={`__right_character flex justify-center items-center w-[35vw] h-[35vw] max-h-[800px] max-w-[800px] relative self-end ${
+              className={`__right_character aspect-[1333/750] flex justify-center items-center w-[35vw] h-[35vw] max-h-[800px] max-w-[800px] relative self-end ${
                 isPlayerAttacking ? "z-0" : "z-10"
               }`}
             >
@@ -262,8 +262,8 @@ const Fight = () => {
                   maxHeight: "100%",
                   objectFit: "cover",
                   transform: "scale(0.73)", // ✅ Slight zoom-in
-                  transformOrigin: "center center",
-                  marginBottom: "35vh"
+                  transformOrigin: "center center"
+                  // marginBottom: "35vh"
                 }}
                 direction="forward"
               />
@@ -279,7 +279,8 @@ const Fight = () => {
             backgroundSize: "contain",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-            display: playerTurn ? "flex" : "none"
+
+            visibility: playerTurn ? "visible" : "hidden"
           }}
         >
           <div className="__character_headshot h-20  w-36 flex flex-row">
@@ -289,8 +290,7 @@ const Fight = () => {
               className="h-20 ml-2 p-1 pirata-one"
             />
             <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
-              {playerDetails &&
-                playerDetails.demeanor.value &&
+              {playerDetails?.demeanor?.value != null &&
                 (playerDetails?.demeanor.value > neutral
                   ? "Motivated"
                   : playerDetails?.demeanor.value < neutral
@@ -303,8 +303,7 @@ const Fight = () => {
               className="__red h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${
-                  playerDetails &&
-                  playerDetails.demeanor.value &&
+                  playerDetails?.demeanor?.value != null &&
                   (playerDetails?.demeanor.value > neutral
                     ? red_buttons[2]
                     : playerDetails?.demeanor.value < neutral
@@ -325,8 +324,7 @@ const Fight = () => {
               className="__green h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${
-                  playerDetails &&
-                  playerDetails.demeanor.value &&
+                  playerDetails?.demeanor?.value != null &&
                   (playerDetails?.demeanor.value > neutral
                     ? green_buttons[2]
                     : playerDetails?.demeanor.value < neutral
@@ -347,8 +345,7 @@ const Fight = () => {
               className="__blue h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
               style={{
                 backgroundImage: `url(${
-                  playerDetails &&
-                  playerDetails.demeanor.value &&
+                  playerDetails?.demeanor?.value != null &&
                   (playerDetails?.demeanor.value > neutral
                     ? blue_buttons[2]
                     : playerDetails?.demeanor.value < neutral
@@ -397,7 +394,7 @@ const Fight = () => {
             backgroundSize: "contain",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-            display: playerTurn ? "none" : "flex"
+            visibility: playerTurn ? "hidden" : "visible"
           }}
           onClick={() => {
             defendAction(account).then((e) => {
