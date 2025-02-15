@@ -202,13 +202,20 @@ const Fight = () => {
 
           {/* Ensure the characters' container does not overflow */}
           {/* h-[calc(100%-120px)] */}
-          <div className="__characters flex flex-row w-full justify-between relative group">
+          <div className="__characters flex w-full justify-between relative group">
+            {/* LEFT CHARACTER */}
             <div
-              className={`__left_character aspect-[1200/734] flex justify-center items-center w-[35vw] h-[35vw] max-h-[800px] max-w-[800px] relative self-end transition-transform duration-500 ${
-                isPlayerAttacking
-                  ? "translate-x-[30vw] scale-100"
-                  : "translate-x-0"
-              } ${isPlayerAttacking ? "z-10" : "z-0"}`}
+              className={`
+      __left_character
+      aspect-[1200/734]         /* 1200×734 ratio for the sprite */
+      w-[35vw]                  /* 35% of viewport width */
+      max-w-[800px]             /* cap at 800px wide */
+      flex items-center justify-center
+      relative self-end
+      transition-transform duration-500
+      overflow-x-hidden
+      ${isPlayerAttacking ? "translate-x-[30vw] z-10" : "translate-x-0 z-0"}
+    `}
             >
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"}
@@ -219,26 +226,28 @@ const Fight = () => {
                 steps={isPlayerAttacking ? 5 : 6}
                 fps={isPlayerAttacking ? 10 : 5}
                 autoplay
-                loop={isPlayerAttacking ? false : true}
+                loop={!isPlayerAttacking}
+                direction="forward"
+                /* Let Tailwind handle object-fit / sizing */
                 style={{
-                  display: "block",
                   height: "100%",
                   width: "100%",
-                  maxHeight: "100%",
-                  maxWidth: "100%",
-                  objectFit: "cover",
-                  transform: "scale(2)",
-                  transformOrigin: "center center"
-                  // marginBottom: "-30vw"
+                  objectFit: "contain"
                 }}
-                direction="forward"
               />
             </div>
 
+            {/* RIGHT CHARACTER */}
             <div
-              className={`__right_character aspect-[1333/750] flex justify-center items-center w-[35vw] h-[35vw] max-h-[800px] max-w-[800px] relative self-end ${
-                isPlayerAttacking ? "z-0" : "z-10"
-              }`}
+              className={`
+      __right_character
+      aspect-[1333/750]         /* 1333×750 ratio for the enemy sprite */
+      w-[35vw]
+      max-w-[800px]
+      flex items-center justify-center
+      relative self-end
+      ${isPlayerAttacking ? "z-0" : "z-10"}
+    `}
             >
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"}
@@ -254,18 +263,14 @@ const Fight = () => {
                 heightFrame={750}
                 steps={isPlayerAttacking ? 5 : 6}
                 fps={isPlayerAttacking ? 10 : 5}
-                autoplay={true}
-                loop={true}
+                autoplay
+                loop
+                direction="forward"
                 style={{
                   height: "100%",
-                  display: "block",
-                  maxHeight: "100%",
-                  objectFit: "cover",
-                  transform: "scale(0.73)", // ✅ Slight zoom-in
-                  transformOrigin: "center center"
-                  // marginBottom: "35vh"
+                  width: "100%",
+                  objectFit: "contain"
                 }}
-                direction="forward"
               />
             </div>
           </div>
