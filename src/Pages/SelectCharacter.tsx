@@ -10,9 +10,11 @@ import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
 import { useDojoSDK } from "@dojoengine/sdk/react";
 
 import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
+import { useGameStore } from "../store/GameStore";
 
 const SelectCharacter = () => {
   const { sdk } = useDojoSDK();
+  const { setTransitionTrigger } = useGameStore();
 
   const [data, setData] = useState<Array<IPlayableCharacter>>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -59,7 +61,7 @@ const SelectCharacter = () => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      <div className="__upper_text text-center text-8xl mb-7 unifrakturmaguntia text-red-600 large-stroke">
+      <div className="__upper_text text-center text-8xl mb-7 unifrakturmaguntia text-red-700 large-stroke">
         Choose Your Warrior
       </div>
 
@@ -99,7 +101,7 @@ const SelectCharacter = () => {
                 return (
                   <div
                     key={player.value.uid.value.toString()} // Use `uid` as a unique key
-                    className="__selectable_player player_card flex relative bg-red-500 border-black border-4 min-w-96 min-h-96"
+                    className="__selectable_player player_card flex relative bg-blue-400 border-black border-4 min-w-72 min-h-72"
                     style={{
                       gridColumn:
                         isLastItem && totalItems % 3 !== 0
@@ -121,15 +123,19 @@ const SelectCharacter = () => {
                         .then((e) => {
                           console.log(e.transaction_hash);
                           console.log("spawn successful");
-                          navigate("/fight", {
-                            state: {
-                              id: player.value.uid,
-                              address: account.address,
-                              // characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`,
-                              characterImage: `${player.value.skin.value}`,
-                              enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0].value.skin.value}`
-                            }
-                          });
+
+                          setTransitionTrigger(true);
+                          setTimeout(() => {
+                            navigate("/fight", {
+                              state: {
+                                id: player.value.uid,
+                                address: account.address,
+                                // characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`,
+                                characterImage: `${player.value.skin.value}`,
+                                enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0].value.skin.value}`
+                              }
+                            });
+                          }, 500);
                         })
                         .catch((error) => {
                           console.log("error spawning character");
@@ -141,7 +147,7 @@ const SelectCharacter = () => {
                       className="absolute top-0 left-0 w-full h-full object-cover"
                       style={{
                         objectPosition: "center top",
-                        transform: "scale(2)", // Optional zoom effect
+                        transform: "scale(2.5)", // Optional zoom effect
                         marginTop: "10rem" // Adjust to center the desired portion
                       }}
                       // src={`https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`}

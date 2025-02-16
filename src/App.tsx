@@ -20,6 +20,8 @@ const rpc = "https://api.cartridge.gg/x/starknet/sepolia";
 
 import { CONTRACT_ADDRESS } from "./constants";
 import StarknetProvider from "./StarknetProvider";
+import TransitionOverlay from "./Components/TransitionOverlay";
+import { useGameStore } from "./store/GameStore";
 
 const policies: SessionPolicies = {
   contracts: {
@@ -88,6 +90,7 @@ const provider = jsonRpcProvider({
 });
 
 function App() {
+  const { transitionTrigger, setTransitionTrigger } = useGameStore();
   return (
     <>
       <StarknetProvider>
@@ -103,6 +106,7 @@ function App() {
             <Route path="/fight" Component={() => <Fight />} />
           </Routes>
         </Router>
+        <TransitionOverlay />
       </StarknetProvider>
     </>
   );

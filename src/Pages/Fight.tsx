@@ -216,7 +216,7 @@ const Fight = () => {
       flex items-center justify-center
       relative self-end
       transition-transform duration-500
-      overflow-hidden bg-red-200
+      overflow-hidden
       ${isPlayerAttacking ? "translate-x-[45vw] z-20" : "translate-x-0 z-10"}
     `}
             >

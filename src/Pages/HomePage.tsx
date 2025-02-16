@@ -8,6 +8,7 @@ import { useAccount, useConnect } from "@starknet-react/core";
 // import { cartridgeConnector as connector } from "../App";
 import LoadingPage from "./LoadingPage";
 import { connector } from "../StarknetProvider";
+import { useGameStore } from "../store/GameStore";
 
 const HomePage = () => {
   const [loaded, setLoaded] = useState(false);
@@ -15,6 +16,16 @@ const HomePage = () => {
 
   const { address } = useAccount(); // Move hook here to avoid invalid hook call error
   const { connect } = useConnect();
+  const { setTransitionTrigger } = useGameStore();
+
+  const handleNavigate = (path: string) => {
+    // Trigger the overlay
+    setTransitionTrigger(true);
+    // After the transition, navigate to the new page
+    setTimeout(() => {
+      navigate(path);
+    }, 500); // should match or be slightly less than the overlay transition
+  };
 
   // setSDK(sdk);
 
@@ -64,7 +75,7 @@ const HomePage = () => {
               onClick={() => {
                 connectWallet();
                 if (address) {
-                  navigate("/character-shop");
+                  handleNavigate("/character-shop");
                 }
               }}
               className="action_butto h-20 w-full max-w-full pirata-one text-5xl hover:cursor-pointer"
