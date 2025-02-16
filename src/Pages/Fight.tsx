@@ -53,6 +53,7 @@ const Fight = () => {
   const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
   const [_fightTxHash, setFightTxHash] = useState<string>();
   const [isPlayerAttacking, setIsPlayerAttacking] = useState<boolean>(false);
+  const [isEnemyAttacking, setIsEnemyAttacking] = useState<boolean>(false);
   const [_demeanor, _setDemeanor] = useState<
     typeof motivated | typeof neutral | typeof motivated
   >(depressed);
@@ -116,6 +117,7 @@ const Fight = () => {
   const defendAction = async (
     account: AccountInterface | undefined
   ): Promise<string | undefined> => {
+    setIsEnemyAttacking(true);
     if (account)
       return account
         ?.execute([
@@ -128,6 +130,7 @@ const Fight = () => {
         .then((e) => {
           console.log(e.transaction_hash);
           console.log("defebnse successful");
+          setIsEnemyAttacking(false);
 
           fetchUser(state.address).then((response) => {
             console.log("account user");
@@ -213,8 +216,8 @@ const Fight = () => {
       flex items-center justify-center
       relative self-end
       transition-transform duration-500
-      overflow-x-hidden
-      ${isPlayerAttacking ? "translate-x-[30vw] z-10" : "translate-x-0 z-0"}
+      overflow-hidden bg-red-200
+      ${isPlayerAttacking ? "translate-x-[45vw] z-20" : "translate-x-0 z-10"}
     `}
             >
               <Spritesheet
@@ -230,8 +233,8 @@ const Fight = () => {
                 direction="forward"
                 /* Let Tailwind handle object-fit / sizing */
                 style={{
-                  height: "100%",
-                  width: "100%",
+                  height: "120%",
+                  width: "120%",
                   objectFit: "contain"
                 }}
               />
@@ -245,15 +248,18 @@ const Fight = () => {
       w-[35vw]
       max-w-[800px]
       flex items-center justify-center
-      relative self-end
-      ${isPlayerAttacking ? "z-0" : "z-10"}
+      relative self-end transition-transform duration-500
+      overflow-hidden
+      ${isPlayerAttacking ? "z-10" : "z-20"} ${
+                isEnemyAttacking ? "-translate-x-[45vw]" : "translate-x-0 z-10"
+              }
     `}
             >
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"}
                 ref={EnemyAnimation}
                 image={
-                  isPlayerAttacking
+                  isEnemyAttacking
                     ? (playerDetails?.current_enemy.value.idle_sprite
                         .value as string)
                     : (playerDetails?.current_enemy.value.hit_sprite
@@ -261,14 +267,15 @@ const Fight = () => {
                 }
                 widthFrame={1333}
                 heightFrame={750}
-                steps={isPlayerAttacking ? 5 : 6}
-                fps={isPlayerAttacking ? 10 : 5}
+                steps={isEnemyAttacking ? 5 : 6}
+                fps={isEnemyAttacking ? 10 : 5}
                 autoplay
                 loop
                 direction="forward"
                 style={{
-                  height: "100%",
-                  width: "100%",
+                  display: "grid",
+                  height: "120%",
+                  width: "120%",
                   objectFit: "contain"
                 }}
               />
