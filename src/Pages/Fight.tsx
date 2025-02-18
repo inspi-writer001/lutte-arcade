@@ -9,9 +9,6 @@ import { AccountInterface } from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
 import HealthBar from "../Components/Healthbar";
 import Spritesheet from "react-responsive-spritesheet";
-import png_sprite from "../assets/placeholders/correct_idlesprite.png";
-import player_attack_sprite from "../assets/placeholders/attacksprite.png";
-import pfp from "../assets/placeholders/female.png";
 import "../styles/fonts.css";
 
 import {
@@ -71,9 +68,7 @@ const Fight = () => {
     });
   }, []);
 
-  const [playerTurn, setPlayerTurn] = useState(
-    playerDetails?.last_attack || false
-  );
+  const [playerTurn, setPlayerTurn] = useState(playerDetails?.last_attack);
 
   const fightAction = async (
     account: AccountInterface | undefined,
@@ -153,6 +148,8 @@ const Fight = () => {
   // console.log(state);
   // const playable_character = state as IplayableCharacter;
 
+  if (!playerDetails) return;
+
   return (
     <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
       <div
@@ -223,7 +220,13 @@ const Fight = () => {
               <Spritesheet
                 key={isPlayerAttacking ? "attack" : "idle"}
                 ref={PlayerAnimation}
-                image={isPlayerAttacking ? player_attack_sprite : png_sprite}
+                image={
+                  isPlayerAttacking
+                    ? playerDetails?.character.value.folder.value +
+                      playerDetails?.character.value.attack_sprite.value
+                    : playerDetails?.character.value.folder.value +
+                      playerDetails?.character.value.idle_sprite.value
+                }
                 widthFrame={1200}
                 heightFrame={734}
                 steps={isPlayerAttacking ? 5 : 6}
@@ -256,14 +259,16 @@ const Fight = () => {
     `}
             >
               <Spritesheet
-                key={isPlayerAttacking ? "attack" : "idle"}
+                key={isEnemyAttacking ? "Eattack" : "Eidle"}
                 ref={EnemyAnimation}
                 image={
                   isEnemyAttacking
-                    ? (playerDetails?.current_enemy.value.idle_sprite
-                        .value as string)
-                    : (playerDetails?.current_enemy.value.hit_sprite
-                        .value as string)
+                    ? ((playerDetails?.current_enemy.value.folder.value +
+                        playerDetails?.current_enemy.value.attack_sprite
+                          .value) as string)
+                    : ((playerDetails?.current_enemy.value.folder.value +
+                        playerDetails?.current_enemy.value.idle_sprite
+                          .value) as string)
                 }
                 widthFrame={1333}
                 heightFrame={750}
@@ -297,7 +302,10 @@ const Fight = () => {
         >
           <div className="__character_headshot h-20  w-36 flex flex-row">
             <img
-              src={pfp}
+              src={
+                playerDetails.character.value.folder.value +
+                playerDetails.character.value.mugshot.value
+              }
               alt="profilee picture"
               className="h-20 ml-2 p-1 pirata-one"
             />
@@ -437,27 +445,50 @@ type ByteArrayField = MetadataField<string>; // For `skin`, `mugshot`, `sprites`
 
 // Define the UEnemy structure
 interface UEnemy {
-  idle_sprite: ByteArrayField; // ByteArray (URL)
-  mugshot: ByteArrayField; // ByteArray (URL)
-  special_attack: PrimitiveField<boolean>; // bool
-  attack_sprite: ByteArrayField; // ByteArray (URL)
-  hit_sprite: ByteArrayField; // ByteArray (URL)
-  max_health: PrimitiveField<number>; // u32
-  level: PrimitiveField<number>; // u8
-  uid: PrimitiveField<number>; // u32
-  health: PrimitiveField<number>; // u32
-  attack_power: PrimitiveField<number>; // u8
-  skin: ByteArrayField; // ByteArray (URL)
+  idle_sprite: ByteArrayField;
+  mugshot: ByteArrayField;
+  special_attack: PrimitiveField<boolean>;
+  attack_sprite: ByteArrayField;
+  hit_sprite: ByteArrayField;
+  max_health: PrimitiveField<number>;
+  level: PrimitiveField<number>;
+  uid: PrimitiveField<number>;
+  health: PrimitiveField<number>;
+  attack_power: PrimitiveField<number>;
+  skin: ByteArrayField;
+  folder: ByteArrayField;
+}
+
+// Define the PlayableCharacter structure
+interface PlayableCharacter {
+  skin: ByteArrayField;
+  level: PrimitiveField<number>;
+  folder: ByteArrayField;
+  uid: PrimitiveField<number>;
+  mugshot: ByteArrayField;
+  special_attack: PrimitiveField<boolean>;
+  idle_sprite: ByteArrayField;
+  hit_sprite: ByteArrayField;
+  attack_power: PrimitiveField<number>;
+  health: PrimitiveField<number>;
+  max_health: PrimitiveField<number>;
+  attack_sprite: ByteArrayField;
 }
 
 // Define the Player structure
 export interface LuttePlayer {
-  demeanor: PrimitiveField<number>; // u8
-  health: PrimitiveField<number>; // u32
-  skin_id: PrimitiveField<number>; // u8
-  special_attack: PrimitiveField<boolean>; // bool
-  last_attack: PrimitiveField<boolean>; // bool
-  attack_power: PrimitiveField<number>; // u8
+  demeanor: PrimitiveField<number>;
+  health: PrimitiveField<number>;
+  skin_id: PrimitiveField<number>;
+  special_attack: PrimitiveField<boolean>;
+  last_attack: PrimitiveField<boolean>;
+  attack_power: PrimitiveField<number>;
   address: ContractAddressField; // ContractAddress (key)
   current_enemy: StructField<UEnemy>; // Struct: UEnemy
+  character: StructField<PlayableCharacter>; // Struct: PlayableCharacter
+}
+
+// Define the root object structure for the `lutte-Player`
+export interface ILuttePlayerData {
+  "lutte-Player": LuttePlayer;
 }

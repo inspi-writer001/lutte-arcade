@@ -151,7 +151,7 @@ const SelectCharacter = () => {
                         marginTop: "10rem" // Adjust to center the desired portion
                       }}
                       // src={`https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`}
-                      src={`${player.value.skin.value}`}
+                      src={`${player.value.folder.value}${player.value.skin.value}`}
                       alt={player.value.skin.value}
                     />
                   </div>
@@ -176,13 +176,49 @@ interface MetadataField<T> {
 // More specific interfaces for known field types (optional)
 interface PrimitiveField<T> extends MetadataField<T> {
   type: "primitive";
-  // We list the expected type names here, adjust as needed.
   type_name: "u8" | "u32" | "bool";
 }
 
 interface ByteArrayField extends MetadataField<string> {
   type: "bytearray";
   type_name: "ByteArray";
+}
+
+// Interface representing the inner value of a UEnemy.
+export interface UEnemyValue {
+  uid: PrimitiveField<number>;
+  health: PrimitiveField<number>;
+  attack_power: PrimitiveField<number>;
+  special_attack: PrimitiveField<boolean>;
+  level: PrimitiveField<number>;
+  max_health: PrimitiveField<number>;
+  skin: ByteArrayField;
+  mugshot: ByteArrayField;
+  attack_sprite: ByteArrayField;
+  hit_sprite: ByteArrayField;
+  idle_sprite: ByteArrayField;
+  folder: ByteArrayField;
+}
+
+// The wrapper interface that represents a UEnemy in the JSON.
+export interface IUEnemy {
+  type: "struct";
+  type_name: "UEnemy";
+  value: UEnemyValue;
+  key: boolean;
+}
+
+// Interface for the EnemiesList
+export interface IEnemiesList {
+  "lutte-EnemiesList": {
+    enemies: {
+      type: "array";
+      type_name: "Array<UEnemy>";
+      value: IUEnemy[];
+      key: boolean;
+    };
+    id: PrimitiveField<number>;
+  };
 }
 
 // Interface representing the inner value of a PlayableCharacter.
@@ -193,6 +229,12 @@ export interface PlayableCharacterValue {
   skin: ByteArrayField;
   special_attack: PrimitiveField<boolean>;
   level: PrimitiveField<number>;
+  max_health: PrimitiveField<number>;
+  mugshot: ByteArrayField;
+  attack_sprite: ByteArrayField;
+  hit_sprite: ByteArrayField;
+  idle_sprite: ByteArrayField;
+  folder: ByteArrayField;
 }
 
 // The wrapper interface that represents a PlayableCharacter in the JSON.
@@ -202,3 +244,19 @@ export interface IPlayableCharacter {
   value: PlayableCharacterValue;
   key: boolean;
 }
+
+// Interface for the PlayableCharacterList
+export interface IPlayableCharacterList {
+  "lutte-PlayableCharacterList": {
+    players: {
+      type: "array";
+      type_name: "Array<PlayableCharacter>";
+      value: IPlayableCharacter[];
+      key: boolean;
+    };
+    id: PrimitiveField<number>;
+  };
+}
+
+// Final interface that combines both lists
+export interface ILutteGameData extends IEnemiesList, IPlayableCharacterList {}
