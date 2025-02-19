@@ -129,10 +129,7 @@ const SelectCharacter = () => {
                             navigate("/fight", {
                               state: {
                                 id: player.value.uid,
-                                address: account.address,
-                                // characterImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`,
-                                characterImage: `${player.value.skin.value}`,
-                                enemyImage: `https://bronze-petite-viper-118.mypinata.cloud/ipfs/${data[0].value.skin.value}`
+                                address: account.address
                               }
                             });
                           }, 500);
