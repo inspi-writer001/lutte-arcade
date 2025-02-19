@@ -68,7 +68,9 @@ const Fight = () => {
     });
   }, []);
 
-  const [playerTurn, setPlayerTurn] = useState(playerDetails?.last_attack);
+  if (!playerDetails) return;
+
+  const [playerTurn, setPlayerTurn] = useState(playerDetails.last_attack.value);
 
   const fightAction = async (
     account: AccountInterface | undefined,
@@ -147,8 +149,6 @@ const Fight = () => {
 
   // console.log(state);
   // const playable_character = state as IplayableCharacter;
-
-  if (!playerDetails) return;
 
   return (
     <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
