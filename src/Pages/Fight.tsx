@@ -150,7 +150,7 @@ const Fight = () => {
 
           setTimeout(() => {
             defendAction(account);
-          }, 200);
+          }, 1000);
           return e.transaction_hash;
         })
         .catch((error) => {
@@ -264,7 +264,7 @@ const Fight = () => {
       relative self-end
       transition-transform duration-500
       overflow-hidden
-      ${movePlayer ? "translate-x-[80%] z-20" : "translate-x-0 z-10"}
+      ${movePlayer ? "translate-x-[77%] z-20" : "translate-x-0 z-10"}
     `}
             >
               <Spritesheet
@@ -303,7 +303,7 @@ const Fight = () => {
       relative self-end transition-transform duration-500
       overflow-hidden
       ${isPlayerAttacking ? "z-10" : "z-20"} ${
-                isEnemyAttacking ? "-translate-x-[45vw]" : "translate-x-0 z-10"
+                isEnemyAttacking ? "-translate-x-[78%]" : "translate-x-0 z-10"
               }
     `}
             >
