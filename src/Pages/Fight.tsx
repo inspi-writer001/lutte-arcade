@@ -24,8 +24,12 @@ let depressed = 0; // 0-5
 let neutral = 6; // 6-15
 let motivated = 16; // 16-20
 
+// last attack state can be 0, 1, 2, 3, 4 -- 1- successful attack, 2- glazed attack, 3- missed
+// attack, 4- critical attack, 0- not yet attacked
+
 const Fight = () => {
   async function fetchUser(address: string) {
+    console.log("address: ", address);
     const res = await sdk.client.getEntities(
       new ToriiQueryBuilder()
         .withClause(
@@ -33,7 +37,7 @@ const Fight = () => {
             .keys(["lutte-Player"], [address], "VariableLen")
             .build()
         )
-        .withLimit(2)
+        .withLimit(1)
         .build()
     );
     console.log(res);
@@ -51,6 +55,8 @@ const Fight = () => {
   const [_fightTxHash, setFightTxHash] = useState<string>();
   const [isPlayerAttacking, setIsPlayerAttacking] = useState<boolean>(false);
   const [isEnemyAttacking, setIsEnemyAttacking] = useState<boolean>(false);
+  const [movePlayer, setMovePlayer] = useState(false);
+  const [_selectedButtonID, setSelectedButtonID] = useState<number>();
   const [_demeanor, _setDemeanor] = useState<
     typeof motivated | typeof neutral | typeof motivated
   >(depressed);
@@ -68,17 +74,16 @@ const Fight = () => {
     });
   }, []);
 
-  if (!playerDetails) return;
-
-  const [playerTurn, setPlayerTurn] = useState(playerDetails.last_attack.value);
+  const [playerTurn, setPlayerTurn] = useState(
+    playerDetails?.last_attack.value
+  );
 
   const fightAction = async (
     account: AccountInterface | undefined,
     id: number
   ): Promise<string | undefined> => {
-    // playerDetails &&
-    //   playerDetails.last_attack.value == true &&
-    setIsPlayerAttacking(true);
+    // setIsPlayerAttacking(true);
+    setSelectedButtonID(id);
     // PlayerAnimation.current?.goToAndPlay(1);
     if (account)
       return account
@@ -89,10 +94,13 @@ const Fight = () => {
             calldata: [id]
           }
         ])
-        .then((e) => {
+        .then(async (e) => {
+          console.log(e);
+
           console.log(e.transaction_hash);
+
           console.log("fight successful");
-          setIsPlayerAttacking(false);
+          // setIsPlayerAttacking(false);
           fetchUser(state.address).then((response) => {
             console.log("account user");
             console.log(response);
@@ -106,6 +114,47 @@ const Fight = () => {
         .catch((error) => {
           console.log("error atttacking character");
           setIsPlayerAttacking(false);
+          console.log(error);
+          throw error;
+        });
+  };
+
+  const resolveAction = async (
+    account: AccountInterface | undefined
+  ): Promise<string | undefined> => {
+    setIsPlayerAttacking(true);
+    if (account)
+      return account
+        ?.execute([
+          {
+            contractAddress: CONTRACT_ADDRESS,
+            entrypoint: "defensive_phase",
+            calldata: []
+          }
+        ])
+        .then((e) => {
+          console.log(e.transaction_hash);
+          console.log("defebnse successful");
+          setIsPlayerAttacking(false);
+          setMovePlayer(false);
+
+          fetchUser(state.address).then((response) => {
+            console.log("account user");
+            console.log(response);
+            setPlayerDetails(
+              response["0x0"]["lutte-Player"] as unknown as LuttePlayer
+            );
+            setIsPlayerLoading(false);
+          });
+          setPlayerTurn(true);
+
+          setTimeout(() => {
+            defendAction(account);
+          }, 200);
+          return e.transaction_hash;
+        })
+        .catch((error) => {
+          console.log("error defending character");
           console.log(error);
           throw error;
         });
@@ -149,6 +198,8 @@ const Fight = () => {
 
   // console.log(state);
   // const playable_character = state as IplayableCharacter;
+
+  if (!playerDetails?.last_attack) return;
 
   return (
     <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
@@ -208,13 +259,12 @@ const Fight = () => {
               className={`
       __left_character
       aspect-[1200/734]         /* 1200×734 ratio for the sprite */
-      w-[35vw]                  /* 35% of viewport width */
-      max-w-[800px]             /* cap at 800px wide */
+      w-[47vw]               
       flex items-center justify-center
       relative self-end
       transition-transform duration-500
       overflow-hidden
-      ${isPlayerAttacking ? "translate-x-[45vw] z-20" : "translate-x-0 z-10"}
+      ${movePlayer ? "translate-x-[80%] z-20" : "translate-x-0 z-10"}
     `}
             >
               <Spritesheet
@@ -248,8 +298,7 @@ const Fight = () => {
               className={`
       __right_character
       aspect-[1333/750]         /* 1333×750 ratio for the enemy sprite */
-      w-[35vw]
-      max-w-[800px]
+      w-[47vw]    
       flex items-center justify-center
       relative self-end transition-transform duration-500
       overflow-hidden
@@ -417,9 +466,12 @@ const Fight = () => {
             visibility: playerTurn ? "hidden" : "visible"
           }}
           onClick={() => {
-            defendAction(account).then((e) => {
-              setFightTxHash(e);
-            });
+            setMovePlayer(true);
+            setTimeout(() => {
+              resolveAction(account).then((e) => {
+                setFightTxHash(e);
+              });
+            }, 500);
           }}
         ></div>
       </div>

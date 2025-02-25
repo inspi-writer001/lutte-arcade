@@ -41,9 +41,9 @@ const SelectCharacter = () => {
     }
     fetchToriiClause().then((result) => {
       console.log(result);
-      console.log(result["0x0"]["lutte-PlayableCharacterList"]?.players.value);
+      console.log(result["0x1"]["lutte-PlayableCharacterList"]?.players.value);
       setData(
-        result["0x0"]["lutte-PlayableCharacterList"]?.players
+        result["0x1"]["lutte-PlayableCharacterList"]?.players
           .value as unknown as Array<IPlayableCharacter>
       );
       setIsLoading(false);

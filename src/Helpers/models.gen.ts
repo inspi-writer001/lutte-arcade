@@ -70,6 +70,7 @@ export interface Player {
   skin_id: BigNumberish;
   last_attack: boolean;
   character: PlayableCharacter;
+  last_attack_state: BigNumberish;
 }
 
 // Type definition for `lutte::models::player::PlayerValue` struct
@@ -82,6 +83,7 @@ export interface PlayerValue {
   skin_id: BigNumberish;
   last_attack: boolean;
   character: PlayableCharacter;
+  last_attack_state: BigNumberish;
 }
 
 // Type definition for `lutte::models::player::Session` struct
@@ -288,7 +290,8 @@ export const schema: SchemaType = {
         "current_enemy",
         "skin_id",
         "last_attack",
-        "character"
+        "character",
+        "last_attack_state"
       ],
       address: "",
       health: 0,
@@ -324,7 +327,8 @@ export const schema: SchemaType = {
         mugshot: "",
         hit_sprite: "",
         folder: ""
-      }
+      },
+      last_attack_state: 0
     },
     PlayerValue: {
       fieldOrder: [
@@ -335,7 +339,8 @@ export const schema: SchemaType = {
         "current_enemy",
         "skin_id",
         "last_attack",
-        "character"
+        "character",
+        "last_attack_state"
       ],
       health: 0,
       demeanor: 0,
@@ -370,7 +375,8 @@ export const schema: SchemaType = {
         mugshot: "",
         hit_sprite: "",
         folder: ""
-      }
+      },
+      last_attack_state: 0
     },
     Session: {
       fieldOrder: ["id", "player"],
