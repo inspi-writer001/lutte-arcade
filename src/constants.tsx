@@ -7,6 +7,6 @@ const WORLD_ADDRESS = manifest.world.address;
 
 // const TORII_URL = "https://api.cartridge.gg/x/lutte-arcade-testne/torii";
 
-const TORII_URL = "https://api.cartridge.gg/x/lutte-arcade-sepolia/torii";
+const TORII_URL = "https://api.cartridge.gg/x/lutte-arcade-sepol/torii";
 
 export { CONTRACT_ADDRESS, RPC_URL, WORLD_ADDRESS, TORII_URL };

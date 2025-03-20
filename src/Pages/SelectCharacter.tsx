@@ -6,10 +6,10 @@ import "../styles/cards.css";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "../constants";
-import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
+import { ToriiQueryBuilder } from "@dojoengine/sdk";
 import { useDojoSDK } from "@dojoengine/sdk/react";
 
-import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
+// import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
 import { useGameStore } from "../store/GameStore";
 
 const SelectCharacter = () => {
@@ -25,27 +25,41 @@ const SelectCharacter = () => {
 
   const navigate = useNavigate();
 
+  //  new ToriiQueryBuilder()
+  //    .withClause(
+  //      new ClauseBuilder<LutteSchemaType>()
+  //        .keys(["lutte-PlayableCharacter"], ["0x1"], "VariableLen")
+  //        .build()
+  //    )
+  //    .build();
+
+  //  new ToriiQueryBuilder()
+  //    .withClause(
+  //      new ClauseBuilder<LutteSchemaType>()
+  //        .where("lutte-PlayableCharacter", "gid", "Eq", 1)
+  //        .build()
+  //    )
+  //    .build();
+
   useEffect(() => {
     async function fetchToriiClause() {
       const res = await sdk.client.getEntities(
         new ToriiQueryBuilder()
-          .withClause(
-            new ClauseBuilder<LutteSchemaType>()
-              .keys(["lutte-PlayableCharacterList"], ["0x0"], "VariableLen")
-              .build()
-          )
-          .withLimit(2)
+          .withEntityModels(["lutte-PlayableCharacter"])
           .build()
       );
       return res;
     }
     fetchToriiClause().then((result) => {
       console.log(result);
-      console.log(result["0x1"]["lutte-PlayableCharacterList"]?.players.value);
-      setData(
-        result["0x1"]["lutte-PlayableCharacterList"]?.players
-          .value as unknown as Array<IPlayableCharacter>
+      // console.log(result["0x1"]["lutte-PlayableCharacter"]);
+
+      const array_characters = Object.values(result).map(
+        (entry) => entry["lutte-PlayableCharacter"]
       );
+
+      console.log(array_characters);
+      setData(array_characters as unknown as Array<IPlayableCharacter>);
       setIsLoading(false);
       console.log(data);
     });
@@ -100,7 +114,7 @@ const SelectCharacter = () => {
 
                 return (
                   <div
-                    key={player.value.uid.value.toString()} // Use `uid` as a unique key
+                    key={player.uid?.value.toString()} // Use `uid` as a unique key
                     className="__selectable_player player_card flex relative bg-blue-400 border-black border-4 min-w-72 min-h-72"
                     style={{
                       gridColumn:
@@ -117,7 +131,7 @@ const SelectCharacter = () => {
                           {
                             contractAddress: CONTRACT_ADDRESS,
                             entrypoint: "spawn",
-                            calldata: [player.value.uid.value.toString()]
+                            calldata: [player.uid.value.toString()]
                           }
                         ])
                         .then((e) => {
@@ -128,7 +142,7 @@ const SelectCharacter = () => {
                           setTimeout(() => {
                             navigate("/fight", {
                               state: {
-                                id: player.value.uid,
+                                id: player.uid,
                                 address: account.address
                               }
                             });
@@ -144,12 +158,12 @@ const SelectCharacter = () => {
                       className="absolute top-0 left-0 w-full h-full object-cover"
                       style={{
                         objectPosition: "center top",
-                        transform: "scale(2.5)", // Optional zoom effect
-                        marginTop: "10rem" // Adjust to center the desired portion
+                        transform: "scale(0.9)" // Optional zoom effect
+                        // marginTop: "10rem" // Adjust to center the desired portion
                       }}
                       // src={`https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`}
-                      src={`${player.value.folder.value}${player.value.skin.value}`}
-                      alt={player.value.skin.value}
+                      src={`${player.folder?.value}${player.skin?.value}`}
+                      alt={player.skin?.value}
                     />
                   </div>
                 );
@@ -235,12 +249,7 @@ export interface PlayableCharacterValue {
 }
 
 // The wrapper interface that represents a PlayableCharacter in the JSON.
-export interface IPlayableCharacter {
-  type: "struct";
-  type_name: "PlayableCharacter";
-  value: PlayableCharacterValue;
-  key: boolean;
-}
+export type IPlayableCharacter = PlayableCharacterValue;
 
 // Interface for the PlayableCharacterList
 export interface IPlayableCharacterList {
