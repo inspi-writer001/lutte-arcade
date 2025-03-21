@@ -307,7 +307,13 @@ const Fight = () => {
                     ? 2
                     : 6
                 }
-                fps={playerMovement == "idle" ? 10 : 5}
+                fps={
+                  playerMovement == "idle"
+                    ? 10
+                    : playerMovement == "hit" || playerMovement == "dodge"
+                    ? 2
+                    : 5
+                }
                 autoplay
                 loop={playerMovement == "idle"}
                 direction="forward"
@@ -362,8 +368,20 @@ const Fight = () => {
                 }
                 widthFrame={1333}
                 heightFrame={750}
-                steps={enemyMovement == "attack" ? 5 : 6}
-                fps={enemyMovement == "attack" ? 5 : 6}
+                steps={
+                  enemyMovement == "attack"
+                    ? 5
+                    : enemyMovement == "hit" || enemyMovement == "dodge"
+                    ? 2
+                    : 6
+                }
+                fps={
+                  enemyMovement == "attack"
+                    ? 5
+                    : enemyMovement == "hit" || enemyMovement == "dodge"
+                    ? 2
+                    : 6
+                }
                 autoplay
                 loop={enemyMovement == "idle"}
                 direction="forward"
