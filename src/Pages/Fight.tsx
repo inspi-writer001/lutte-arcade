@@ -61,13 +61,22 @@ const Fight = () => {
   const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
   const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
-  const [_fightTxHash, setFightTxHash] = useState<string>();
-  const [isPlayerAttacking, setIsPlayerAttacking] = useState<boolean>(false);
-  const [isEnemyAttacking, setIsEnemyAttacking] = useState<boolean>(false);
-  const [movePlayer, setMovePlayer] = useState(false);
-  const [isResolved, setIsResolved] = useState<boolean>();
-  const [isResolvedDefense, setIsResolvedDefense] = useState<boolean>();
-  const [_selectedButtonID, setSelectedButtonID] = useState<number>();
+  const [cacheUser, setCacheUser] = useState<LuttePlayer>();
+  const [playerMovement, setPlayerMovement] = useState<
+    "idle" | "dash" | "attack" | "dead" | "hit" | "dodge"
+  >("idle");
+  const [enemyMovement, setEnemyMovement] = useState<
+    "idle" | "dash" | "attack" | "dead" | "hit" | "dodge"
+  >("idle");
+  const [isActionClicable, setIsActionClickable] = useState(true);
+  const [playerState, setPlayerState] = useState<"attack" | "defense">(
+    "attack"
+  );
+
+  const [selectedButtonID, setSelectedButtonID] = useState<number | undefined>(
+    undefined
+  );
+
   const [_demeanor, _setDemeanor] = useState<
     typeof motivated | typeof neutral | typeof motivated
   >(depressed);
@@ -81,6 +90,7 @@ const Fight = () => {
       setPlayerDetails(
         response["0x0"]["lutte-Player"] as unknown as LuttePlayer
       );
+      setCacheUser(response["0x0"]["lutte-Player"] as unknown as LuttePlayer);
       setIsPlayerLoading(false);
     });
   }, []);
@@ -89,13 +99,31 @@ const Fight = () => {
     !Boolean(playerDetails?.last_attack.value)
   );
 
+  const compareCache = (
+    newData: LuttePlayer,
+    previousData: LuttePlayer | undefined
+  ) => {
+    if (!previousData) return;
+    let user_previous_health = previousData.health.value;
+    let enemy_previous_health = previousData.current_enemy.value.health.value;
+
+    let user_new_health = newData.health.value;
+    let enemy_new_health = newData.current_enemy.value.health.value;
+
+    let user_health_diff = Math.abs(user_previous_health - user_new_health);
+    let enemy_health_dif = Math.abs(enemy_previous_health - enemy_new_health);
+
+    return {
+      enemy_health_dif,
+      user_health_diff
+    };
+  };
+
   const fightAction = async (
     account: AccountInterface | undefined,
     id: number
   ): Promise<string | undefined> => {
-    setSelectedButtonID(id);
-    setIsResolved(false);
-
+    setIsActionClickable(false);
     // PlayerAnimation.current?.goToAndPlay(1);
     if (account)
       return account
@@ -113,94 +141,52 @@ const Fight = () => {
 
           console.log("fight successful");
           // setIsPlayerAttacking(false);
-          fetchUser(state.address).then((response) => {
-            console.log("account user");
-            console.log(response);
 
-            let typed_response = response["0x0"][
-              "lutte-Player"
-            ] as unknown as LuttePlayer;
-            setPlayerDetails(typed_response);
-            setPlayerTurn(!Boolean(typed_response.last_attack.value));
-          });
           return e.transaction_hash;
         })
         .catch((error) => {
-          console.log("error atttacking character");
-          setIsPlayerAttacking(false);
+          console.log("error attacking character");
+          setPlayerMovement("idle");
           console.log(error);
           throw error;
         });
   };
 
-  const resolveAction = async (
-    account: AccountInterface | undefined
-  ): Promise<string | undefined> => {
-    setIsPlayerAttacking(true);
-    if (account)
-      return account
-        ?.execute([
-          {
-            contractAddress: CONTRACT_ADDRESS,
-            entrypoint: "defensive_phase",
-            calldata: []
-          }
-        ])
-        .then((e) => {
-          console.log(e.transaction_hash);
-          console.log("defebnse successful");
-          setIsPlayerAttacking(false);
-          setMovePlayer(false);
+  const resolveAction = async (): Promise<LuttePlayer> => {
+    return fetchUser(state.address).then((response) => {
+      console.log("account user");
+      console.log(response);
 
-          setIsResolved(true);
-          setIsResolvedDefense(false);
+      let typed_response = response["0x0"][
+        "lutte-Player"
+      ] as unknown as LuttePlayer;
+      setPlayerDetails(typed_response);
+      setPlayerTurn(!Boolean(typed_response.last_attack.value));
 
-          fetchUser(state.address).then((response) => {
-            console.log("account user");
-            console.log(response);
-            setPlayerDetails(
-              response["0x0"]["lutte-Player"] as unknown as LuttePlayer
-            );
-            setIsPlayerLoading(false);
-          });
+      setIsActionClickable(true);
 
-          return e.transaction_hash;
-        })
-        .catch((error) => {
-          console.log("error defending character");
-          console.log(error);
-          throw error;
-        });
+      return typed_response;
+    });
   };
 
   const defendAction = async (
-    account: AccountInterface | undefined
+    account: AccountInterface | undefined,
+    id: number
   ): Promise<string | undefined> => {
-    setIsEnemyAttacking(true);
+    setIsActionClickable(false);
     if (account)
       return account
         ?.execute([
           {
             contractAddress: CONTRACT_ADDRESS,
             entrypoint: "defensive_phase",
-            calldata: []
+            calldata: [id]
           }
         ])
         .then((e) => {
           console.log(e.transaction_hash);
           console.log("defebnse successful");
-          setIsEnemyAttacking(false);
-          setMovePlayer(false);
 
-          fetchUser(state.address).then((response) => {
-            console.log("account user");
-            console.log(response);
-            setPlayerDetails(
-              response["0x0"]["lutte-Player"] as unknown as LuttePlayer
-            );
-            setIsPlayerLoading(false);
-          });
-          setPlayerTurn(true);
           return e.transaction_hash;
         })
         .catch((error) => {
@@ -276,31 +262,50 @@ const Fight = () => {
             <div
               className={`
       __left_character
-      aspect-[1200/734]         /* 1200×734 ratio for the sprite */
+      aspect-[1200/884]         /* 1200×734 ratio for the sprite .. later added 150 */
       w-[47vw]               
       flex items-center justify-center
       relative self-end
       transition-transform duration-500
       overflow-hidden
-      ${movePlayer ? "translate-x-[77%] z-20" : "translate-x-[0%] z-10"}
+      ${
+        playerMovement == "dash" || playerMovement == "attack"
+          ? "translate-x-[77%] z-20"
+          : "translate-x-[0%] z-10"
+      }
     `}
             >
               <Spritesheet
-                key={isPlayerAttacking ? "attack" : "idle"}
+                key={playerMovement}
                 ref={PlayerAnimation}
                 image={
-                  isPlayerAttacking
+                  playerMovement == "attack"
                     ? playerDetails?.character.value.folder.value +
                       playerDetails?.character.value.attack_sprite.value
+                    : playerMovement == "dash"
+                    ? playerDetails?.character.value.folder.value +
+                      playerDetails?.character.value.dash_sprite.value
+                    : playerMovement == "hit"
+                    ? playerDetails?.character.value.folder.value +
+                      playerDetails?.character.value.hit_sprite.value
+                    : playerMovement == "dodge"
+                    ? playerDetails?.character.value.folder.value +
+                      playerDetails?.character.value.dodge_sprite.value
                     : playerDetails?.character.value.folder.value +
                       playerDetails?.character.value.idle_sprite.value
                 }
                 widthFrame={1200}
                 heightFrame={734}
-                steps={isPlayerAttacking ? 5 : 6}
-                fps={isPlayerAttacking ? 10 : 5}
+                steps={
+                  playerMovement == "attack"
+                    ? 5
+                    : playerMovement == "hit" || playerMovement == "dodge"
+                    ? 2
+                    : 6
+                }
+                fps={playerMovement == "idle" ? 10 : 5}
                 autoplay
-                loop={!isPlayerAttacking}
+                loop={playerMovement == "idle"}
                 direction="forward"
                 /* Let Tailwind handle object-fit / sizing */
                 style={{
@@ -315,23 +320,39 @@ const Fight = () => {
             <div
               className={`
       __right_character
-      aspect-[1333/750]         /* 1333×750 ratio for the enemy sprite */
+      aspect-[1333/900]         /* 1333×750 ratio for the enemy sprite ..later added 150 */
       w-[47vw]    
       flex items-center justify-center
       relative self-end transition-transform duration-500
       overflow-hidden
-      ${isPlayerAttacking ? "z-10" : "z-20"} ${
-                isEnemyAttacking ? "-translate-x-[78%]" : "translate-x-0 z-10"
+      ${
+        enemyMovement == "dash" || enemyMovement == "attack" ? "z-10" : "z-20"
+      } ${
+                enemyMovement == "dash" || enemyMovement == "attack"
+                  ? "-translate-x-[78%]"
+                  : "translate-x-0 z-10"
               }
     `}
             >
               <Spritesheet
-                key={isEnemyAttacking ? "Eattack" : "Eidle"}
+                key={`Enemy+${enemyMovement}`}
                 ref={EnemyAnimation}
                 image={
-                  isEnemyAttacking
+                  enemyMovement == "attack"
                     ? ((playerDetails?.current_enemy.value.folder.value +
                         playerDetails?.current_enemy.value.attack_sprite
+                          .value) as string)
+                    : enemyMovement == "dash"
+                    ? ((playerDetails?.current_enemy.value.folder.value +
+                        playerDetails?.current_enemy.value.dash_sprite
+                          .value) as string)
+                    : enemyMovement == "hit"
+                    ? ((playerDetails?.current_enemy.value.folder.value +
+                        playerDetails?.current_enemy.value.hit_sprite
+                          .value) as string)
+                    : enemyMovement == "dodge"
+                    ? ((playerDetails?.current_enemy.value.folder.value +
+                        playerDetails?.current_enemy.value.dodge_sprite
                           .value) as string)
                     : ((playerDetails?.current_enemy.value.folder.value +
                         playerDetails?.current_enemy.value.idle_sprite
@@ -339,10 +360,10 @@ const Fight = () => {
                 }
                 widthFrame={1333}
                 heightFrame={750}
-                steps={isEnemyAttacking ? 5 : 6}
-                fps={isEnemyAttacking ? 10 : 5}
+                steps={enemyMovement == "attack" ? 5 : 6}
+                fps={enemyMovement == "attack" ? 5 : 6}
                 autoplay
-                loop
+                loop={enemyMovement == "idle"}
                 direction="forward"
                 style={{
                   display: "grid",
@@ -356,7 +377,7 @@ const Fight = () => {
         </div>
       </div>
       <div className="__bottom_tab bg-black h-[17vh] w-full relative bottom-0 flex flex-row justify-between px-10">
-        {playerTurn === true ? (
+        {playerState == "attack" ? (
           <div
             className="__actions_buttons flex w-[450px] relative flex-row items-center"
             style={{
@@ -386,7 +407,12 @@ const Fight = () => {
                     : "Neutral")}
               </div>
             </div>
-            <div className="__buttons_container flex flex-row relative gap-0 left-6">
+            <div
+              className="__buttons_container flex flex-row relative gap-0 left-6"
+              style={{
+                visibility: isActionClicable ? "visible" : "hidden"
+              }}
+            >
               <div
                 className="__red h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
                 style={{
@@ -403,9 +429,8 @@ const Fight = () => {
                   backgroundRepeat: "no-repeat"
                 }}
                 onClick={() => {
-                  fightAction(account, 0).then((e) => {
-                    setFightTxHash(e);
-                  });
+                  setSelectedButtonID(1);
+                  fightAction(account, 1);
                 }}
               ></div>
               <div
@@ -424,9 +449,8 @@ const Fight = () => {
                   backgroundRepeat: "no-repeat"
                 }}
                 onClick={() => {
-                  fightAction(account, 1).then((e) => {
-                    setFightTxHash(e);
-                  });
+                  setSelectedButtonID(2);
+                  fightAction(account, 2);
                 }}
               ></div>
               <div
@@ -445,9 +469,8 @@ const Fight = () => {
                   backgroundRepeat: "no-repeat"
                 }}
                 onClick={() => {
-                  fightAction(account, 2).then((e) => {
-                    setFightTxHash(e);
-                  });
+                  setSelectedButtonID(3);
+                  fightAction(account, 3);
                 }}
               ></div>
               <div
@@ -483,8 +506,6 @@ const Fight = () => {
               backgroundSize: "contain",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat"
-
-              // visibility: playerTurn ? "visible" : "hidden"
             }}
           >
             <div className="__character_headshot h-20  w-36 flex flex-row">
@@ -505,7 +526,12 @@ const Fight = () => {
                     : "Neutral")}
               </div>
             </div>
-            <div className="__buttons_container flex flex-row relative gap-0 left-6">
+            <div
+              className="__buttons_container flex flex-row relative gap-0 left-6"
+              style={{
+                visibility: isActionClicable ? "visible" : "hidden"
+              }}
+            >
               <div
                 className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
                 style={{
@@ -516,6 +542,7 @@ const Fight = () => {
                 }}
                 onClick={() => {
                   setSelectedButtonID(1);
+                  defendAction(account, 1);
                 }}
               ></div>
               <div
@@ -528,6 +555,7 @@ const Fight = () => {
                 }}
                 onClick={() => {
                   setSelectedButtonID(2);
+                  defendAction(account, 2);
                 }}
               ></div>
               <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
@@ -536,15 +564,13 @@ const Fight = () => {
             </div>
           </div>
         )}
-        {typeof isResolved !== undefined && (
+        {
           <div className="__phase pirata-one flex self-center text-2xl mr-0">
-            {playerTurn == false &&
-            isResolvedDefense == true &&
-            isResolved == false
+            {playerTurn == true && playerState == "attack"
               ? "Attack Phase"
               : "Defensive Phase"}
           </div>
-        )}
+        }
         <div
           className="__resolve flex w-[150px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
           style={{
@@ -555,15 +581,56 @@ const Fight = () => {
             // visibility: playerTurn ? "hidden" : "visible"
           }}
           onClick={() => {
-            playerTurn && !isResolved && setMovePlayer(true);
+            if (
+              playerState === "defense" &&
+              typeof selectedButtonID !== "undefined"
+            ) {
+              setEnemyMovement("dash");
+              setTimeout(() => {
+                setEnemyMovement("attack");
 
-            !isResolved
-              ? resolveAction(account).then((e) => {
-                  setFightTxHash(e);
+                resolveAction().then((e) => {
+                  let diff = compareCache(e, cacheUser);
+                  if (!diff) return;
+                  console.log(diff.user_health_diff);
+                  if (diff.user_health_diff > 5) {
+                    setPlayerMovement("hit");
+                  } else setPlayerMovement("dodge");
 
-                  setMovePlayer(false);
-                })
-              : defendAction(account);
+                  setCacheUser(e);
+                  setEnemyMovement("idle");
+                });
+              }, 1000);
+
+              setPlayerState("attack");
+              setSelectedButtonID(undefined);
+            }
+
+            if (
+              playerState == "attack" &&
+              typeof selectedButtonID != "undefined"
+            ) {
+              setPlayerMovement("dash");
+              setTimeout(() => {
+                setPlayerMovement("attack");
+                resolveAction().then((e) => {
+                  let diff = compareCache(e, cacheUser);
+                  if (!diff) return;
+                  console.log(diff.enemy_health_dif);
+                  if (diff.enemy_health_dif > 5) {
+                    setEnemyMovement("hit");
+                  } else setEnemyMovement("dodge");
+
+                  setCacheUser(e);
+                  setTimeout(() => {
+                    setPlayerMovement("idle");
+                  }, 1000);
+                });
+              }, 1000);
+
+              setPlayerState("defense");
+              setSelectedButtonID(undefined);
+            }
           }}
         ></div>
       </div>
@@ -594,6 +661,8 @@ interface UEnemy {
   special_attack: PrimitiveField<boolean>;
   attack_sprite: ByteArrayField;
   hit_sprite: ByteArrayField;
+  dash_sprite: ByteArrayField;
+  dodge_sprite: ByteArrayField;
   max_health: PrimitiveField<number>;
   level: PrimitiveField<number>;
   uid: PrimitiveField<number>;
@@ -613,6 +682,8 @@ interface PlayableCharacter {
   special_attack: PrimitiveField<boolean>;
   idle_sprite: ByteArrayField;
   hit_sprite: ByteArrayField;
+  dash_sprite: ByteArrayField;
+  dodge_sprite: ByteArrayField;
   attack_power: PrimitiveField<number>;
   health: PrimitiveField<number>;
   max_health: PrimitiveField<number>;
