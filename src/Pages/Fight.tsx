@@ -69,6 +69,7 @@ const Fight = () => {
     "idle" | "dash" | "attack" | "dead" | "hit" | "dodge"
   >("idle");
   const [isActionClicable, setIsActionClickable] = useState(true);
+  const [isResolveClickable, setIsResolveClickable] = useState(false);
   const [playerState, setPlayerState] = useState<"attack" | "defense">(
     "attack"
   );
@@ -141,7 +142,7 @@ const Fight = () => {
 
           console.log("fight successful");
           // setIsPlayerAttacking(false);
-
+          setIsResolveClickable(true);
           return e.transaction_hash;
         })
         .catch((error) => {
@@ -164,6 +165,7 @@ const Fight = () => {
       setPlayerTurn(!Boolean(typed_response.last_attack.value));
 
       setIsActionClickable(true);
+      setIsResolveClickable(false);
 
       return typed_response;
     });
@@ -186,6 +188,8 @@ const Fight = () => {
         .then((e) => {
           console.log(e.transaction_hash);
           console.log("defebnse successful");
+
+          setIsResolveClickable(true);
 
           return e.transaction_hash;
         })
@@ -326,12 +330,10 @@ const Fight = () => {
       relative self-end transition-transform duration-500
       overflow-hidden
       ${
-        enemyMovement == "dash" || enemyMovement == "attack" ? "z-10" : "z-20"
-      } ${
-                enemyMovement == "dash" || enemyMovement == "attack"
-                  ? "-translate-x-[78%]"
-                  : "translate-x-0 z-10"
-              }
+        enemyMovement == "dash" || enemyMovement == "attack"
+          ? "-translate-x-[78%] z-20"
+          : "translate-x-0 z-10"
+      }
     `}
             >
               <Spritesheet
@@ -473,29 +475,8 @@ const Fight = () => {
                   fightAction(account, 3);
                 }}
               ></div>
-              <div
-                className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                // style={{
-                //   backgroundImage: `url(${other_buttons.block})`,
-                //   backgroundSize: "contain",
-                //   backgroundPosition: "center",
-                //   backgroundRepeat: "no-repeat"
-                // }}
-                // onClick={() => {
-                //   fightAction(account, 0).then((e) => {
-                //     setFightTxHash(e);
-                //   });
-                // }}
-              ></div>
-              <div
-                className="__critical h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                style={{
-                  backgroundImage: `url(${other_buttons.specialAttack})`,
-                  backgroundSize: "contain",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat"
-                }}
-              ></div>
+              <div className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
+              <div className="__critical h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
             </div>
           </div>
         ) : (
@@ -558,7 +539,19 @@ const Fight = () => {
                   defendAction(account, 2);
                 }}
               ></div>
-              <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
+              <div
+                className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                style={{
+                  backgroundImage: `url(${other_buttons.dodge})`,
+                  backgroundSize: "contain",
+                  backgroundPosition: "center",
+                  backgroundRepeat: "no-repeat"
+                }}
+                onClick={() => {
+                  setSelectedButtonID(3);
+                  defendAction(account, 3);
+                }}
+              ></div>
               <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
               <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
             </div>
@@ -578,7 +571,8 @@ const Fight = () => {
             backgroundSize: "contain",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
-            visibility: !isActionClicable ? "visible" : "hidden"
+            visibility:
+              !isActionClicable && isResolveClickable ? "visible" : "hidden"
           }}
           onClick={async () => {
             if (
@@ -598,7 +592,7 @@ const Fight = () => {
 
               console.log(diff.user_health_diff);
 
-              if (diff.user_health_diff > 5) {
+              if (diff.user_health_diff > 0) {
                 setPlayerMovement("hit");
               } else {
                 setPlayerMovement("dodge");
@@ -632,7 +626,7 @@ const Fight = () => {
 
               console.log(diff.enemy_health_dif);
 
-              if (diff.enemy_health_dif > 5) {
+              if (diff.enemy_health_dif > 0) {
                 setEnemyMovement("hit");
               } else {
                 setEnemyMovement("dodge");
