@@ -603,7 +603,7 @@ const Fight = () => {
                 }}
                 onClick={() => {
                   setSelectedButtonID(1);
-                  defendAction(account, 1);
+                  defendAction(account, 0);
                 }}
               ></div>
               <div
@@ -616,7 +616,7 @@ const Fight = () => {
                 }}
                 onClick={() => {
                   setSelectedButtonID(2);
-                  defendAction(account, 2);
+                  defendAction(account, 1);
                 }}
               ></div>
               <div
@@ -629,7 +629,7 @@ const Fight = () => {
                 }}
                 onClick={() => {
                   setSelectedButtonID(3);
-                  defendAction(account, 3);
+                  defendAction(account, 2);
                 }}
               ></div>
               <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
