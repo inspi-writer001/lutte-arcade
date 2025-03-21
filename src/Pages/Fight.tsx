@@ -225,9 +225,9 @@ const Fight = () => {
               {/* <p>
                 Health: {isPlayerLoading ? "Loading..." : playerDetails?.health}
               </p> */}
-              <p>
-                Demeanor:{" "}
-                {isPlayerLoading ? "Loading..." : playerDetails?.demeanor.value}
+              <p className="text-yellow-800">
+                Health:{" "}
+                {isPlayerLoading ? "Loading..." : playerDetails?.health.value}
               </p>
             </div>
             <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-end">
@@ -246,11 +246,11 @@ const Fight = () => {
                   ? "Loading..."
                   : playerDetails?.current_enemy.health}
               </p> */}
-              <p>
-                Attack Power:{" "}
+              <p className="text-yellow-800">
+                Health:{" "}
                 {isPlayerLoading
                   ? "Loading..."
-                  : playerDetails?.current_enemy.value.attack_power.value}
+                  : playerDetails?.current_enemy.value.health.value}
               </p>
             </div>
           </div>
@@ -577,31 +577,41 @@ const Fight = () => {
             backgroundImage: `url(${turn_wrapper})`,
             backgroundSize: "contain",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
-            // visibility: playerTurn ? "hidden" : "visible"
+            backgroundRepeat: "no-repeat",
+            visibility: !isActionClicable ? "visible" : "hidden"
           }}
-          onClick={() => {
+          onClick={async () => {
             if (
               playerState === "defense" &&
               typeof selectedButtonID !== "undefined"
             ) {
               setEnemyMovement("dash");
-              setTimeout(() => {
-                setEnemyMovement("attack");
 
-                resolveAction().then((e) => {
-                  let diff = compareCache(e, cacheUser);
-                  if (!diff) return;
-                  console.log(diff.user_health_diff);
-                  if (diff.user_health_diff > 5) {
-                    setPlayerMovement("hit");
-                  } else setPlayerMovement("dodge");
+              // Wait for 1 second before switching to attack
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              setEnemyMovement("attack");
 
-                  setCacheUser(e);
-                  setEnemyMovement("idle");
-                });
-              }, 1000);
+              // Ensure resolveAction completes before continuing
+              const e = await resolveAction();
+              let diff = compareCache(e, cacheUser);
+              if (!diff) return;
 
+              console.log(diff.user_health_diff);
+
+              if (diff.user_health_diff > 5) {
+                setPlayerMovement("hit");
+              } else {
+                setPlayerMovement("dodge");
+              }
+
+              setCacheUser(e);
+
+              // Wait 1.5 seconds before switching enemy to idle
+              await new Promise((resolve) => setTimeout(resolve, 1500));
+              setEnemyMovement("idle");
+              setPlayerMovement("idle");
+
+              // Update player state after defense sequence
               setPlayerState("attack");
               setSelectedButtonID(undefined);
             }
@@ -611,22 +621,29 @@ const Fight = () => {
               typeof selectedButtonID != "undefined"
             ) {
               setPlayerMovement("dash");
-              setTimeout(() => {
-                setPlayerMovement("attack");
-                resolveAction().then((e) => {
-                  let diff = compareCache(e, cacheUser);
-                  if (!diff) return;
-                  console.log(diff.enemy_health_dif);
-                  if (diff.enemy_health_dif > 5) {
-                    setEnemyMovement("hit");
-                  } else setEnemyMovement("dodge");
 
-                  setCacheUser(e);
-                  setTimeout(() => {
-                    setPlayerMovement("idle");
-                  }, 1000);
-                });
-              }, 1000);
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              setPlayerMovement("attack");
+
+              // Ensure resolveAction completes before continuing
+              const e = await resolveAction();
+              let diff = compareCache(e, cacheUser);
+              if (!diff) return;
+
+              console.log(diff.enemy_health_dif);
+
+              if (diff.enemy_health_dif > 5) {
+                setEnemyMovement("hit");
+              } else {
+                setEnemyMovement("dodge");
+              }
+
+              setCacheUser(e);
+
+              // Wait 1.5 seconds before switching back to idle
+              await new Promise((resolve) => setTimeout(resolve, 1500));
+              setPlayerMovement("idle");
+              setEnemyMovement("idle");
 
               setPlayerState("defense");
               setSelectedButtonID(undefined);
