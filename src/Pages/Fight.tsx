@@ -96,6 +96,46 @@ const Fight = () => {
     });
   }, []);
 
+  // ✅ Preload all images to prevent jank
+  useEffect(() => {
+    const preloadImages = (urls: string[]) => {
+      urls.forEach((url) => {
+        const img = new Image();
+        img.src = url;
+      });
+    };
+
+    if (playerDetails?.character?.value) {
+      preloadImages([
+        playerDetails.character.value.folder.value +
+          playerDetails.character.value.idle_sprite.value,
+        playerDetails.character.value.folder.value +
+          playerDetails.character.value.attack_sprite.value,
+        playerDetails.character.value.folder.value +
+          playerDetails.character.value.dash_sprite.value,
+        playerDetails.character.value.folder.value +
+          playerDetails.character.value.hit_sprite.value,
+        playerDetails.character.value.folder.value +
+          playerDetails.character.value.dodge_sprite.value
+      ]);
+    }
+
+    if (playerDetails?.current_enemy?.value) {
+      preloadImages([
+        playerDetails.current_enemy.value.folder.value +
+          playerDetails.current_enemy.value.idle_sprite.value,
+        playerDetails.current_enemy.value.folder.value +
+          playerDetails.current_enemy.value.attack_sprite.value,
+        playerDetails.current_enemy.value.folder.value +
+          playerDetails.current_enemy.value.dash_sprite.value,
+        playerDetails.current_enemy.value.folder.value +
+          playerDetails.current_enemy.value.hit_sprite.value,
+        playerDetails.current_enemy.value.folder.value +
+          playerDetails.current_enemy.value.dodge_sprite.value
+      ]);
+    }
+  }, [playerDetails]);
+
   const [playerTurn, setPlayerTurn] = useState(
     !Boolean(playerDetails?.last_attack.value)
   );
@@ -200,6 +240,55 @@ const Fight = () => {
         });
   };
 
+  const getSpriteImage = (
+    movement: typeof playerMovement | typeof enemyMovement,
+    type: "player" | "enemy"
+  ) => {
+    if (!playerDetails?.character?.value) return "";
+    const folder =
+      type == "player"
+        ? playerDetails.character.value.folder.value
+        : playerDetails.current_enemy.value.folder.value;
+
+    switch (movement) {
+      case "attack":
+        return (
+          folder +
+          (type == "player"
+            ? playerDetails.character.value.attack_sprite.value
+            : playerDetails.current_enemy.value.attack_sprite.value)
+        );
+      case "dash":
+        return (
+          folder +
+          (type == "player"
+            ? playerDetails.character.value.dash_sprite.value
+            : playerDetails.current_enemy.value.dash_sprite.value)
+        );
+      case "hit":
+        return (
+          folder +
+          (type == "player"
+            ? playerDetails.character.value.hit_sprite.value
+            : playerDetails.current_enemy.value.hit_sprite.value)
+        );
+      case "dodge":
+        return (
+          folder +
+          (type == "player"
+            ? playerDetails.character.value.dodge_sprite.value
+            : playerDetails.current_enemy.value.dodge_sprite.value)
+        );
+      default:
+        return (
+          folder +
+          (type == "player"
+            ? playerDetails.character.value.idle_sprite.value
+            : playerDetails.current_enemy.value.idle_sprite.value)
+        );
+    }
+  };
+
   // console.log(state);
   // const playable_character = state as IplayableCharacter;
 
@@ -282,34 +371,23 @@ const Fight = () => {
               <Spritesheet
                 key={playerMovement}
                 ref={PlayerAnimation}
-                image={
-                  playerMovement == "attack"
-                    ? playerDetails?.character.value.folder.value +
-                      playerDetails?.character.value.attack_sprite.value
-                    : playerMovement == "dash"
-                    ? playerDetails?.character.value.folder.value +
-                      playerDetails?.character.value.dash_sprite.value
-                    : playerMovement == "hit"
-                    ? playerDetails?.character.value.folder.value +
-                      playerDetails?.character.value.hit_sprite.value
-                    : playerMovement == "dodge"
-                    ? playerDetails?.character.value.folder.value +
-                      playerDetails?.character.value.dodge_sprite.value
-                    : playerDetails?.character.value.folder.value +
-                      playerDetails?.character.value.idle_sprite.value
-                }
+                image={getSpriteImage(playerMovement, "player")}
                 widthFrame={1200}
                 heightFrame={734}
                 steps={
                   playerMovement == "attack"
                     ? 5
-                    : playerMovement == "hit" || playerMovement == "dodge"
+                    : playerMovement == "hit"
+                    ? 3
+                    : playerMovement == "dodge"
+                    ? 2
+                    : playerMovement == "dash"
                     ? 2
                     : 6
                 }
                 fps={
                   playerMovement == "idle"
-                    ? 10
+                    ? 5
                     : playerMovement == "hit" || playerMovement == "dodge"
                     ? 2
                     : 5
@@ -345,35 +423,19 @@ const Fight = () => {
               <Spritesheet
                 key={`Enemy+${enemyMovement}`}
                 ref={EnemyAnimation}
-                image={
-                  enemyMovement == "attack"
-                    ? ((playerDetails?.current_enemy.value.folder.value +
-                        playerDetails?.current_enemy.value.attack_sprite
-                          .value) as string)
-                    : enemyMovement == "dash"
-                    ? ((playerDetails?.current_enemy.value.folder.value +
-                        playerDetails?.current_enemy.value.dash_sprite
-                          .value) as string)
-                    : enemyMovement == "hit"
-                    ? ((playerDetails?.current_enemy.value.folder.value +
-                        playerDetails?.current_enemy.value.hit_sprite
-                          .value) as string)
-                    : enemyMovement == "dodge"
-                    ? ((playerDetails?.current_enemy.value.folder.value +
-                        playerDetails?.current_enemy.value.dodge_sprite
-                          .value) as string)
-                    : ((playerDetails?.current_enemy.value.folder.value +
-                        playerDetails?.current_enemy.value.idle_sprite
-                          .value) as string)
-                }
+                image={getSpriteImage(enemyMovement, "enemy")}
                 widthFrame={1333}
                 heightFrame={750}
                 steps={
                   enemyMovement == "attack"
                     ? 5
-                    : enemyMovement == "hit" || enemyMovement == "dodge"
+                    : enemyMovement == "hit"
                     ? 2
-                    : 6
+                    : enemyMovement == "dodge"
+                    ? 2
+                    : enemyMovement == "dash"
+                    ? 2
+                    : 7
                 }
                 fps={
                   enemyMovement == "attack"
