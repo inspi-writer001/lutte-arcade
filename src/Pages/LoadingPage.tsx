@@ -23,7 +23,7 @@ const LoadingPage: FC<ILoadingPage> = ({ onLoaded }) => {
   }, [onLoaded]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#3b2f2f]">
+    <div className="flex items-center justify-center w-full min-h-screen bg-[#3b2f2f]">
       <div className="text-center text-[#e4e2dc]">
         <div className="text-4xl font-bold mb-4 pirata-one">Lutte Arcade</div>
         <div className="text-4xl font-bold mb-4 pirata-one">

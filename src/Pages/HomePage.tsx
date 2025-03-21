@@ -62,7 +62,7 @@ const HomePage = () => {
     <>
       {loaded ? (
         <div
-          className="flex flex-row justify-center h-screen min-h-screen text-white w-[100vw] min-w-[100vw]"
+          className="flex flex-row justify-center h-screen min-h-screen text-white w-full min-w-full"
           style={{
             backgroundImage: `url(${bgImage})`,
             backgroundSize: "cover",
