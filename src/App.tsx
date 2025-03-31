@@ -5,7 +5,9 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import HomePage from "./Pages/HomePage";
 import SelectCharacter from "./Pages/SelectCharacter";
-import Fight from "./Pages/Fight";
+// import Fight from "./Pages/Fight";
+// import Fight from "./Pages/FightCanvas.tsx";
+import Fight from "./Pages/Fighter";
 
 import { Chain, mainnet, sepolia } from "@starknet-react/chains";
 import {
@@ -22,6 +24,7 @@ import { CONTRACT_ADDRESS } from "./constants";
 import StarknetProvider from "./StarknetProvider";
 import TransitionOverlay from "./Components/TransitionOverlay";
 import { useGameStore } from "./store/GameStore";
+import PixiBunny from "./Pages/PixiBunny";
 
 const policies: SessionPolicies = {
   contracts: {
@@ -98,6 +101,8 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" Component={() => <HomePage />} />
+
+            <Route path="/bunny" Component={() => <PixiBunny />} />
 
             <Route
               path="/character-shop"
