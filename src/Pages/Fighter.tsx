@@ -3,7 +3,7 @@ import { useAccount } from "@starknet-react/core";
 import fight_bg from "../assets/placeholders/fight_bg.png";
 import component_wrapper from "../assets/bottom_components/bottom_ui.png";
 import turn_wrapper from "../assets/bottom_components/endturn.png";
-import { createRef, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
@@ -20,17 +20,8 @@ import {
 import { useDojoSDK } from "@dojoengine/sdk/react";
 import { ClauseBuilder, ToriiQueryBuilder } from "@dojoengine/sdk";
 import { padHexTo66 } from "../Helpers/converters";
-import FightCanvas from "./FightCanvas";
-import FightKaboom from "./FighterKaboom";
-import CanvasSprite from "./CanvasSprite";
-// import { Assets, Container } from "pixi.js";
-import {
-  Assets,
-  Texture,
-  Spritesheet,
-  AnimatedSprite,
-  TextureSource
-} from "pixi.js";
+
+import { Assets, Texture, Spritesheet, TextureSource } from "pixi.js";
 import PixiBunny from "./PixiBunny";
 
 let depressed = 0; // 0-5
@@ -48,21 +39,21 @@ let motivated = 16; // 16-20
 //    )
 //    .build();
 
-const playerFrameData = {
-  idle: { width: 1202, height: 736, steps: 6, fps: 3 },
-  attack: { width: 1202, height: 736, steps: 5, fps: 3 },
-  dash: { width: 1200, height: 734, steps: 2, fps: 3 },
-  hit: { width: 1202, height: 734, steps: 3, fps: 3 },
-  dodge: { width: 1200, height: 734, steps: 2, fps: 3 }
-};
+// const playerFrameData = {
+//   idle: { width: 1202, height: 736, steps: 6, fps: 3 },
+//   attack: { width: 1202, height: 736, steps: 5, fps: 3 },
+//   dash: { width: 1200, height: 734, steps: 2, fps: 3 },
+//   hit: { width: 1202, height: 734, steps: 3, fps: 3 },
+//   dodge: { width: 1200, height: 734, steps: 2, fps: 3 }
+// };
 
-const enemyFrameData = {
-  idle: { width: 1335, height: 752, steps: 7, fps: 3 },
-  attack: { width: 1335, height: 752, steps: 5, fps: 3 },
-  dash: { width: 1335, height: 752, steps: 2, fps: 3 },
-  hit: { width: 1333, height: 750, steps: 2, fps: 3 },
-  dodge: { width: 1335, height: 752, steps: 2, fps: 3 }
-};
+// const enemyFrameData = {
+//   idle: { width: 1335, height: 752, steps: 7, fps: 3 },
+//   attack: { width: 1335, height: 752, steps: 5, fps: 3 },
+//   dash: { width: 1335, height: 752, steps: 2, fps: 3 },
+//   hit: { width: 1333, height: 750, steps: 2, fps: 3 },
+//   dodge: { width: 1335, height: 752, steps: 2, fps: 3 }
+// };
 
 interface IEntity {
   png: string;
@@ -88,8 +79,6 @@ const Fight = () => {
   const { account } = useAccount();
   const { state } = useLocation();
   const { sdk } = useDojoSDK();
-  const PlayerAnimation = createRef<Spritesheet>();
-  const EnemyAnimation = createRef<Spritesheet>();
 
   const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
@@ -414,10 +403,10 @@ const Fight = () => {
       !playerDetails?.character?.value &&
       (!characterTextures || !enemyTextures)
     )
-      return "";
+      throw "assets still loading";
     const folder = type == "player" ? characterTextures : enemyTextures;
 
-    if (!folder) return "";
+    if (!folder) throw "assets still loading";
 
     switch (movement) {
       case "attack":
@@ -781,7 +770,7 @@ const Fight = () => {
               setCacheUser(e);
 
               // Wait 1.5 seconds before switching enemy to idle
-              await new Promise((resolve) => setTimeout(resolve, 1500));
+              await new Promise((resolve) => setTimeout(resolve, 900));
               setEnemyMovement("idle");
               setPlayerMovement("idle");
 
@@ -815,7 +804,7 @@ const Fight = () => {
               setCacheUser(e);
 
               // Wait 1.5 seconds before switching back to idle
-              await new Promise((resolve) => setTimeout(resolve, 1500));
+              await new Promise((resolve) => setTimeout(resolve, 900));
               setPlayerMovement("idle");
               setEnemyMovement("idle");
 

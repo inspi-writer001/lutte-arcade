@@ -1,11 +1,5 @@
 import { Application, extend } from "@pixi/react";
-import {
-  Container,
-  Graphics,
-  Sprite,
-  AnimatedSprite,
-  RgbaArray
-} from "pixi.js";
+import { Container, Graphics, Sprite, AnimatedSprite } from "pixi.js";
 
 import { BunnySprite, IBunnySprite } from "./BunnySprite";
 import React from "react";
