@@ -3,9 +3,13 @@ import React, { useEffect, useRef } from "react";
 
 export interface IBunnySprite {
   textures: Texture[];
+  playerMovement: string;
 }
 
-export const BunnySprite: React.FC<IBunnySprite> = ({ textures }) => {
+export const BunnySprite: React.FC<IBunnySprite> = ({
+  textures,
+  playerMovement
+}) => {
   // The Pixi.js `Sprite`
   // const [textures, setTextures] = useState<Texture[]>([]);
   const spriteRef = useRef<AnimatedSprite>(null);
@@ -78,7 +82,12 @@ export const BunnySprite: React.FC<IBunnySprite> = ({ textures }) => {
       scale={0.6}
       textures={textures}
       animationSpeed={0.1}
-      loop={textures.length > 3}
+      loop={playerMovement === "idle"}
+      onComplete={() => {
+        if (playerMovement !== "idle") {
+          spriteRef.current?.stop();
+        }
+      }}
       x={20}
       y={100}
     />

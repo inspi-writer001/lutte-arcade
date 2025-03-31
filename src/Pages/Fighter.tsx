@@ -80,6 +80,8 @@ const Fight = () => {
   const { state } = useLocation();
   const { sdk } = useDojoSDK();
 
+  const [assetsLoaded, setAssetsLoaded] = useState(false);
+
   const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
   const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
@@ -229,6 +231,7 @@ const Fight = () => {
         console.log("-----------");
         console.log(response);
         setCharacterTextures(response);
+        setAssetsLoaded(true);
       });
     }
 
@@ -287,6 +290,7 @@ const Fight = () => {
         }
       ]).then((response) => {
         setEnemyTextures(response);
+        setAssetsLoaded(true);
       });
     }
   }, [playerDetails]);
@@ -398,27 +402,29 @@ const Fight = () => {
   const getSpriteImage = (
     movement: typeof playerMovement | typeof enemyMovement,
     type: "player" | "enemy"
-  ) => {
+  ): Texture[] => {
     if (
-      !playerDetails?.character?.value &&
-      (!characterTextures || !enemyTextures)
-    )
-      throw "assets still loading";
-    const folder = type == "player" ? characterTextures : enemyTextures;
+      !playerDetails?.character?.value ||
+      !characterTextures ||
+      !enemyTextures
+    ) {
+      return []; // ✅ Return an empty array instead of `undefined`
+    }
 
-    if (!folder) throw "assets still loading";
+    const folder = type === "player" ? characterTextures : enemyTextures;
+    if (!folder) return [];
 
     switch (movement) {
       case "attack":
-        return folder[1];
+        return folder[1] || [];
       case "dash":
-        return folder[2];
+        return folder[2] || [];
       case "hit":
-        return folder[3];
+        return folder[3] || [];
       case "dodge":
-        return folder[4];
+        return folder[4] || [];
       default:
-        return folder[0];
+        return folder[0] || [];
     }
   };
 
@@ -427,61 +433,68 @@ const Fight = () => {
 
   if (!playerDetails?.last_attack) return;
 
-  return (
-    <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
-      <div
-        className="flex h-[83vh] w-full relative justify-center"
-        style={{
-          backgroundImage: `url(${fight_bg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat"
-        }}
-      >
-        <div className="__fight_canvas w-full h-full max-h-[83vh] flex flex-col justify-between px-1 md:px-20 relative max-w-[1500px] overflow-hidden">
-          <div className="__health flex flex-row justify-between w-full">
-            <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-start">
-              <HealthBar
-                percentage={
-                  ((playerDetails?.health.value || 0) /
-                    playerDetails?.character.value.max_health.value) *
-                  100
-                }
-              />
-              {/* <p>
-                Health: {isPlayerLoading ? "Loading..." : playerDetails?.health}
-              </p> */}
-              <p className="text-yellow-800">
-                Health:{" "}
-                {isPlayerLoading ? "Loading..." : playerDetails?.health.value}
-              </p>
-            </div>
-            <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-end">
-              <div className="__flipped_appearance transform scale-x-[-1]">
+  if (!assetsLoaded) {
+    return (
+      <div className="__loading_screen pirata-one flex w-full h-full text-center justify-center items-center text-2xl p-4">
+        Loading...
+      </div>
+    );
+  } else
+    return (
+      <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
+        <div
+          className="flex h-[83vh] w-full relative justify-center"
+          style={{
+            backgroundImage: `url(${fight_bg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat"
+          }}
+        >
+          <div className="__fight_canvas w-full h-full max-h-[83vh] flex flex-col justify-between px-1 md:px-20 relative max-w-[1500px] overflow-hidden">
+            <div className="__health flex flex-row justify-between w-full">
+              <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-start">
                 <HealthBar
                   percentage={
-                    ((playerDetails?.current_enemy.value.health.value || 0) /
-                      playerDetails?.current_enemy.value.max_health.value) *
+                    ((playerDetails?.health.value || 0) /
+                      playerDetails?.character.value.max_health.value) *
                     100
                   }
                 />
+                {/* <p>
+                Health: {isPlayerLoading ? "Loading..." : playerDetails?.health}
+              </p> */}
+                <p className="text-yellow-800">
+                  Health:{" "}
+                  {isPlayerLoading ? "Loading..." : playerDetails?.health.value}
+                </p>
               </div>
-              {/* <p>
+              <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-end">
+                <div className="__flipped_appearance transform scale-x-[-1]">
+                  <HealthBar
+                    percentage={
+                      ((playerDetails?.current_enemy.value.health.value || 0) /
+                        playerDetails?.current_enemy.value.max_health.value) *
+                      100
+                    }
+                  />
+                </div>
+                {/* <p>
                 Health:{" "}
                 {isPlayerLoading
                   ? "Loading..."
                   : playerDetails?.current_enemy.health}
               </p> */}
-              <p className="text-yellow-800">
-                Health:{" "}
-                {isPlayerLoading
-                  ? "Loading..."
-                  : playerDetails?.current_enemy.value.health.value}
-              </p>
+                <p className="text-yellow-800">
+                  Health:{" "}
+                  {isPlayerLoading
+                    ? "Loading..."
+                    : playerDetails?.current_enemy.value.health.value}
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* <CanvasSprite
+            {/* <CanvasSprite
             playerSprite={getSpriteImage(playerMovement, "player")}
             enemySprite={getSpriteImage(enemyMovement, "enemy")}
             playerMovement={playerMovement}
@@ -502,10 +515,10 @@ const Fight = () => {
               }
             }}
           /> */}
-          <div className="__characters flex w-full justify-between relative group">
-            {/* LEFT CHARACTER */}
-            <div
-              className={`
+            <div className="__characters flex w-full justify-between relative group">
+              {/* LEFT CHARACTER */}
+              <div
+                className={`
                 __left_character
                 aspect-[1200/884]         /* 1200×734 ratio for the sprite .. later added 150 */
                 w-[47vw]               
@@ -519,13 +532,16 @@ const Fight = () => {
                     : "translate-x-[0%] z-10"
                 }
               `}
-            >
-              <PixiBunny textures={getSpriteImage(playerMovement, "player")} />
-            </div>
+              >
+                <PixiBunny
+                  textures={getSpriteImage(playerMovement, "player")}
+                  playerMovement={playerMovement}
+                />
+              </div>
 
-            {/* RIGHT CHARACTER */}
-            <div
-              className={`
+              {/* RIGHT CHARACTER */}
+              <div
+                className={`
                 __right_character
                 aspect-[1333/900]         /* 1333×750 ratio for the enemy sprite ..later added 150 */
                 w-[47vw]    
@@ -538,284 +554,287 @@ const Fight = () => {
                     : "translate-x-0 z-10"
                 }
               `}
-            >
-              <PixiBunny textures={getSpriteImage(enemyMovement, "enemy")} />
+              >
+                <PixiBunny
+                  textures={getSpriteImage(enemyMovement, "enemy")}
+                  playerMovement={playerMovement}
+                />
+              </div>
             </div>
+            {/* Ensure the characters' container does not overflow */}
+            {/* h-[calc(100%-120px)] */}
+            {/* <div className="__characters flex w-full justify-between relative group"></div> */}
           </div>
-          {/* Ensure the characters' container does not overflow */}
-          {/* h-[calc(100%-120px)] */}
-          {/* <div className="__characters flex w-full justify-between relative group"></div> */}
+        </div>
+        <div className="__bottom_tab bg-black h-[17vh] w-full relative bottom-0 flex flex-row justify-between px-10">
+          {playerState == "attack" ? (
+            <div
+              className="__actions_buttons flex w-[450px] relative flex-row items-center"
+              style={{
+                backgroundImage: `url(${component_wrapper})`,
+                backgroundSize: "contain",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+
+                // visibility: playerTurn ? "visible" : "hidden"
+              }}
+            >
+              <div className="__character_headshot h-20  w-36 flex flex-row">
+                <img
+                  src={
+                    playerDetails.character.value.folder.value +
+                    playerDetails.character.value.mugshot.value
+                  }
+                  alt="profile picture"
+                  className="h-20 ml-2 p-1 pirata-one"
+                />
+                <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
+                  {playerDetails?.demeanor?.value != null &&
+                    (playerDetails?.demeanor.value > neutral
+                      ? "Motivated"
+                      : playerDetails?.demeanor.value < neutral
+                      ? "Depressed"
+                      : "Neutral")}
+                </div>
+              </div>
+              <div
+                className="__buttons_container flex flex-row relative gap-0 left-6"
+                style={{
+                  visibility: isActionClicable ? "visible" : "hidden"
+                }}
+              >
+                <div
+                  className="__red h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                  style={{
+                    backgroundImage: `url(${
+                      playerDetails?.demeanor?.value != null &&
+                      (playerDetails?.demeanor.value > neutral
+                        ? red_buttons[2]
+                        : playerDetails?.demeanor.value < neutral
+                        ? red_buttons[0]
+                        : red_buttons[1])
+                    })`,
+                    backgroundSize: "contain",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat"
+                  }}
+                  onClick={() => {
+                    setSelectedButtonID(1);
+                    fightAction(account, 1);
+                  }}
+                ></div>
+                <div
+                  className="__green h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                  style={{
+                    backgroundImage: `url(${
+                      playerDetails?.demeanor?.value != null &&
+                      (playerDetails?.demeanor.value > neutral
+                        ? green_buttons[2]
+                        : playerDetails?.demeanor.value < neutral
+                        ? green_buttons[0]
+                        : green_buttons[1])
+                    })`,
+                    backgroundSize: "contain",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat"
+                  }}
+                  onClick={() => {
+                    setSelectedButtonID(2);
+                    fightAction(account, 2);
+                  }}
+                ></div>
+                <div
+                  className="__blue h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                  style={{
+                    backgroundImage: `url(${
+                      playerDetails?.demeanor?.value != null &&
+                      (playerDetails?.demeanor.value > neutral
+                        ? blue_buttons[2]
+                        : playerDetails?.demeanor.value < neutral
+                        ? blue_buttons[0]
+                        : blue_buttons[1])
+                    })`,
+                    backgroundSize: "contain",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat"
+                  }}
+                  onClick={() => {
+                    setSelectedButtonID(3);
+                    fightAction(account, 3);
+                  }}
+                ></div>
+                <div className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
+                <div className="__critical h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="__defense_buttons flex w-[450px] relative flex-row items-center"
+              style={{
+                backgroundImage: `url(${component_wrapper})`,
+                backgroundSize: "contain",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+              }}
+            >
+              <div className="__character_headshot h-20  w-36 flex flex-row">
+                <img
+                  src={
+                    playerDetails.character.value.folder.value +
+                    playerDetails.character.value.mugshot.value
+                  }
+                  alt="profile picture"
+                  className="h-20 ml-2 p-1 pirata-one"
+                />
+                <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
+                  {playerDetails?.demeanor?.value != null &&
+                    (playerDetails?.demeanor.value > neutral
+                      ? "Motivated"
+                      : playerDetails?.demeanor.value < neutral
+                      ? "Depressed"
+                      : "Neutral")}
+                </div>
+              </div>
+              <div
+                className="__buttons_container flex flex-row relative gap-0 left-6"
+                style={{
+                  visibility: isActionClicable ? "visible" : "hidden"
+                }}
+              >
+                <div
+                  className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                  style={{
+                    backgroundImage: `url(${other_buttons.block})`,
+                    backgroundSize: "contain",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat"
+                  }}
+                  onClick={() => {
+                    setSelectedButtonID(1);
+                    defendAction(account, 0);
+                  }}
+                ></div>
+                <div
+                  className="__critical h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                  style={{
+                    backgroundImage: `url(${other_buttons.specialAttack})`,
+                    backgroundSize: "contain",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat"
+                  }}
+                  onClick={() => {
+                    setSelectedButtonID(2);
+                    defendAction(account, 1);
+                  }}
+                ></div>
+                <div
+                  className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+                  style={{
+                    backgroundImage: `url(${other_buttons.dodge})`,
+                    backgroundSize: "contain",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat"
+                  }}
+                  onClick={() => {
+                    setSelectedButtonID(3);
+                    defendAction(account, 2);
+                  }}
+                ></div>
+                <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
+                <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
+              </div>
+            </div>
+          )}
+          {
+            <div className="__phase pirata-one flex self-center text-2xl mr-0">
+              {playerTurn == true && playerState == "attack"
+                ? "Attack Phase"
+                : "Defensive Phase"}
+            </div>
+          }
+          <div
+            className="__resolve flex w-[150px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+            style={{
+              backgroundImage: `url(${turn_wrapper})`,
+              backgroundSize: "contain",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              visibility:
+                !isActionClicable && isResolveClickable ? "visible" : "hidden"
+            }}
+            onClick={async () => {
+              if (
+                playerState === "defense" &&
+                typeof selectedButtonID !== "undefined"
+              ) {
+                setEnemyMovement("dash");
+
+                // Wait for 1 second before switching to attack
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+                setEnemyMovement("attack");
+
+                // Ensure resolveAction completes before continuing
+                const e = await resolveAction();
+                let diff = compareCache(e, cacheUser);
+                if (!diff) return;
+
+                console.log(diff.user_health_diff);
+
+                if (diff.user_health_diff > 0) {
+                  setPlayerMovement("hit");
+                } else {
+                  setPlayerMovement("dodge");
+                }
+
+                setCacheUser(e);
+
+                // Wait 1.5 seconds before switching enemy to idle
+                await new Promise((resolve) => setTimeout(resolve, 900));
+                setEnemyMovement("idle");
+                setPlayerMovement("idle");
+
+                // Update player state after defense sequence
+                setPlayerState("attack");
+                setSelectedButtonID(undefined);
+              }
+
+              if (
+                playerState == "attack" &&
+                typeof selectedButtonID != "undefined"
+              ) {
+                setPlayerMovement("dash");
+
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+                setPlayerMovement("attack");
+
+                // Ensure resolveAction completes before continuing
+                const e = await resolveAction();
+                let diff = compareCache(e, cacheUser);
+                if (!diff) return;
+
+                console.log(diff.enemy_health_dif);
+
+                if (diff.enemy_health_dif > 0) {
+                  setEnemyMovement("hit");
+                } else {
+                  setEnemyMovement("dodge");
+                }
+
+                setCacheUser(e);
+
+                // Wait 1.5 seconds before switching back to idle
+                await new Promise((resolve) => setTimeout(resolve, 900));
+                setPlayerMovement("idle");
+                setEnemyMovement("idle");
+
+                setPlayerState("defense");
+                setSelectedButtonID(undefined);
+              }
+            }}
+          ></div>
         </div>
       </div>
-      <div className="__bottom_tab bg-black h-[17vh] w-full relative bottom-0 flex flex-row justify-between px-10">
-        {playerState == "attack" ? (
-          <div
-            className="__actions_buttons flex w-[450px] relative flex-row items-center"
-            style={{
-              backgroundImage: `url(${component_wrapper})`,
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat"
-
-              // visibility: playerTurn ? "visible" : "hidden"
-            }}
-          >
-            <div className="__character_headshot h-20  w-36 flex flex-row">
-              <img
-                src={
-                  playerDetails.character.value.folder.value +
-                  playerDetails.character.value.mugshot.value
-                }
-                alt="profilee picture"
-                className="h-20 ml-2 p-1 pirata-one"
-              />
-              <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
-                {playerDetails?.demeanor?.value != null &&
-                  (playerDetails?.demeanor.value > neutral
-                    ? "Motivated"
-                    : playerDetails?.demeanor.value < neutral
-                    ? "Depressed"
-                    : "Neutral")}
-              </div>
-            </div>
-            <div
-              className="__buttons_container flex flex-row relative gap-0 left-6"
-              style={{
-                visibility: isActionClicable ? "visible" : "hidden"
-              }}
-            >
-              <div
-                className="__red h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                style={{
-                  backgroundImage: `url(${
-                    playerDetails?.demeanor?.value != null &&
-                    (playerDetails?.demeanor.value > neutral
-                      ? red_buttons[2]
-                      : playerDetails?.demeanor.value < neutral
-                      ? red_buttons[0]
-                      : red_buttons[1])
-                  })`,
-                  backgroundSize: "contain",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat"
-                }}
-                onClick={() => {
-                  setSelectedButtonID(1);
-                  fightAction(account, 1);
-                }}
-              ></div>
-              <div
-                className="__green h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                style={{
-                  backgroundImage: `url(${
-                    playerDetails?.demeanor?.value != null &&
-                    (playerDetails?.demeanor.value > neutral
-                      ? green_buttons[2]
-                      : playerDetails?.demeanor.value < neutral
-                      ? green_buttons[0]
-                      : green_buttons[1])
-                  })`,
-                  backgroundSize: "contain",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat"
-                }}
-                onClick={() => {
-                  setSelectedButtonID(2);
-                  fightAction(account, 2);
-                }}
-              ></div>
-              <div
-                className="__blue h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                style={{
-                  backgroundImage: `url(${
-                    playerDetails?.demeanor?.value != null &&
-                    (playerDetails?.demeanor.value > neutral
-                      ? blue_buttons[2]
-                      : playerDetails?.demeanor.value < neutral
-                      ? blue_buttons[0]
-                      : blue_buttons[1])
-                  })`,
-                  backgroundSize: "contain",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat"
-                }}
-                onClick={() => {
-                  setSelectedButtonID(3);
-                  fightAction(account, 3);
-                }}
-              ></div>
-              <div className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
-              <div className="__critical h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
-            </div>
-          </div>
-        ) : (
-          <div
-            className="__defense_buttons flex w-[450px] relative flex-row items-center"
-            style={{
-              backgroundImage: `url(${component_wrapper})`,
-              backgroundSize: "contain",
-              backgroundPosition: "center",
-              backgroundRepeat: "no-repeat"
-            }}
-          >
-            <div className="__character_headshot h-20  w-36 flex flex-row">
-              <img
-                src={
-                  playerDetails.character.value.folder.value +
-                  playerDetails.character.value.mugshot.value
-                }
-                alt="profilee picture"
-                className="h-20 ml-2 p-1 pirata-one"
-              />
-              <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
-                {playerDetails?.demeanor?.value != null &&
-                  (playerDetails?.demeanor.value > neutral
-                    ? "Motivated"
-                    : playerDetails?.demeanor.value < neutral
-                    ? "Depressed"
-                    : "Neutral")}
-              </div>
-            </div>
-            <div
-              className="__buttons_container flex flex-row relative gap-0 left-6"
-              style={{
-                visibility: isActionClicable ? "visible" : "hidden"
-              }}
-            >
-              <div
-                className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                style={{
-                  backgroundImage: `url(${other_buttons.block})`,
-                  backgroundSize: "contain",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat"
-                }}
-                onClick={() => {
-                  setSelectedButtonID(1);
-                  defendAction(account, 0);
-                }}
-              ></div>
-              <div
-                className="__critical h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                style={{
-                  backgroundImage: `url(${other_buttons.specialAttack})`,
-                  backgroundSize: "contain",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat"
-                }}
-                onClick={() => {
-                  setSelectedButtonID(2);
-                  defendAction(account, 1);
-                }}
-              ></div>
-              <div
-                className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-                style={{
-                  backgroundImage: `url(${other_buttons.dodge})`,
-                  backgroundSize: "contain",
-                  backgroundPosition: "center",
-                  backgroundRepeat: "no-repeat"
-                }}
-                onClick={() => {
-                  setSelectedButtonID(3);
-                  defendAction(account, 2);
-                }}
-              ></div>
-              <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
-              <div className="__empty h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
-            </div>
-          </div>
-        )}
-        {
-          <div className="__phase pirata-one flex self-center text-2xl mr-0">
-            {playerTurn == true && playerState == "attack"
-              ? "Attack Phase"
-              : "Defensive Phase"}
-          </div>
-        }
-        <div
-          className="__resolve flex w-[150px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
-          style={{
-            backgroundImage: `url(${turn_wrapper})`,
-            backgroundSize: "contain",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            visibility:
-              !isActionClicable && isResolveClickable ? "visible" : "hidden"
-          }}
-          onClick={async () => {
-            if (
-              playerState === "defense" &&
-              typeof selectedButtonID !== "undefined"
-            ) {
-              setEnemyMovement("dash");
-
-              // Wait for 1 second before switching to attack
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-              setEnemyMovement("attack");
-
-              // Ensure resolveAction completes before continuing
-              const e = await resolveAction();
-              let diff = compareCache(e, cacheUser);
-              if (!diff) return;
-
-              console.log(diff.user_health_diff);
-
-              if (diff.user_health_diff > 0) {
-                setPlayerMovement("hit");
-              } else {
-                setPlayerMovement("dodge");
-              }
-
-              setCacheUser(e);
-
-              // Wait 1.5 seconds before switching enemy to idle
-              await new Promise((resolve) => setTimeout(resolve, 900));
-              setEnemyMovement("idle");
-              setPlayerMovement("idle");
-
-              // Update player state after defense sequence
-              setPlayerState("attack");
-              setSelectedButtonID(undefined);
-            }
-
-            if (
-              playerState == "attack" &&
-              typeof selectedButtonID != "undefined"
-            ) {
-              setPlayerMovement("dash");
-
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-              setPlayerMovement("attack");
-
-              // Ensure resolveAction completes before continuing
-              const e = await resolveAction();
-              let diff = compareCache(e, cacheUser);
-              if (!diff) return;
-
-              console.log(diff.enemy_health_dif);
-
-              if (diff.enemy_health_dif > 0) {
-                setEnemyMovement("hit");
-              } else {
-                setEnemyMovement("dodge");
-              }
-
-              setCacheUser(e);
-
-              // Wait 1.5 seconds before switching back to idle
-              await new Promise((resolve) => setTimeout(resolve, 900));
-              setPlayerMovement("idle");
-              setEnemyMovement("idle");
-
-              setPlayerState("defense");
-              setSelectedButtonID(undefined);
-            }
-          }}
-        ></div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Fight;

@@ -12,12 +12,12 @@ extend({
   AnimatedSprite
 });
 
-const PixiBunny: React.FC<IBunnySprite> = ({ textures }) => {
+const PixiBunny: React.FC<IBunnySprite> = ({ textures, playerMovement }) => {
   return (
     // We'll wrap our components with an <Application> component to provide
     // the Pixi.js Application context
     <Application backgroundAlpha={0}>
-      <BunnySprite textures={textures} />
+      <BunnySprite textures={textures} playerMovement={playerMovement} />
     </Application>
   );
 };
