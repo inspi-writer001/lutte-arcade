@@ -534,6 +534,7 @@ const Fight = () => {
               `}
               >
                 <PixiBunny
+                  key={"player"}
                   textures={getSpriteImage(playerMovement, "player")}
                   playerMovement={playerMovement}
                 />
@@ -556,8 +557,9 @@ const Fight = () => {
               `}
               >
                 <PixiBunny
+                  key={"enemy"}
                   textures={getSpriteImage(enemyMovement, "enemy")}
-                  playerMovement={playerMovement}
+                  playerMovement={enemyMovement}
                 />
               </div>
             </div>
@@ -767,15 +769,21 @@ const Fight = () => {
                 playerState === "defense" &&
                 typeof selectedButtonID !== "undefined"
               ) {
+                // Start with enemy dash
                 setEnemyMovement("dash");
 
-                // Wait for 1 second before switching to attack
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                // Shorter dash duration to keep the flow smooth
+                await new Promise((resolve) => setTimeout(resolve, 500));
+
+                // Trigger enemy attack only once
                 setEnemyMovement("attack");
 
-                // Ensure resolveAction completes before continuing
+                // Allow attack animation to play before resolving action
+                await new Promise((resolve) => setTimeout(resolve, 600));
+
+                // Resolve action and calculate health difference
                 const e = await resolveAction();
-                let diff = compareCache(e, cacheUser);
+                const diff = compareCache(e, cacheUser);
                 if (!diff) return;
 
                 console.log(diff.user_health_diff);
@@ -788,28 +796,36 @@ const Fight = () => {
 
                 setCacheUser(e);
 
-                // Wait 1.5 seconds before switching enemy to idle
+                // Wait for player reaction animation to finish
                 await new Promise((resolve) => setTimeout(resolve, 900));
+
+                // Reset both to idle
                 setEnemyMovement("idle");
                 setPlayerMovement("idle");
 
-                // Update player state after defense sequence
+                // Set up for next turn
                 setPlayerState("attack");
                 setSelectedButtonID(undefined);
               }
 
               if (
-                playerState == "attack" &&
-                typeof selectedButtonID != "undefined"
+                playerState === "attack" &&
+                typeof selectedButtonID !== "undefined"
               ) {
                 setPlayerMovement("dash");
 
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                // Dash duration
+                await new Promise((resolve) => setTimeout(resolve, 500));
+
+                // Only trigger attack once
                 setPlayerMovement("attack");
 
-                // Ensure resolveAction completes before continuing
+                // Wait for the attack animation to complete
+                await new Promise((resolve) => setTimeout(resolve, 600));
+
+                // Resolve the action
                 const e = await resolveAction();
-                let diff = compareCache(e, cacheUser);
+                const diff = compareCache(e, cacheUser);
                 if (!diff) return;
 
                 console.log(diff.enemy_health_dif);
@@ -822,11 +838,14 @@ const Fight = () => {
 
                 setCacheUser(e);
 
-                // Wait 1.5 seconds before switching back to idle
+                // Wait for the reaction animation (hit/dodge)
                 await new Promise((resolve) => setTimeout(resolve, 900));
+
+                // Return both to idle
                 setPlayerMovement("idle");
                 setEnemyMovement("idle");
 
+                // Switch to defense mode
                 setPlayerState("defense");
                 setSelectedButtonID(undefined);
               }
