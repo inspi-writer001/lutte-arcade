@@ -2,9 +2,15 @@
   transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
 }
 
+/* .player_card:hover {
+  transform: scale(1.05); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); 
+  
+} */
+
 .player_card:hover {
-  transform: scale(1.05); /* Slightly larger on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Adds a subtle shadow on hover */
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 .player_card:active {

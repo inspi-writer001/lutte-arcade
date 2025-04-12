@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import bgImage from "../assets/placeholders/start_plain.svg";
+import bgImage from "../assets/select_screen_bg.png";
+import header from "../assets/select_screen_header.png";
 // import { useContractInstance } from "../hooks/useContract";
 import "../styles/cards.css";
 // import { useStore } from "../store/GameStore";
@@ -67,7 +68,7 @@ const SelectCharacter = () => {
 
   return (
     <div
-      className="flex justify-center items-center w-screen h-screen text-center flex-col px-10 bg-[#3b2f2f]"
+      className="flex justify-center items-center w-screen h-screen text-center flex-col px-10 bg-[#3b2f2f] overflow-hidden"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
@@ -75,8 +76,8 @@ const SelectCharacter = () => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      <div className="__upper_text text-center text-8xl mb-7 unifrakturmaguntia text-red-700 large-stroke">
-        Choose Your Warrior
+      <div className="__upper_text text-center text-8xl mb-7 unifrakturmaguntia text-red-700 large-stroke absolute top-[5vh]">
+        <img src={header} />
       </div>
 
       <div className="__player_selection w-full flex flex-row justify-center">
@@ -113,9 +114,11 @@ const SelectCharacter = () => {
                 const totalItems = data.length;
 
                 return (
-                  <div
+                  <img
                     key={player.uid?.value.toString()} // Use `uid` as a unique key
-                    className="__selectable_player player_card flex relative bg-blue-400 border-black border-4 min-w-72 min-h-72"
+                    className="__selectable_player player_card flex relative min-w-[200px] min-h-[150px]"
+                    src={`${player.folder?.value}${player.skin?.value}`}
+                    alt={player.skin?.value}
                     style={{
                       gridColumn:
                         isLastItem && totalItems % 3 !== 0
@@ -153,19 +156,7 @@ const SelectCharacter = () => {
                           console.log(error);
                         });
                     }}
-                  >
-                    <img
-                      className="absolute top-0 left-0 w-full h-full object-cover"
-                      style={{
-                        objectPosition: "center top",
-                        transform: "scale(0.9)" // Optional zoom effect
-                        // marginTop: "10rem" // Adjust to center the desired portion
-                      }}
-                      // src={`https://bronze-petite-viper-118.mypinata.cloud/ipfs/${player.value.skin.value}`}
-                      src={`${player.folder?.value}${player.skin?.value}`}
-                      alt={player.skin?.value}
-                    />
-                  </div>
+                  />
                 );
               })}
           </div>

@@ -95,7 +95,7 @@ const provider = jsonRpcProvider({
 function App() {
   const { transitionTrigger, setTransitionTrigger } = useGameStore();
   return (
-    <>
+    <div className="aspect-wrapper">
       <StarknetProvider>
         {" "}
         <Router>
@@ -113,7 +113,7 @@ function App() {
         </Router>
         <TransitionOverlay />
       </StarknetProvider>
-    </>
+    </div>
   );
 }
 
