@@ -49,7 +49,7 @@ const HealthBar: FC<IHealthBar> = ({ percentage }) => {
       <img
         src={getHealthImage(percentage)}
         alt="Health bar"
-        style={{ width: "350px", height: "80px" }}
+        style={{ width: "300px", height: "60px" }}
       />
     </div>
   );

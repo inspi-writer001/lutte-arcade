@@ -1,8 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAccount } from "@starknet-react/core";
 import fight_bg from "../assets/placeholders/fight_bg.png";
-import component_wrapper from "../assets/bottom_components/bottom_ui.png";
-import turn_wrapper from "../assets/bottom_components/endturn.png";
+import component_wrapper from "../assets/bottom_components/button_ui_panel.png";
+import ui_component_wrapper from "../assets/bottom_components/ui_panel_rack.png";
+import turn_wrapper from "../assets/bottom_components/turn_wrapper.png";
+import turn from "../assets/bottom_components/turn.png";
 import { useEffect, useState } from "react";
 import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
@@ -568,7 +570,15 @@ const Fight = () => {
             {/* <div className="__characters flex w-full justify-between relative group"></div> */}
           </div>
         </div>
-        <div className="__bottom_tab bg-black h-[17vh] w-full relative bottom-0 flex flex-row justify-between px-10">
+        <div
+          className="__bottom_tab bg-black h-[16vh] w-full relative bottom-0 flex flex-row justify-between px-10"
+          style={{
+            backgroundImage: `url(${ui_component_wrapper})`,
+            backgroundSize: "contain",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat"
+          }}
+        >
           {playerState == "attack" ? (
             <div
               className="__actions_buttons flex w-[450px] relative flex-row items-center"
@@ -588,9 +598,9 @@ const Fight = () => {
                     playerDetails.character.value.mugshot.value
                   }
                   alt="profile picture"
-                  className="h-20 ml-2 p-1 pirata-one"
+                  className="h-20 ml-2 p-3 pirata-one"
                 />
-                <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
+                <div className="__excitement text-amber-300 self-end mb-3 unifrakturmaguntia">
                   {playerDetails?.demeanor?.value != null &&
                     (playerDetails?.demeanor.value > neutral
                       ? "Motivated"
@@ -671,7 +681,7 @@ const Fight = () => {
             </div>
           ) : (
             <div
-              className="__defense_buttons flex w-[450px] relative flex-row items-center"
+              className="__defense_buttons flex w-[450px] h-[] relative flex-row items-center"
               style={{
                 backgroundImage: `url(${component_wrapper})`,
                 backgroundSize: "contain",
@@ -755,10 +765,10 @@ const Fight = () => {
             </div>
           }
           <div
-            className="__resolve flex w-[150px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"
+            className="__resolve flex w-[150px] relative justify-center hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300 p-9"
             style={{
               backgroundImage: `url(${turn_wrapper})`,
-              backgroundSize: "contain",
+              backgroundSize: "center",
               backgroundPosition: "center",
               backgroundRepeat: "no-repeat",
               visibility:
@@ -850,7 +860,9 @@ const Fight = () => {
                 setSelectedButtonID(undefined);
               }
             }}
-          ></div>
+          >
+            <img src={turn} alt="resolve turn icon" />
+          </div>
         </div>
       </div>
     );

@@ -70,7 +70,7 @@ const HomePage = () => {
             backgroundRepeat: "no-repeat"
           }}
         >
-          <div className=" h-full w-[100vw] flex flex-col justify-end relative bottom-0">
+          <div className=" h-full w-[100vw] flex flex-col justify-end relative bottom-9">
             <button
               onClick={() => {
                 connectWallet();
