@@ -11,7 +11,7 @@ import { AccountInterface } from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
 import HealthBar from "../Components/Healthbar";
 import game_over from "../assets/gameover.jpg";
-// import Spritesheet from "react-responsive-spritesheet";
+
 import "../styles/fonts.css";
 
 import {
@@ -33,30 +33,6 @@ let motivated = 16; // 16-20
 
 // last attack state can be 0, 1, 2, 3, 4 -- 1- successful attack, 2- glazed attack, 3- missed
 // attack, 4- critical attack, 0- not yet attacked
-
-//  new ToriiQueryBuilder()
-//    .withClause(
-//      new ClauseBuilder<LutteSchemaType>()
-//        .keys(["lutte-Player"], [address], "VariableLen")
-//        .build()
-//    )
-//    .build();
-
-// const playerFrameData = {
-//   idle: { width: 1202, height: 736, steps: 6, fps: 3 },
-//   attack: { width: 1202, height: 736, steps: 5, fps: 3 },
-//   dash: { width: 1200, height: 734, steps: 2, fps: 3 },
-//   hit: { width: 1202, height: 734, steps: 3, fps: 3 },
-//   dodge: { width: 1200, height: 734, steps: 2, fps: 3 }
-// };
-
-// const enemyFrameData = {
-//   idle: { width: 1335, height: 752, steps: 7, fps: 3 },
-//   attack: { width: 1335, height: 752, steps: 5, fps: 3 },
-//   dash: { width: 1335, height: 752, steps: 2, fps: 3 },
-//   hit: { width: 1333, height: 750, steps: 2, fps: 3 },
-//   dodge: { width: 1335, height: 752, steps: 2, fps: 3 }
-// };
 
 interface IEntity {
   png: string;
@@ -158,7 +134,7 @@ const Fight = () => {
           return animationTextures;
         } catch (error) {
           console.error("Error loading spritesheet:", error);
-          return []; // Return an empty array on failure
+          return [];
         }
       };
 
@@ -317,7 +293,7 @@ const Fight = () => {
     id: number
   ): Promise<string | undefined> => {
     setIsActionClickable(false);
-    // PlayerAnimation.current?.goToAndPlay(1);
+
     if (account)
       return account
         ?.execute([
@@ -401,7 +377,7 @@ const Fight = () => {
       !characterTextures ||
       !enemyTextures
     ) {
-      return []; // ✅ Return an empty array instead of `undefined`
+      return [];
     }
 
     const folder = type === "player" ? characterTextures : enemyTextures;
@@ -420,9 +396,6 @@ const Fight = () => {
         return folder[0] || [];
     }
   };
-
-  // console.log(state);
-  // const playable_character = state as IplayableCharacter;
 
   if (!playerDetails?.last_attack) return;
 
@@ -469,9 +442,7 @@ const Fight = () => {
                     100
                   }
                 />
-                {/* <p>
-                Health: {isPlayerLoading ? "Loading..." : playerDetails?.health}
-              </p> */}
+
                 <p className="text-yellow-800">
                   Health:{" "}
                   {isPlayerLoading ? "Loading..." : playerDetails?.health.value}
@@ -487,12 +458,7 @@ const Fight = () => {
                     }
                   />
                 </div>
-                {/* <p>
-                Health:{" "}
-                {isPlayerLoading
-                  ? "Loading..."
-                  : playerDetails?.current_enemy.health}
-              </p> */}
+
                 <p className="text-yellow-800">
                   Health:{" "}
                   {isPlayerLoading
@@ -502,27 +468,6 @@ const Fight = () => {
               </div>
             </div>
 
-            {/* <CanvasSprite
-            playerSprite={getSpriteImage(playerMovement, "player")}
-            enemySprite={getSpriteImage(enemyMovement, "enemy")}
-            playerMovement={playerMovement}
-            enemyMovement={enemyMovement}
-            isEnemyMovingForward={
-              enemyMovement == "attack" || enemyMovement == "dash"
-            }
-            isPlayerMovingForward={
-              playerMovement == "attack" || playerMovement == "dash"
-            }
-            playerFrameData={playerFrameData}
-            enemyFrameData={enemyFrameData}
-            onAnimationComplete={(character: "player" | "enemy") => {
-              if (character === "player") {
-                setPlayerMovement("idle"); // Transition player to idle state
-              } else if (character === "enemy") {
-                setEnemyMovement("idle"); // Transition enemy to idle state
-              }
-            }}
-          /> */}
             <div className="__characters flex w-full justify-between relative group">
               {/* LEFT CHARACTER */}
               <div
