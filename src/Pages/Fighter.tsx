@@ -10,6 +10,7 @@ import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
 import { AccountInterface } from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
 import HealthBar from "../Components/Healthbar";
+import game_over from "../assets/gameover.jpg";
 // import Spritesheet from "react-responsive-spritesheet";
 import "../styles/fonts.css";
 
@@ -133,7 +134,6 @@ const Fight = () => {
     const preloadImages = async (urls: IEntity[]) => {
       const loadSpritesheet = async (entity: IEntity) => {
         try {
-          console.log("Loading spritesheet JSON...");
           const response = await fetch(entity.json);
           const spritesheetData = await response.json();
 
@@ -141,16 +141,12 @@ const Fight = () => {
             throw new Error("Invalid spritesheet: 'frames' key missing.");
           }
 
-          console.log("Loading spritesheet texture...");
           const texture = await Assets.load(entity.png);
 
-          console.log("Creating Spritesheet instance...");
           const spritesheet = new Spritesheet(texture, spritesheetData);
 
-          console.log("Parsing spritesheet...");
-          await spritesheet.parse(); // ✅ Ensure it's fully parsed before using
+          await spritesheet.parse();
 
-          console.log("Extracting animation textures...");
           const animationTextures = Object.keys(spritesheetData.frames).map(
             (frameName) => spritesheet.textures[frameName]
           );
@@ -159,7 +155,6 @@ const Fight = () => {
             throw new Error("No frames found in spritesheet.");
           }
 
-          console.log("Textures loaded:", animationTextures);
           return animationTextures;
         } catch (error) {
           console.error("Error loading spritesheet:", error);
@@ -167,12 +162,10 @@ const Fight = () => {
         }
       };
 
-      // ✅ Use `map` to return an array of promises
       const assetsPromises = urls.map((url) =>
         loadSpritesheet({ json: url.json, png: url.png })
       );
 
-      // ✅ Wait for all promises to resolve
       return Promise.all(assetsPromises);
     };
 
@@ -230,8 +223,6 @@ const Fight = () => {
             "/spritesheet.png"
         }
       ]).then((response) => {
-        console.log("-----------");
-        console.log(response);
         setCharacterTextures(response);
         setAssetsLoaded(true);
       });
@@ -434,6 +425,21 @@ const Fight = () => {
   // const playable_character = state as IplayableCharacter;
 
   if (!playerDetails?.last_attack) return;
+
+  if (playerDetails?.health.value == 0)
+    return (
+      <div className="w-full h-full flex justify-center items-center relative">
+        <img src={game_over} height={"100%"} width={"100%"} />
+        <h1
+          className="absolute pirata-one font-bold text-4xl mt-36 hover:cursor-pointer w-[300px] text-center bg-gray-950 py-3"
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          Go Home
+        </h1>
+      </div>
+    );
 
   if (!assetsLoaded) {
     return (
