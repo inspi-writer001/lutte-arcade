@@ -64,6 +64,7 @@ const Fight = () => {
 
   const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
+
   const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
   const [cacheUser, setCacheUser] = useState<LuttePlayer>();
   const [playerMovement, setPlayerMovement] = useState<
