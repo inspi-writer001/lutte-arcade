@@ -178,6 +178,56 @@ export function setupWorld(provider: DojoProvider) {
     }
   };
 
+  const build_actions_deleteCharacter_calldata = (
+    uid: BigNumberish
+  ): DojoCall => {
+    return {
+      contractName: "actions",
+      entrypoint: "delete_character",
+      calldata: [uid]
+    };
+  };
+
+  const actions_deleteCharacter = async (
+    snAccount: Account | AccountInterface,
+    uid: BigNumberish
+  ) => {
+    try {
+      return await provider.execute(
+        snAccount,
+        build_actions_deleteCharacter_calldata(uid),
+        "lutte"
+      );
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
+  const build_actions_deleteEnemy_calldata = (uid: BigNumberish): DojoCall => {
+    return {
+      contractName: "actions",
+      entrypoint: "delete_enemy",
+      calldata: [uid]
+    };
+  };
+
+  const actions_deleteEnemy = async (
+    snAccount: Account | AccountInterface,
+    uid: BigNumberish
+  ) => {
+    try {
+      return await provider.execute(
+        snAccount,
+        build_actions_deleteEnemy_calldata(uid),
+        "lutte"
+      );
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
   const build_actions_entityCount_calldata = (gid: BigNumberish): DojoCall => {
     return {
       contractName: "actions",
@@ -338,12 +388,24 @@ export function setupWorld(provider: DojoProvider) {
     idleSprite: ByteArray,
     attackSprite: ByteArray,
     mugshot: ByteArray,
-    hitSprite: ByteArray
+    hitSprite: ByteArray,
+    dashSprite: ByteArray,
+    dodgeSprite: ByteArray
   ): DojoCall => {
     return {
       contractName: "actions",
       entrypoint: "update_enemy_asset",
-      calldata: [id, skin, folder, idleSprite, attackSprite, mugshot, hitSprite]
+      calldata: [
+        id,
+        skin,
+        folder,
+        idleSprite,
+        attackSprite,
+        mugshot,
+        hitSprite,
+        dashSprite,
+        dodgeSprite
+      ]
     };
   };
 
@@ -355,7 +417,9 @@ export function setupWorld(provider: DojoProvider) {
     idleSprite: ByteArray,
     attackSprite: ByteArray,
     mugshot: ByteArray,
-    hitSprite: ByteArray
+    hitSprite: ByteArray,
+    dashSprite: ByteArray,
+    dodgeSprite: ByteArray
   ) => {
     try {
       return await provider.execute(
@@ -367,7 +431,9 @@ export function setupWorld(provider: DojoProvider) {
           idleSprite,
           attackSprite,
           mugshot,
-          hitSprite
+          hitSprite,
+          dashSprite,
+          dodgeSprite
         ),
         "lutte"
       );
@@ -384,12 +450,24 @@ export function setupWorld(provider: DojoProvider) {
     idleSprite: ByteArray,
     attackSprite: ByteArray,
     mugshot: ByteArray,
-    hitSprite: ByteArray
+    hitSprite: ByteArray,
+    dashSprite: ByteArray,
+    dodgeSprite: ByteArray
   ): DojoCall => {
     return {
       contractName: "actions",
       entrypoint: "update_player_asset",
-      calldata: [id, skin, folder, idleSprite, attackSprite, mugshot, hitSprite]
+      calldata: [
+        id,
+        skin,
+        folder,
+        idleSprite,
+        attackSprite,
+        mugshot,
+        hitSprite,
+        dashSprite,
+        dodgeSprite
+      ]
     };
   };
 
@@ -401,7 +479,9 @@ export function setupWorld(provider: DojoProvider) {
     idleSprite: ByteArray,
     attackSprite: ByteArray,
     mugshot: ByteArray,
-    hitSprite: ByteArray
+    hitSprite: ByteArray,
+    dashSprite: ByteArray,
+    dodgeSprite: ByteArray
   ) => {
     try {
       return await provider.execute(
@@ -413,7 +493,9 @@ export function setupWorld(provider: DojoProvider) {
           idleSprite,
           attackSprite,
           mugshot,
-          hitSprite
+          hitSprite,
+          dashSprite,
+          dodgeSprite
         ),
         "lutte"
       );
@@ -431,6 +513,10 @@ export function setupWorld(provider: DojoProvider) {
       buildCreateEnemyCalldata: build_actions_createEnemy_calldata,
       defensivePhase: actions_defensivePhase,
       buildDefensivePhaseCalldata: build_actions_defensivePhase_calldata,
+      deleteCharacter: actions_deleteCharacter,
+      buildDeleteCharacterCalldata: build_actions_deleteCharacter_calldata,
+      deleteEnemy: actions_deleteEnemy,
+      buildDeleteEnemyCalldata: build_actions_deleteEnemy_calldata,
       entityCount: actions_entityCount,
       buildEntityCountCalldata: build_actions_entityCount_calldata,
       fetchEnemies: actions_fetchEnemies,
