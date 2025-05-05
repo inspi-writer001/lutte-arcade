@@ -60,6 +60,7 @@ const Fight = () => {
   const { sdk } = useDojoSDK();
 
   const [assetsLoaded, setAssetsLoaded] = useState(false);
+  const [showGameOver, setShowGameOver] = useState(false);
 
   const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
@@ -200,7 +201,7 @@ const Fight = () => {
         }
       ]).then((response) => {
         setCharacterTextures(response);
-        setAssetsLoaded(true);
+        // setAssetsLoaded(true);
       });
     }
 
@@ -263,6 +264,16 @@ const Fight = () => {
       });
     }
   }, [playerDetails]);
+
+  useEffect(() => {
+    if (playerDetails?.health.value === 0) {
+      const timer = setTimeout(() => {
+        setShowGameOver(true);
+      }, 1500);
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, [playerDetails?.health.value]);
 
   const [playerTurn, setPlayerTurn] = useState(
     !Boolean(playerDetails?.last_attack.value)
@@ -399,20 +410,19 @@ const Fight = () => {
 
   if (!playerDetails?.last_attack) return;
 
-  if (playerDetails?.health.value == 0)
+  if (showGameOver) {
     return (
       <div className="w-full h-full flex justify-center items-center relative">
-        <img src={game_over} height={"100%"} width={"100%"} />
+        <img src={game_over} height="100%" width="100%" />
         <h1
           className="absolute pirata-one font-bold text-4xl mt-36 hover:cursor-pointer w-[300px] text-center bg-gray-950 py-3"
-          onClick={() => {
-            navigate("/");
-          }}
+          onClick={() => navigate("/")}
         >
           Go Home
         </h1>
       </div>
     );
+  }
 
   if (!assetsLoaded) {
     return (
@@ -424,12 +434,15 @@ const Fight = () => {
     return (
       <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
         <div
-          className="flex h-[83vh] w-full relative justify-center"
+          className="flex w-full relative justify-center"
           style={{
+            aspectRatio: "16 / 9", // Adjust based on your image ratio
             backgroundImage: `url(${fight_bg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
+            backgroundSize: "contain",
+            backgroundPosition: "bottom center",
+            backgroundRepeat: "no-repeat",
+            width: "100%",
+            maxHeight: "83vh"
           }}
         >
           <div className="__fight_canvas w-full h-full max-h-[83vh] flex flex-col justify-between px-1 md:px-20 relative max-w-[1500px] overflow-hidden">
@@ -501,7 +514,7 @@ const Fight = () => {
                 w-[47vw]    
                 flex items-center justify-center
                 relative self-end transition-transform duration-500
-                overflow-hidden
+                
                 ${
                   enemyMovement == "dash" || enemyMovement == "attack"
                     ? "-translate-x-[78%] z-20"
@@ -509,11 +522,13 @@ const Fight = () => {
                 }
               `}
               >
-                <PixiBunny
-                  key={"enemy"}
-                  textures={getSpriteImage(enemyMovement, "enemy")}
-                  playerMovement={enemyMovement}
-                />
+                <div className="absolute">
+                  <PixiBunny
+                    key={"enemy"}
+                    textures={getSpriteImage(enemyMovement, "enemy")}
+                    playerMovement={enemyMovement}
+                  />
+                </div>
               </div>
             </div>
             {/* Ensure the characters' container does not overflow */}
@@ -740,7 +755,7 @@ const Fight = () => {
                 setEnemyMovement("attack");
 
                 // Allow attack animation to play before resolving action
-                await new Promise((resolve) => setTimeout(resolve, 600));
+                await new Promise((resolve) => setTimeout(resolve, 150));
 
                 // Resolve action and calculate health difference
                 const e = await resolveAction();
@@ -782,7 +797,7 @@ const Fight = () => {
                 setPlayerMovement("attack");
 
                 // Wait for the attack animation to complete
-                await new Promise((resolve) => setTimeout(resolve, 600));
+                await new Promise((resolve) => setTimeout(resolve, 150));
 
                 // Resolve the action
                 const e = await resolveAction();
