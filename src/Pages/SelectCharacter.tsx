@@ -1,17 +1,15 @@
 import { useEffect, useState } from "react";
 import bgImage from "../assets/select_screen_bg.png";
 import header from "../assets/select_screen_header.png";
-// import { useContractInstance } from "../hooks/useContract";
 import "../styles/cards.css";
-// import { useStore } from "../store/GameStore";
 import { useNavigate } from "react-router-dom";
 import { useAccount } from "@starknet-react/core";
 import { CONTRACT_ADDRESS } from "../constants";
 import { ToriiQueryBuilder } from "@dojoengine/sdk";
 import { useDojoSDK } from "@dojoengine/sdk/react";
+import ch1 from "../assets/placeholders/ch1.png";
+import ch3 from "../assets/placeholders/ch3.png";
 
-// import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
-// import { useGameStore } from "../store/GameStore";
 import IntroScene from "../Components/IntroScene";
 
 const SelectCharacter = () => {
@@ -113,80 +111,83 @@ const SelectCharacter = () => {
           </div>
         ) : (
           // Render Characters
-          <div
-            className="__player_boxed grid gap-4 max-w-[1024px] hover:cursor-pointer overflow-y-scroll p-3"
-            style={{
-              gridTemplateColumns: "repeat(3, 1fr)", // 3 items per row
-              gridAutoRows: "minmax(20rem, auto)", // Ensure rows adapt to content
-              overflowY: "scroll", // Enable vertical scrolling
-              maxHeight: "80vh", // Set a maximum height for the container
-              justifyItems: "center" // Center items in their columns
-            }}
-          >
-            {/* {!data && (
-              <div
-                onClick={() => {
-                  console.log(data);
-                }}
-              >
-                press
-              </div>
-            )} */}
-            {data &&
-              data.map((player, index: number) => {
-                // Determine if this is the last item and adjust its position
-                const isLastItem = index === data.length - 1;
-                const totalItems = data.length;
+          <div className="__players_tentative w-full flex flex-col md:flex-row justify-center items-center gap-1 relative">
+            <img
+              src={ch1}
+              alt="coming soon left"
+              className="pointer-events-none hidden sm:block w-[200px] h-[300px] object-contain"
+            />
+            <div
+              className="__player_boxed grid max-w-[1024px] hover:cursor-pointer overflow-y-scroll p-3"
+              style={{
+                gridTemplateColumns: "repeat(3, 1fr)", // 3 items per row
+                gridAutoRows: "minmax(20rem, auto)", // Ensure rows adapt to content
+                overflowY: "scroll", // Enable vertical scrolling
+                maxHeight: "80vh", // Set a maximum height for the container
+                justifyItems: "center" // Center items in their columns
+              }}
+            >
+              {data &&
+                data.map((player, index: number) => {
+                  // Determine if this is the last item and adjust its position
+                  const isLastItem = index === data.length - 1;
+                  const totalItems = data.length;
 
-                return (
-                  <img
-                    key={player.uid?.value.toString()} // Use `uid` as a unique key
-                    className="__selectable_player player_card flex relative min-w-[200px] min-h-[150px]"
-                    src={`${player.folder?.value}${player.skin?.value}`}
-                    alt={player.skin?.value}
-                    style={{
-                      gridColumn:
-                        isLastItem && totalItems % 3 !== 0
-                          ? "2 / span 1"
-                          : "auto", // Center the last item if it's alone in the row
-                      borderRadius: "0.5rem",
-                      overflow: "hidden", // Ensures the image is cropped
-                      position: "relative"
-                    }}
-                    onClick={() => {
-                      account
-                        ?.execute([
-                          {
-                            contractAddress: CONTRACT_ADDRESS,
-                            entrypoint: "spawn",
-                            calldata: [player.uid.value.toString()]
-                          }
-                        ])
-                        .then((e) => {
-                          console.log(e.transaction_hash);
-                          console.log("spawn successful");
-                          setCutScene(true);
+                  return (
+                    <img
+                      key={player.uid?.value.toString()} // Use `uid` as a unique key
+                      className="__selectable_player player_card flex relative min-w-[200px] min-h-[150px]"
+                      src={`${player.folder?.value}${player.skin?.value}`}
+                      alt={player.skin?.value}
+                      style={{
+                        gridColumn:
+                          isLastItem && totalItems % 3 !== 0
+                            ? "2 / span 1"
+                            : "auto", // Center the last item if it's alone in the row
+                        borderRadius: "0.5rem",
+                        overflow: "hidden", // Ensures the image is cropped
+                        position: "relative"
+                      }}
+                      onClick={() => {
+                        account
+                          ?.execute([
+                            {
+                              contractAddress: CONTRACT_ADDRESS,
+                              entrypoint: "spawn",
+                              calldata: [player.uid.value.toString()]
+                            }
+                          ])
+                          .then((e) => {
+                            console.log(e.transaction_hash);
+                            console.log("spawn successful");
+                            setCutScene(true);
 
-                          setId(player.uid);
-                          setAddress(account.address);
-                          // setTransitionTrigger(true);
-                          // setTimeout(() => {
-                          //   navigate("/fight", {
-                          //     state: {
-                          //       id: player.uid,
-                          //       address: account.address
-                          //     }
-                          //   });
-                          // }, 500);
-                        })
-                        .catch((error) => {
-                          console.log("error spawning character");
-                          console.log(error);
-                        });
-                    }}
-                  />
-                );
-              })}
+                            setId(player.uid);
+                            setAddress(account.address);
+                            // setTransitionTrigger(true);
+                            // setTimeout(() => {
+                            //   navigate("/fight", {
+                            //     state: {
+                            //       id: player.uid,
+                            //       address: account.address
+                            //     }
+                            //   });
+                            // }, 500);
+                          })
+                          .catch((error) => {
+                            console.log("error spawning character");
+                            console.log(error);
+                          });
+                      }}
+                    />
+                  );
+                })}
+            </div>
+            <img
+              src={ch3}
+              alt="coming soon right"
+              className="pointer-events-none hidden sm:block w-[200px] h-[300px] object-contain"
+            />
           </div>
         )}
       </div>
