@@ -93,7 +93,9 @@ const provider = jsonRpcProvider({
 });
 
 function App() {
-  const { transitionTrigger, setTransitionTrigger } = useGameStore();
+  const { transitionTrigger, setTransitionTrigger, setGlobalMusic } =
+    useGameStore();
+  // setGlobalMusic(true);
   return (
     <div className="aspect-wrapper">
       <StarknetProvider>

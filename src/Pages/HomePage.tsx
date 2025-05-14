@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "../styles/buttons.css";
 import bgImage from "../assets/placeholders/start_bg.svg";
 
@@ -9,8 +9,10 @@ import { useAccount, useConnect } from "@starknet-react/core";
 import LoadingPage from "./LoadingPage";
 import { connector } from "../StarknetProvider";
 import { useGameStore } from "../store/GameStore";
+import BackgroundMusic from "../Components/BackgroundMusic";
 
 const HomePage = () => {
+  const bgMusicRef = useRef<any>(null);
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
 
@@ -70,6 +72,7 @@ const HomePage = () => {
             backgroundRepeat: "no-repeat"
           }}
         >
+          <BackgroundMusic ref={bgMusicRef} />
           <div className=" h-full w-[100vw] flex flex-col justify-end relative bottom-9">
             <button
               onClick={() => {

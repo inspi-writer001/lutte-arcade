@@ -27,6 +27,8 @@ import { padHexTo66 } from "../Helpers/converters";
 import { Assets, Texture, Spritesheet, TextureSource } from "pixi.js";
 import PixiBunny from "./PixiBunny";
 
+import { attack_1, attack_3, dodge, playSound } from "../Helpers/audio";
+
 let depressed = 0; // 0-5
 let neutral = 6; // 6-15
 let motivated = 16; // 16-20
@@ -433,7 +435,8 @@ const Fight = () => {
     );
   } else
     return (
-      <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
+      <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col ">
+        {/* <BackgroundMusic /> */}
         <div
           className="flex w-full relative justify-center"
           style={{
@@ -447,7 +450,7 @@ const Fight = () => {
           }}
         >
           <div className="__fight_canvas w-full h-full max-h-[83vh] flex flex-col justify-between px-1 md:px-20 relative max-w-[1500px] overflow-hidden">
-            <div className="__health flex flex-row justify-between w-full">
+            <div className="__health flex flex-row justify-between w-full mt-4">
               <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-start">
                 <HealthBar
                   percentage={
@@ -538,7 +541,7 @@ const Fight = () => {
           </div>
         </div>
         <div
-          className="__bottom_tab bg-black h-[16vh] w-full relative bottom-0 flex flex-row justify-between px-10"
+          className="__bottom_tab bg-black h-[15vh] w-full relative bottom-1 flex flex-row justify-between px-10"
           style={{
             backgroundImage: `url(${ui_component_wrapper})`,
             backgroundSize: "contain",
@@ -565,7 +568,7 @@ const Fight = () => {
                     playerDetails.character.value.mugshot.value
                   }
                   alt="profile picture"
-                  className="h-20 ml-2 p-3 pirata-one"
+                  className="ml-2 p-3 pirata-one"
                 />
                 <div className="__excitement text-amber-300 self-end mb-3 unifrakturmaguntia">
                   {playerDetails?.demeanor?.value != null &&
@@ -577,7 +580,7 @@ const Fight = () => {
                 </div>
               </div>
               <div
-                className="__buttons_container flex flex-row relative gap-0 left-6"
+                className="__buttons_container flex flex-row relative gap-2 left-6"
                 style={{
                   visibility: isActionClicable ? "visible" : "hidden"
                 }}
@@ -663,9 +666,9 @@ const Fight = () => {
                     playerDetails.character.value.mugshot.value
                   }
                   alt="profile picture"
-                  className="h-20 ml-2 p-1 pirata-one"
+                  className="ml-2 p-3 pirata-one"
                 />
-                <div className="__excitement text-amber-300 self-end mb-1 unifrakturmaguntia">
+                <div className="__excitement text-amber-300 self-end mb-3 unifrakturmaguntia">
                   {playerDetails?.demeanor?.value != null &&
                     (playerDetails?.demeanor.value > neutral
                       ? "Motivated"
@@ -675,7 +678,7 @@ const Fight = () => {
                 </div>
               </div>
               <div
-                className="__buttons_container flex flex-row relative gap-0 left-6"
+                className="__buttons_container flex flex-row relative gap-2 left-6"
                 style={{
                   visibility: isActionClicable ? "visible" : "hidden"
                 }}
@@ -732,7 +735,7 @@ const Fight = () => {
             </div>
           }
           <div
-            className="__resolve flex w-[150px] relative justify-center hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300 p-9"
+            className="__resolve flex w-[150px] relative justify-center hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300 p-11"
             style={{
               backgroundImage: `url(${turn_wrapper})`,
               backgroundSize: "center",
@@ -746,13 +749,10 @@ const Fight = () => {
                 playerState === "defense" &&
                 typeof selectedButtonID !== "undefined"
               ) {
-                // Start with enemy dash
                 setEnemyMovement("dash");
 
                 // Shorter dash duration to keep the flow smooth
                 await new Promise((resolve) => setTimeout(resolve, 500));
-
-                // Trigger enemy attack only once
                 setEnemyMovement("attack");
 
                 // Allow attack animation to play before resolving action
@@ -766,9 +766,13 @@ const Fight = () => {
                 console.log(diff.user_health_diff);
 
                 if (diff.user_health_diff > 0) {
+                  if (diff.user_health_diff > 20) {
+                    playSound(attack_3);
+                  } else playSound(attack_1);
                   setPlayerMovement("hit");
                 } else {
                   setPlayerMovement("dodge");
+                  playSound(dodge);
                 }
 
                 setCacheUser(e);
@@ -793,8 +797,6 @@ const Fight = () => {
 
                 // Dash duration
                 await new Promise((resolve) => setTimeout(resolve, 500));
-
-                // Only trigger attack once
                 setPlayerMovement("attack");
 
                 // Wait for the attack animation to complete
@@ -808,9 +810,13 @@ const Fight = () => {
                 console.log(diff.enemy_health_dif);
 
                 if (diff.enemy_health_dif > 0) {
+                  if (diff.enemy_health_dif > 20) {
+                    playSound(attack_3);
+                  } else playSound(attack_1);
                   setEnemyMovement("hit");
                 } else {
                   setEnemyMovement("dodge");
+                  playSound(dodge);
                 }
 
                 setCacheUser(e);
