@@ -56,7 +56,7 @@ const HomePage = () => {
   const handleRespawn = async () => {
     if (!account) return;
 
-    const result = await account.execute([
+    await account.execute([
       {
         contractAddress: CONTRACT_ADDRESS,
         entrypoint: "respawn",

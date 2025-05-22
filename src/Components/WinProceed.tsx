@@ -84,15 +84,15 @@ const WinProceed = () => {
 
 export default WinProceed;
 
-interface MetadataField<T> {
-  type: string;
-  type_name: string;
-  value: T;
-  key: boolean;
-}
+// interface MetadataField<T> {
+//   type: string;
+//   type_name: string;
+//   value: T;
+//   key: boolean;
+// }
 
 // More specific interfaces for known field types (optional)
-interface PrimitiveField<T> extends MetadataField<T> {
-  type: "primitive";
-  type_name: "u8" | "u32" | "bool";
-}
+// interface PrimitiveField<T> extends MetadataField<T> {
+//   type: "primitive";
+//   type_name: "u8" | "u32" | "bool";
+// }
