@@ -10,13 +10,14 @@ import LoadingPage from "./LoadingPage";
 import { connector } from "../StarknetProvider";
 import { useGameStore } from "../store/GameStore";
 import BackgroundMusic from "../Components/BackgroundMusic";
+import { CONTRACT_ADDRESS } from "../constants";
 
 const HomePage = () => {
   const bgMusicRef = useRef<any>(null);
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
 
-  const { address } = useAccount(); // Move hook here to avoid invalid hook call error
+  const { address, account } = useAccount(); // Move hook here to avoid invalid hook call error
   const { connect } = useConnect();
   const { setTransitionTrigger } = useGameStore();
 
@@ -48,16 +49,24 @@ const HomePage = () => {
       } catch (error) {
         console.error("Failed to connect wallet:", error);
         // setError(error?.toString() || "Couldn't connect wallet");
-      } finally {
-        // setLoading(false);
-        if (address) {
-          navigate("/character-shop");
-        }
-        return address;
       }
-    } else {
-      navigate("/character-shop");
     }
+  };
+
+  const handleRespawn = async () => {
+    if (!account) return;
+
+    const result = await account.execute([
+      {
+        contractAddress: CONTRACT_ADDRESS,
+        entrypoint: "respawn",
+        calldata: []
+      }
+    ]);
+
+    navigate("/fight", {
+      state: { id: 1, address }
+    });
   };
 
   return (
@@ -73,7 +82,18 @@ const HomePage = () => {
           }}
         >
           <BackgroundMusic ref={bgMusicRef} />
-          <div className=" h-full w-[100vw] flex flex-col justify-end relative bottom-9">
+          <div className=" h-full w-[100vw] flex flex-col justify-end relative bottom-9 gap-2">
+            <button
+              onClick={() => {
+                connectWallet();
+                if (address) {
+                  handleRespawn();
+                }
+              }}
+              className="action_butto hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center  h-20 w-96 md:w-[400px] max-w-full pirata-one text-5xl self-center"
+            >
+              Resume Mist
+            </button>
             <button
               onClick={() => {
                 connectWallet();
@@ -81,7 +101,7 @@ const HomePage = () => {
                   handleNavigate("/character-shop");
                 }
               }}
-              className="action_butto h-20 w-full max-w-full pirata-one text-5xl hover:cursor-pointer"
+              className="action_butto bg-gray-950 py-3 px-12 rounded-md text-center h-20 w-96 md:w-[400px] max-w-full pirata-one text-5xl hover:cursor-pointer self-center"
             >
               Click Here to Start
             </button>

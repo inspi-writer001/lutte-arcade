@@ -7,12 +7,17 @@ import { CONTRACT_ADDRESS } from "../constants";
 import { useAccount } from "@starknet-react/core";
 import { dojoConfig } from "../dojoConfig";
 
+import { useNavigate } from "react-router-dom";
+
 const provider = new RpcProvider({
   nodeUrl: dojoConfig.rpcUrl as string
 });
 
 const WinProceed = () => {
   const { account } = useAccount();
+
+  const id = 1;
+  const navigate = useNavigate();
 
   const nextMist = async (account: AccountInterface | undefined) => {
     if (!account) return;
@@ -48,7 +53,10 @@ const WinProceed = () => {
       ]);
       // const txHashRespawn = result_respawn.transaction_hash;
 
-      return txHash;
+      // return txHash;
+      navigate("/fight", {
+        state: { id, address: account.address }
+      });
     } catch (error) {
       console.error("Next Stage failed: ", error);
 
@@ -62,7 +70,7 @@ const WinProceed = () => {
       </div>
       <div className="__button_container mt-9">
         <button
-          className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-6 rounded-md text-center "
+          className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center "
           onClick={() => {
             nextMist(account);
           }}
@@ -75,3 +83,16 @@ const WinProceed = () => {
 };
 
 export default WinProceed;
+
+interface MetadataField<T> {
+  type: string;
+  type_name: string;
+  value: T;
+  key: boolean;
+}
+
+// More specific interfaces for known field types (optional)
+interface PrimitiveField<T> extends MetadataField<T> {
+  type: "primitive";
+  type_name: "u8" | "u32" | "bool";
+}
