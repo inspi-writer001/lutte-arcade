@@ -80,7 +80,7 @@ const policies: SessionPolicies = {
 };
 
 // Configure RPC provider
-const provider = jsonRpcProvider({
+const provider = new jsonRpcProvider({
   rpc: (chain: Chain) => {
     switch (chain) {
       case mainnet:

@@ -7,7 +7,11 @@ import turn_wrapper from "../assets/bottom_components/turn_wrapper.png";
 import turn from "../assets/bottom_components/turn.png";
 import { useEffect, useState } from "react";
 import { SchemaType as LutteSchemaType } from "../Helpers/models.gen";
-import { AccountInterface } from "starknet";
+import {
+  AccountInterface,
+  RpcProvider,
+  TransactionExecutionStatus
+} from "starknet";
 import { CONTRACT_ADDRESS } from "../constants";
 import HealthBar from "../Components/Healthbar";
 import game_over from "../assets/gameover.jpg";
@@ -27,7 +31,10 @@ import { padHexTo66 } from "../Helpers/converters";
 import { Assets, Texture, Spritesheet, TextureSource } from "pixi.js";
 import PixiBunny from "./PixiBunny";
 
-import { attack_1, attack_3, dodge, playSound } from "../Helpers/audio";
+import { attack_1, attack_3, death, dodge, playSound } from "../Helpers/audio";
+// import { provider } from "../App";
+import { dojoConfig } from "../dojoConfig";
+import WinProceed from "../Components/WinProceed";
 
 let depressed = 0; // 0-5
 let neutral = 6; // 6-15
@@ -63,6 +70,7 @@ const Fight = () => {
 
   const [assetsLoaded, setAssetsLoaded] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
+  const [showGameWon, setShowGameWon] = useState(false);
 
   const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
@@ -108,6 +116,10 @@ const Fight = () => {
       setIsPlayerLoading(false);
     });
   }, []);
+
+  const provider = new RpcProvider({
+    nodeUrl: dojoConfig.rpcUrl as string
+  });
 
   // ✅ Preload all images to prevent jank
   useEffect(() => {
@@ -270,13 +282,29 @@ const Fight = () => {
 
   useEffect(() => {
     if (playerDetails?.health.value === 0) {
+      setIsResolveClickable(false);
+      setIsActionClickable(false);
       const timer = setTimeout(() => {
+        playSound(death);
         setShowGameOver(true);
-      }, 1500);
+      }, 3000);
 
       return () => clearTimeout(timer); // cleanup
     }
   }, [playerDetails?.health.value]);
+
+  useEffect(() => {
+    if (playerDetails?.current_enemy.value.health.value === 0) {
+      setIsResolveClickable(false);
+      setIsActionClickable(false);
+      const timer = setTimeout(() => {
+        playSound(death);
+        setShowGameWon(true);
+      }, 3000);
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, [playerDetails?.current_enemy.value.health.value]);
 
   const [playerTurn, setPlayerTurn] = useState(
     !Boolean(playerDetails?.last_attack.value)
@@ -287,14 +315,24 @@ const Fight = () => {
     previousData: LuttePlayer | undefined
   ) => {
     if (!previousData) return;
-    let user_previous_health = previousData.health.value;
-    let enemy_previous_health = previousData.current_enemy.value.health.value;
 
-    let user_new_health = newData.health.value;
-    let enemy_new_health = newData.current_enemy.value.health.value;
+    const user_previous_health = previousData.health.value;
+    const enemy_previous_health = previousData.current_enemy.value.health.value;
 
-    let user_health_diff = Math.abs(user_previous_health - user_new_health);
-    let enemy_health_dif = Math.abs(enemy_previous_health - enemy_new_health);
+    const user_new_health = newData.health.value;
+    const enemy_new_health = newData.current_enemy.value.health.value;
+
+    const user_health_diff = user_previous_health - user_new_health;
+    const enemy_health_dif = enemy_previous_health - enemy_new_health;
+
+    console.log({
+      player_prev: user_previous_health,
+      player_new: user_new_health,
+      enemy_prev: enemy_previous_health,
+      enemy_new: enemy_new_health,
+      user_health_diff,
+      enemy_health_dif
+    });
 
     return {
       enemy_health_dif,
@@ -305,34 +343,37 @@ const Fight = () => {
   const fightAction = async (
     account: AccountInterface | undefined,
     id: number
-  ): Promise<string | undefined> => {
+  ) => {
     setIsActionClickable(false);
 
-    if (account)
-      return account
-        ?.execute([
-          {
-            contractAddress: CONTRACT_ADDRESS,
-            entrypoint: "offensive_phase",
-            calldata: [id]
-          }
-        ])
-        .then(async (e) => {
-          console.log(e);
+    if (!account) return;
 
-          console.log(e.transaction_hash);
+    try {
+      const result = await account.execute([
+        {
+          contractAddress: CONTRACT_ADDRESS,
+          entrypoint: "offensive_phase",
+          calldata: [id]
+        }
+      ]);
+      const txHash = result.transaction_hash;
 
-          console.log("fight successful");
-          // setIsPlayerAttacking(false);
-          setIsResolveClickable(true);
-          return e.transaction_hash;
-        })
-        .catch((error) => {
-          console.log("error attacking character");
-          setPlayerMovement("idle");
-          console.log(error);
-          throw error;
-        });
+      console.log("Waiting for tx to be accepted: ", txHash);
+
+      await provider.waitForTransaction(txHash, {
+        retryInterval: 500,
+        successStates: [TransactionExecutionStatus.SUCCEEDED]
+        // retryTimeout: 60000 // timeout in ms
+      });
+
+      console.log("Transaction accepted!");
+      setIsResolveClickable(true);
+      return txHash;
+    } catch (error) {
+      console.error("Fight failed: ", error);
+      setPlayerMovement("idle");
+      throw error;
+    }
   };
 
   const resolveAction = async (): Promise<LuttePlayer> => {
@@ -358,28 +399,45 @@ const Fight = () => {
     id: number
   ): Promise<string | undefined> => {
     setIsActionClickable(false);
-    if (account)
-      return account
-        ?.execute([
-          {
-            contractAddress: CONTRACT_ADDRESS,
-            entrypoint: "defensive_phase",
-            calldata: [id]
-          }
-        ])
-        .then((e) => {
-          console.log(e.transaction_hash);
-          console.log("defebnse successful");
+    if (!account) return;
 
-          setIsResolveClickable(true);
+    try {
+      const result = await account.execute([
+        {
+          contractAddress: CONTRACT_ADDRESS,
+          entrypoint: "defensive_phase",
+          calldata: [id]
+        }
+      ]);
+      const txHash = result.transaction_hash;
 
-          return e.transaction_hash;
-        })
-        .catch((error) => {
-          console.log("error defending character");
-          console.log(error);
-          throw error;
-        });
+      await provider.waitForTransaction(txHash, {
+        retryInterval: 500,
+        successStates: [TransactionExecutionStatus.SUCCEEDED]
+        // retryTimeout: 60000 // timeout in ms
+      });
+
+      setIsResolveClickable(true);
+      return txHash;
+    } catch (error) {
+      console.log("error defending character");
+      console.log(error);
+      throw error;
+    }
+
+    // .then((e) => {
+    //   console.log(e.transaction_hash);
+    //   console.log("defebnse successful");
+
+    //   setIsResolveClickable(true);
+
+    //   return e.transaction_hash;
+    // })
+    // .catch((error) => {
+    //   console.log("error defending character");
+    //   console.log(error);
+    //   throw error;
+    // });
   };
 
   const getSpriteImage = (
@@ -425,6 +483,10 @@ const Fight = () => {
         </h1>
       </div>
     );
+  }
+
+  if (showGameWon) {
+    return <WinProceed />;
   }
 
   if (!assetsLoaded) {
@@ -546,7 +608,8 @@ const Fight = () => {
             backgroundImage: `url(${ui_component_wrapper})`,
             backgroundSize: "contain",
             backgroundPosition: "center",
-            backgroundRepeat: "no-repeat"
+            backgroundRepeat: "no-repeat",
+            aspectRatio: "16 / 9"
           }}
         >
           {playerState == "attack" ? (
@@ -602,7 +665,7 @@ const Fight = () => {
                   }}
                   onClick={() => {
                     setSelectedButtonID(1);
-                    fightAction(account, 1);
+                    fightAction(account, 0);
                   }}
                 ></div>
                 <div
@@ -622,7 +685,7 @@ const Fight = () => {
                   }}
                   onClick={() => {
                     setSelectedButtonID(2);
-                    fightAction(account, 2);
+                    fightAction(account, 1);
                   }}
                 ></div>
                 <div
@@ -642,7 +705,7 @@ const Fight = () => {
                   }}
                   onClick={() => {
                     setSelectedButtonID(3);
-                    fightAction(account, 3);
+                    fightAction(account, 2);
                   }}
                 ></div>
                 <div className="__other h-[50px] w-[50px] relative hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300"></div>
@@ -651,7 +714,7 @@ const Fight = () => {
             </div>
           ) : (
             <div
-              className="__defense_buttons flex w-[450px] h-[] relative flex-row items-center"
+              className="__defense_buttons flex w-[450px] h-[] relative flex-row items-center "
               style={{
                 backgroundImage: `url(${component_wrapper})`,
                 backgroundSize: "contain",
@@ -768,7 +831,9 @@ const Fight = () => {
                 if (diff.user_health_diff > 0) {
                   if (diff.user_health_diff > 20) {
                     playSound(attack_3);
-                  } else playSound(attack_1);
+                  } else {
+                    playSound(attack_1);
+                  }
                   setPlayerMovement("hit");
                 } else {
                   setPlayerMovement("dodge");
@@ -778,7 +843,7 @@ const Fight = () => {
                 setCacheUser(e);
 
                 // Wait for player reaction animation to finish
-                await new Promise((resolve) => setTimeout(resolve, 900));
+                await new Promise((resolve) => setTimeout(resolve, 1000));
 
                 // Reset both to idle
                 setEnemyMovement("idle");
@@ -812,7 +877,9 @@ const Fight = () => {
                 if (diff.enemy_health_dif > 0) {
                   if (diff.enemy_health_dif > 20) {
                     playSound(attack_3);
-                  } else playSound(attack_1);
+                  } else {
+                    playSound(attack_1);
+                  }
                   setEnemyMovement("hit");
                 } else {
                   setEnemyMovement("dodge");
@@ -822,7 +889,7 @@ const Fight = () => {
                 setCacheUser(e);
 
                 // Wait for the reaction animation (hit/dodge)
-                await new Promise((resolve) => setTimeout(resolve, 900));
+                await new Promise((resolve) => setTimeout(resolve, 1000));
 
                 // Return both to idle
                 setPlayerMovement("idle");

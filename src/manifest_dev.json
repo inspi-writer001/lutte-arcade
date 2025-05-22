@@ -1253,7 +1253,7 @@
   "contracts": [
     {
       "address": "0xdbcfcde8132d5981fdc2b2844a87fb57713882e0dd764dadbe5492e7a020b0",
-      "class_hash": "0x693da249953b3aa156be8542175594391d8fafe0d58e27852df38f0accd4214",
+      "class_hash": "0x6ecc4e740fe5184ab48128a78409eec194fd0f62896ec09f04ab3efcdaf3efa",
       "abi": [
         {
           "type": "impl",
@@ -1716,6 +1716,20 @@
             },
             {
               "type": "function",
+              "name": "respawn",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "next_enemy",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
               "name": "create_character",
               "inputs": [
                 {
@@ -1831,6 +1845,10 @@
                   "type": "core::byte_array::ByteArray"
                 },
                 {
+                  "name": "health",
+                  "type": "core::integer::u32"
+                },
+                {
                   "name": "folder",
                   "type": "core::byte_array::ByteArray"
                 },
@@ -1873,6 +1891,10 @@
                 {
                   "name": "skin",
                   "type": "core::byte_array::ByteArray"
+                },
+                {
+                  "name": "health",
+                  "type": "core::integer::u32"
                 },
                 {
                   "name": "folder",
@@ -2088,6 +2110,8 @@
       "systems": [
         "offensive_phase",
         "defensive_phase",
+        "respawn",
+        "next_enemy",
         "create_character",
         "create_enemy",
         "update_enemy_asset",

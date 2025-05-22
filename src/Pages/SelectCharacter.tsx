@@ -91,7 +91,7 @@ const SelectCharacter = () => {
       }}
     >
       {cutScene && (
-        <div className="cutscene absolute h-full w-full z-50">
+        <div className="cutscene absolute h-full w-full z-50 self-center flex">
           <IntroScene
             onFinish={() => {
               setIntroFinished(true);
@@ -118,7 +118,7 @@ const SelectCharacter = () => {
               className="pointer-events-none hidden sm:block w-[200px] h-[300px] object-contain"
             />
             <div
-              className="__player_boxed grid max-w-[1024px] hover:cursor-pointer overflow-y-scroll p-3"
+              className="__player_boxed grid max-w-[400px] hover:cursor-pointer overflow-y-scroll p-3"
               style={{
                 gridTemplateColumns: "repeat(3, 1fr)", // 3 items per row
                 gridAutoRows: "minmax(20rem, auto)", // Ensure rows adapt to content
