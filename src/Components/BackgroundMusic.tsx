@@ -54,13 +54,14 @@ const BackgroundMusic = forwardRef((_, ref) => {
       <audio ref={audioRef} src={bg_music} preload="auto" />
       {
         <button
+          className="music_button"
           onClick={handleUserClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           style={{
-            position: "fixed",
-            bottom: "150px",
-            right: "20px",
+            position: "absolute",
+            top: "170px",
+            right: "100px",
             height: "50px",
             width: isHovered ? "160px" : "50px",
             backgroundColor: "white",
@@ -71,6 +72,7 @@ const BackgroundMusic = forwardRef((_, ref) => {
             zIndex: "1000",
             display: "flex",
             alignItems: "center",
+            justifySelf: "left",
             justifyContent: isHovered ? "flex-start" : "center",
             paddingLeft: isHovered ? "15px" : "0",
             paddingRight: isHovered ? "15px" : "0",

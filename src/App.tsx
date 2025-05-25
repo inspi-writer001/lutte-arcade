@@ -100,7 +100,7 @@ function App() {
   const bgMusicRef = useRef<any>(null);
   // setGlobalMusic(true);
   return (
-    <div className="aspect-wrapper">
+    <div className="aspect-wrapper relative">
       <StarknetProvider>
         <BackgroundMusic ref={bgMusicRef} />
         <Router>

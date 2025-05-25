@@ -81,17 +81,19 @@ const HomePage = () => {
           }}
         >
           <div className=" h-full w-[100vw] flex flex-col justify-end relative bottom-9 gap-2">
-            <button
-              onClick={() => {
-                connectWallet();
-                if (address) {
-                  handleRespawn();
-                }
-              }}
-              className="action_butto hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center  h-20 w-96 md:w-[400px] max-w-full pirata-one text-5xl self-center"
-            >
-              Resume Mist
-            </button>
+            {!loaded && (
+              <button
+                onClick={() => {
+                  connectWallet();
+                  if (address) {
+                    handleRespawn();
+                  }
+                }}
+                className="action_butto hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center  h-20 w-96 md:w-[400px] max-w-full pirata-one text-5xl self-center"
+              >
+                Resume Mist
+              </button>
+            )}
             <button
               onClick={() => {
                 connectWallet();
@@ -99,7 +101,7 @@ const HomePage = () => {
                   handleNavigate("/character-shop");
                 }
               }}
-              className="action_butto bg-gray-950 py-3 px-12 rounded-md text-center h-20 w-96 md:w-[400px] max-w-full pirata-one text-5xl hover:cursor-pointer self-center"
+              className="action_butto bg-gray-950 py-3 px-12 rounded-md text-center h-20 w-96 md:w-[400px] max-w-full pirata-one text-5xl hover:cursor-pointer self-center mb-5"
             >
               Click Here to Start
             </button>

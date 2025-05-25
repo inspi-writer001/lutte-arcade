@@ -66,7 +66,7 @@ const IntroScene = ({ onFinish }: { onFinish: () => void }) => {
 
       {/* Skip Button */}
       <h1
-        className="absolute pirata-one font-bold text-4xl top-5 right-5 hover:cursor-pointer bg-gray-950 py-3 px-6 rounded-md text-center z-50"
+        className="absolute pirata-one font-bold text-4xl top-20 right-25 hover:cursor-pointer bg-gray-950 py-3 px-6 rounded-md text-center z-50"
         onClick={handleSkip}
       >
         Skip Intro
