@@ -52,6 +52,10 @@ const WinProceed = () => {
         }
       ]);
       // const txHashRespawn = result_respawn.transaction_hash;
+      navigate("/fight", {
+        state: { id, address }
+      });
+      navigate(0);
 
       return ttxHash;
     } catch (error) {
@@ -69,12 +73,7 @@ const WinProceed = () => {
         <button
           className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center "
           onClick={async () => {
-            const result = await nextMist(account);
-            if (result) {
-              navigate("/fight", {
-                state: { id, address }
-              });
-            }
+            await nextMist(account);
           }}
         >
           Proceed to Next Mist

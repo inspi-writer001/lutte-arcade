@@ -25,6 +25,8 @@ import StarknetProvider from "./StarknetProvider";
 import TransitionOverlay from "./Components/TransitionOverlay";
 import { useGameStore } from "./store/GameStore";
 import PixiBunny from "./Pages/PixiBunny";
+import BackgroundMusic from "./Components/BackgroundMusic";
+import { useRef } from "react";
 
 const policies: SessionPolicies = {
   contracts: {
@@ -95,11 +97,12 @@ const provider = new jsonRpcProvider({
 function App() {
   const { transitionTrigger, setTransitionTrigger, setGlobalMusic } =
     useGameStore();
+  const bgMusicRef = useRef<any>(null);
   // setGlobalMusic(true);
   return (
     <div className="aspect-wrapper">
       <StarknetProvider>
-        {" "}
+        <BackgroundMusic ref={bgMusicRef} />
         <Router>
           <Routes>
             <Route path="/" Component={() => <HomePage />} />

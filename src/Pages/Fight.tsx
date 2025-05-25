@@ -297,7 +297,7 @@ const Fight = () => {
   return (
     <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col bg-[#3b2f2f]">
       <div
-        className="flex h-[83vh] w-full relative justify-center"
+        className="flex h-[83dvh] w-full relative justify-center"
         style={{
           backgroundImage: `url(${fight_bg})`,
           backgroundSize: "cover",
@@ -305,7 +305,7 @@ const Fight = () => {
           backgroundRepeat: "no-repeat"
         }}
       >
-        <div className="__fight_canvas w-full h-full max-h-[83vh] flex flex-col justify-between px-1 md:px-20 relative max-w-[1500px] overflow-hidden">
+        <div className="__fight_canvas w-full h-full max-h-[83dvh] flex flex-col justify-between px-1 md:px-20 relative max-w-[1500px] overflow-hidden">
           <div className="__health flex flex-row justify-between w-full">
             <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-start">
               <HealthBar
@@ -458,7 +458,7 @@ const Fight = () => {
           </div>
         </div>
       </div>
-      <div className="__bottom_tab bg-black h-[17vh] w-full relative bottom-0 flex flex-row justify-between px-10">
+      <div className="__bottom_tab bg-black h-[17dvh] w-full relative bottom-0 flex flex-row justify-between px-10">
         {playerState == "attack" ? (
           <div
             className="__actions_buttons flex w-[450px] relative flex-row items-center"

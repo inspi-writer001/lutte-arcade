@@ -497,21 +497,24 @@ const Fight = () => {
     );
   } else
     return (
-      <div className="flex justify-center items-center w-screen max-h-screen text-center flex-col ">
-        {/* <BackgroundMusic /> */}
+      <div
+        className="names_container flex justify-center items-center w-screen max-h-screen text-center flex-col relative max-w-[2000px]"
+        style={{
+          aspectRatio: "16 / 9"
+        }}
+      >
         <div
           className="flex w-full relative justify-center"
           style={{
-            aspectRatio: "16 / 9", // Adjust based on your image ratio
             backgroundImage: `url(${fight_bg})`,
-            backgroundSize: "contain",
-            backgroundPosition: "bottom center",
+            backgroundSize: "cover", // fill the container, maintain aspect ratio
+            backgroundPosition: "bottom center", // align the grass area to bottom
             backgroundRepeat: "no-repeat",
             width: "100%",
-            maxHeight: "83vh"
+            height: "83dvh" // or remove aspectRatio entirely
           }}
         >
-          <div className="__fight_canvas w-full h-full max-h-[83vh] flex flex-col justify-between px-1 md:px-20 relative max-w-[1500px] overflow-hidden">
+          <div className="__fight_canvas w-full h-full max-h-[83dvh] flex flex-col justify-between px-1 md:px-20 relative max-w-[1500px] overflow-hidden">
             <div className="__health flex flex-row justify-between w-full mt-4">
               <div className="__character_health flex self-start min-w-[30%] flex-col mt-6 items-start">
                 <HealthBar
@@ -602,8 +605,10 @@ const Fight = () => {
             {/* <div className="__characters flex w-full justify-between relative group"></div> */}
           </div>
         </div>
+
+        {/* here */}
         <div
-          className="__bottom_tab bg-black h-[15vh] w-full relative bottom-1 flex flex-row justify-between px-10"
+          className="__bottom_tab bg-black h-[15dvh] w-[90vw] max-w-[2000px] relative bottom-1 flex flex-row justify-between "
           style={{
             backgroundImage: `url(${ui_component_wrapper})`,
             backgroundSize: "contain",
@@ -614,7 +619,7 @@ const Fight = () => {
         >
           {playerState == "attack" ? (
             <div
-              className="__actions_buttons flex w-[450px] relative flex-row items-center"
+              className="__actions_buttons flex w-[450px] relative flex-row items-center ml-[clamp(14rem,15%,4rem)]"
               style={{
                 backgroundImage: `url(${component_wrapper})`,
                 backgroundSize: "contain",
@@ -624,7 +629,7 @@ const Fight = () => {
                 // visibility: playerTurn ? "visible" : "hidden"
               }}
             >
-              <div className="__character_headshot h-20  w-36 flex flex-row">
+              <div className="__character_headshot h-20 w-36 flex flex-row">
                 <img
                   src={
                     playerDetails.character.value.folder.value +
@@ -714,7 +719,7 @@ const Fight = () => {
             </div>
           ) : (
             <div
-              className="__defense_buttons flex w-[450px] h-[] relative flex-row items-center "
+              className="__defense_buttons flex w-[450px] relative flex-row items-center ml-[clamp(14rem,15%,4rem)]"
               style={{
                 backgroundImage: `url(${component_wrapper})`,
                 backgroundSize: "contain",
@@ -798,7 +803,7 @@ const Fight = () => {
             </div>
           }
           <div
-            className="__resolve flex w-[150px] relative justify-center hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300 p-11"
+            className="__resolve flex w-[150px] relative justify-center hover:cursor-pointer hover:scale-110 hover:opacity-90 active:scale-95 active:opacity-70 transition-transform duration-300 p-11 mr-[clamp(14rem,15%,4rem)] z-30"
             style={{
               backgroundImage: `url(${turn_wrapper})`,
               backgroundSize: "center",
@@ -843,7 +848,7 @@ const Fight = () => {
                 setCacheUser(e);
 
                 // Wait for player reaction animation to finish
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                await new Promise((resolve) => setTimeout(resolve, 1200));
 
                 // Reset both to idle
                 setEnemyMovement("idle");
@@ -889,7 +894,7 @@ const Fight = () => {
                 setCacheUser(e);
 
                 // Wait for the reaction animation (hit/dodge)
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                await new Promise((resolve) => setTimeout(resolve, 1200));
 
                 // Return both to idle
                 setPlayerMovement("idle");

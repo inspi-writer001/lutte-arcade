@@ -82,7 +82,7 @@ const SelectCharacter = () => {
 
   return (
     <div
-      className="flex justify-center items-center w-screen h-screen text-center flex-col px-10 bg-[#3b2f2f] overflow-hidden"
+      className="flex justify-center items-center w-screen h-screen text-center flex-col px-10  overflow-hidden"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
@@ -111,43 +111,47 @@ const SelectCharacter = () => {
           </div>
         ) : (
           // Render Characters
-          <div className="__players_tentative w-full flex flex-col md:flex-row justify-center items-center gap-1 relative">
+          <div className="__players_tentative w-full flex flex-col md:flex-row justify-center items-center gap-4 relative">
             <img
               src={ch1}
               alt="coming soon left"
-              className="pointer-events-none hidden sm:block w-[200px] h-[300px] object-contain"
+              className="pointer-events-none hidden sm:block w-[17%] object-contain"
             />
             <div
-              className="__player_boxed grid max-w-[400px] hover:cursor-pointer overflow-y-scroll p-3"
-              style={{
-                gridTemplateColumns: "repeat(3, 1fr)", // 3 items per row
-                gridAutoRows: "minmax(20rem, auto)", // Ensure rows adapt to content
-                overflowY: "scroll", // Enable vertical scrolling
-                maxHeight: "80vh", // Set a maximum height for the container
-                justifyItems: "center" // Center items in their columns
-              }}
+              className="__player_boxed grid w-[19%] hover:cursor-pointer overflow-y-visible"
+              style={
+                {
+                  // gridTemplateColumns: "repeat(3, 1fr)" // 3 items per row
+                  // gridAutoRows: "minmax(20rem, auto)", // Ensure rows adapt to content
+                  // overflowY: "scroll", // Enable vertical scrolling
+                  // maxHeight: "80vh", // Set a maximum height for the container
+                  // justifyItems: "center" // Center items in their columns
+                }
+              }
             >
               {data &&
-                data.map((player, index: number) => {
+                data.map((player, _index: number) => {
                   // Determine if this is the last item and adjust its position
-                  const isLastItem = index === data.length - 1;
-                  const totalItems = data.length;
+                  // const isLastItem = index === data.length - 1;
+                  // const totalItems = data.length;
 
                   return (
                     <img
                       key={player.uid?.value.toString()} // Use `uid` as a unique key
-                      className="__selectable_player player_card flex relative min-w-[200px] min-h-[150px]"
+                      className="__selectable_player player_card flex relative w-full"
                       src={`${player.folder?.value}${player.skin?.value}`}
                       alt={player.skin?.value}
-                      style={{
-                        gridColumn:
-                          isLastItem && totalItems % 3 !== 0
-                            ? "2 / span 1"
-                            : "auto", // Center the last item if it's alone in the row
-                        borderRadius: "0.5rem",
-                        overflow: "hidden", // Ensures the image is cropped
-                        position: "relative"
-                      }}
+                      style={
+                        {
+                          // gridColumn:
+                          //   isLastItem && totalItems % 3 !== 0
+                          //     ? "2 / span 1"
+                          //     : "auto", // Center the last item if it's alone in the row
+                          // borderRadius: "0.5rem",
+                          // overflow: "hidden", // Ensures the image is cropped
+                          // position: "relative"
+                        }
+                      }
                       onClick={() => {
                         account
                           ?.execute([
@@ -186,7 +190,7 @@ const SelectCharacter = () => {
             <img
               src={ch3}
               alt="coming soon right"
-              className="pointer-events-none hidden sm:block w-[200px] h-[300px] object-contain"
+              className="pointer-events-none hidden sm:block w-[17%] object-contain"
             />
           </div>
         )}
