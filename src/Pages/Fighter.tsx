@@ -901,7 +901,11 @@ const Fight = () => {
               }
             }}
           >
-            <img src={turn} alt="resolve turn icon" />
+            <img
+              src={turn}
+              alt="resolve turn icon"
+              className="max-h-10 self-center"
+            />
           </div>
         </div>
       </div>

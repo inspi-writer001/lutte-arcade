@@ -14,7 +14,7 @@ const provider = new RpcProvider({
 });
 
 const WinProceed = () => {
-  const { account } = useAccount();
+  const { account, address } = useAccount();
 
   const id = 1;
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const WinProceed = () => {
       console.log("attempting to respawn");
 
       // const result_respawn =
-      await account.execute([
+      const ttxHash = await account.execute([
         {
           contractAddress: CONTRACT_ADDRESS,
           entrypoint: "respawn",
@@ -53,10 +53,7 @@ const WinProceed = () => {
       ]);
       // const txHashRespawn = result_respawn.transaction_hash;
 
-      // return txHash;
-      navigate("/fight", {
-        state: { id, address: account.address }
-      });
+      return ttxHash;
     } catch (error) {
       console.error("Next Stage failed: ", error);
 
@@ -71,8 +68,13 @@ const WinProceed = () => {
       <div className="__button_container mt-9">
         <button
           className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center "
-          onClick={() => {
-            nextMist(account);
+          onClick={async () => {
+            const result = await nextMist(account);
+            if (result) {
+              navigate("/fight", {
+                state: { id, address }
+              });
+            }
           }}
         >
           Proceed to Next Mist
