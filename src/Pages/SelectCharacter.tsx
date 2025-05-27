@@ -59,12 +59,18 @@ const SelectCharacter = ({ bgMusicRef }: SelectCharacterProps) => {
           .withEntityModels(["lutte-PlayableCharacter"])
           .build()
       );
+
+      // console.log("gghg", res);
+
       return res;
     }
     fetchToriiClause().then((result) => {
-      const array_characters = Object.values(result).map(
-        (entry) => entry["lutte-PlayableCharacter"]
+      const array_characters = result.items.map(
+        (item) => item.models["lutte-PlayableCharacter"]
       );
+      // const array_characters = Object.values(result).map(
+      //   (entry) => entry["lutte-PlayableCharacter"]
+      // );
 
       setData(array_characters as unknown as Array<IPlayableCharacter>);
       setIsLoading(false);
@@ -178,92 +184,48 @@ const SelectCharacter = ({ bgMusicRef }: SelectCharacterProps) => {
 
 export default SelectCharacter;
 
-interface MetadataField<T> {
+export interface MetadataField<T> {
   type: string;
   type_name: string;
   value: T;
   key: boolean;
 }
 
-// More specific interfaces for known field types (optional)
-interface PrimitiveField<T> extends MetadataField<T> {
+export interface PrimitiveField<T> extends MetadataField<T> {
   type: "primitive";
   type_name: "u8" | "u32" | "bool";
 }
 
-interface ByteArrayField extends MetadataField<string> {
+export interface ByteArrayField extends MetadataField<string> {
   type: "bytearray";
   type_name: "ByteArray";
 }
 
-// Interface representing the inner value of a UEnemy.
-export interface UEnemyValue {
+export interface IPlayableCharacter {
   uid: PrimitiveField<number>;
   health: PrimitiveField<number>;
+  max_health: PrimitiveField<number>;
   attack_power: PrimitiveField<number>;
   special_attack: PrimitiveField<boolean>;
   level: PrimitiveField<number>;
-  max_health: PrimitiveField<number>;
   skin: ByteArrayField;
   mugshot: ByteArrayField;
+  folder: ByteArrayField;
   attack_sprite: ByteArrayField;
   hit_sprite: ByteArrayField;
   idle_sprite: ByteArrayField;
-  folder: ByteArrayField;
+  dash_sprite: ByteArrayField;
+  dodge_sprite: ByteArrayField;
+  gid: PrimitiveField<number>;
 }
 
-// The wrapper interface that represents a UEnemy in the JSON.
-export interface IUEnemy {
-  type: "struct";
-  type_name: "UEnemy";
-  value: UEnemyValue;
-  key: boolean;
-}
-
-// Interface for the EnemiesList
-export interface IEnemiesList {
-  "lutte-EnemiesList": {
-    enemies: {
-      type: "array";
-      type_name: "Array<UEnemy>";
-      value: IUEnemy[];
-      key: boolean;
-    };
-    id: PrimitiveField<number>;
+export interface IEntityItem {
+  hashed_keys: string;
+  models: {
+    "lutte-PlayableCharacter": IPlayableCharacter;
   };
 }
 
-// Interface representing the inner value of a PlayableCharacter.
-export interface PlayableCharacterValue {
-  uid: PrimitiveField<number>;
-  health: PrimitiveField<number>;
-  attack_power: PrimitiveField<number>;
-  skin: ByteArrayField;
-  special_attack: PrimitiveField<boolean>;
-  level: PrimitiveField<number>;
-  max_health: PrimitiveField<number>;
-  mugshot: ByteArrayField;
-  attack_sprite: ByteArrayField;
-  hit_sprite: ByteArrayField;
-  idle_sprite: ByteArrayField;
-  folder: ByteArrayField;
+export interface IEntityResponse {
+  items: IEntityItem[];
 }
-
-// The wrapper interface that represents a PlayableCharacter in the JSON.
-export type IPlayableCharacter = PlayableCharacterValue;
-
-// Interface for the PlayableCharacterList
-export interface IPlayableCharacterList {
-  "lutte-PlayableCharacterList": {
-    players: {
-      type: "array";
-      type_name: "Array<PlayableCharacter>";
-      value: IPlayableCharacter[];
-      key: boolean;
-    };
-    id: PrimitiveField<number>;
-  };
-}
-
-// Final interface that combines both lists
-export interface ILutteGameData extends IEnemiesList, IPlayableCharacterList {}

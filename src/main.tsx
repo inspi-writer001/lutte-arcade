@@ -17,7 +17,7 @@ import App from "./App.tsx";
 // Dojo related imports
 import { init } from "@dojoengine/sdk";
 import { DojoSdkProvider } from "@dojoengine/sdk/react";
-import { SchemaType as LutteSchemaType, schema } from "./Helpers/models.gen";
+import { SchemaType as LutteSchemaType } from "./Helpers/models.gen";
 import { setupWorld } from "./Helpers/contracts.gen";
 
 import "./index.css";
@@ -34,7 +34,7 @@ async function main() {
   const sdk = await init<LutteSchemaType>(
     {
       client: {
-        rpcUrl: dojoConfig.rpcUrl,
+        // rpcUrl: dojoConfig.rpcUrl,
         toriiUrl: dojoConfig.toriiUrl,
         relayUrl: dojoConfig.relayUrl,
         worldAddress: dojoConfig.manifest.world.address
@@ -45,8 +45,8 @@ async function main() {
         chainId: "sepolia",
         revision: "1"
       }
-    },
-    schema
+    }
+    // schema
   );
 
   createRoot(document.getElementById("root")!).render(

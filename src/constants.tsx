@@ -9,4 +9,6 @@ const WORLD_ADDRESS = manifest.world.address;
 
 const TORII_URL = "https://api.cartridge.gg/x/lutte-arcade-sepol/torii";
 
+// const TORII_URL = "http://127.0.0.1:8080/torii";
+
 export { CONTRACT_ADDRESS, RPC_URL, WORLD_ADDRESS, TORII_URL };

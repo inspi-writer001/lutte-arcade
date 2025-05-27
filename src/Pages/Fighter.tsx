@@ -67,7 +67,12 @@ const Fight = () => {
         .build()
     );
 
-    return res;
+    // console.log(res);
+
+    // return res;
+    return res.items?.[0]?.models[
+      "lutte-Player"
+    ] as unknown as LuttePlayerWrapper;
   }
   const { account } = useAccount();
   const { state } = useLocation();
@@ -80,8 +85,8 @@ const Fight = () => {
   const navigate = useNavigate();
   const [isPlayerLoading, setIsPlayerLoading] = useState(true);
 
-  const [playerDetails, setPlayerDetails] = useState<LuttePlayer>();
-  const [cacheUser, setCacheUser] = useState<LuttePlayer>();
+  const [playerDetails, setPlayerDetails] = useState<LuttePlayerWrapper>();
+  const [cacheUser, setCacheUser] = useState<LuttePlayerWrapper>();
   const [playerMovement, setPlayerMovement] = useState<
     "idle" | "dash" | "attack" | "dead" | "hit" | "dodge"
   >("idle");
@@ -112,10 +117,12 @@ const Fight = () => {
 
   useEffect(() => {
     fetchUser(state.address).then((response) => {
-      setPlayerDetails(
-        response["0x0"]["lutte-Player"] as unknown as LuttePlayer
-      );
-      setCacheUser(response["0x0"]["lutte-Player"] as unknown as LuttePlayer);
+      if (response) {
+        setPlayerDetails(response);
+        setCacheUser(response);
+      } else {
+        console.warn("No player data found.");
+      }
       setIsPlayerLoading(false);
     });
   }, []);
@@ -317,23 +324,19 @@ const Fight = () => {
   );
 
   const compareCache = (
-    newData: LuttePlayer,
-    previousData: LuttePlayer | undefined
+    newData: LuttePlayerWrapper,
+    previousData: LuttePlayerWrapper | undefined
   ) => {
     if (!previousData) return;
 
     const user_previous_health = previousData.health.value;
     const enemy_previous_health = previousData.current_enemy.value.health.value;
-
     const user_new_health = newData.health.value;
     const enemy_new_health = newData.current_enemy.value.health.value;
 
-    const user_health_diff = user_previous_health - user_new_health;
-    const enemy_health_dif = enemy_previous_health - enemy_new_health;
-
     return {
-      enemy_health_dif,
-      user_health_diff
+      enemy_health_dif: enemy_previous_health - enemy_new_health,
+      user_health_diff: user_previous_health - user_new_health
     };
   };
 
@@ -355,11 +358,16 @@ const Fight = () => {
       ]);
       const txHash = result.transaction_hash;
 
+      // console.log("Waiting for tx to be accepted: ", txHash);
+
       await provider.waitForTransaction(txHash, {
         retryInterval: 500,
         successStates: [TransactionExecutionStatus.SUCCEEDED]
         // retryTimeout: 60000 // timeout in ms
       });
+
+      // console.log("Transaction accepted!");
+      // setIsResolveClickable(true);
 
       setIsResolveClickable(true);
       return txHash;
@@ -370,21 +378,15 @@ const Fight = () => {
     }
   };
 
-  const resolveAction = async (): Promise<LuttePlayer> => {
+  const resolveAction = async (): Promise<LuttePlayerWrapper> => {
     return fetchUser(state.address).then((response) => {
-      let typed_response = response["0x0"][
-        "lutte-Player"
-      ] as unknown as LuttePlayer;
-      setPlayerDetails(typed_response);
-      setPlayerTurn(!Boolean(typed_response.last_attack.value));
-
+      setPlayerDetails(response);
+      setPlayerTurn(!Boolean(response.last_attack.value));
       setIsActionClickable(true);
       setIsResolveClickable(false);
-
-      return typed_response;
+      return response;
     });
   };
-
   const defendAction = async (
     account: AccountInterface | undefined,
     id: number
@@ -884,68 +886,153 @@ const Fight = () => {
 
 export default Fight;
 
-// Generic metadata structure for a field
-interface MetadataField<T> {
-  type: string;
+export interface FetchUserResponse {
+  items: Item[];
+}
+
+export interface Item {
+  hashed_keys: string; // e.g., "0x0"
+  models: {
+    "lutte-Player": LuttePlayerWrapper;
+  };
+}
+
+export interface LuttePlayerWrapper {
+  last_attack_state: Primitive<u32>;
+  attack_power: Primitive<u8>;
+  special_attack: Primitive<boolean>;
+  address: Primitive<string>; // ContractAddress
+  health: Primitive<u32>;
+  demeanor: Primitive<u8>;
+  skin_id: Primitive<u8>;
+  last_attack: Primitive<boolean>;
+  current_enemy: Struct<SelectedEnemy>;
+  character: Struct<SelectedCharacter>;
+}
+
+export interface Primitive<T> {
+  type: "primitive";
   type_name: string;
   value: T;
   key: boolean;
 }
 
-// Specific field types
-type PrimitiveField<T> = MetadataField<T>;
-type ContractAddressField = MetadataField<string>;
-type StructField<T> = MetadataField<T>;
-type ByteArrayField = MetadataField<string>; // For `skin`, `mugshot`, `sprites`
-
-// Define the UEnemy structure
-interface UEnemy {
-  idle_sprite: ByteArrayField;
-  mugshot: ByteArrayField;
-  special_attack: PrimitiveField<boolean>;
-  attack_sprite: ByteArrayField;
-  hit_sprite: ByteArrayField;
-  dash_sprite: ByteArrayField;
-  dodge_sprite: ByteArrayField;
-  max_health: PrimitiveField<number>;
-  level: PrimitiveField<number>;
-  uid: PrimitiveField<number>;
-  health: PrimitiveField<number>;
-  attack_power: PrimitiveField<number>;
-  skin: ByteArrayField;
-  folder: ByteArrayField;
+export interface Struct<T> {
+  type: "struct";
+  type_name: string;
+  value: T;
+  key: boolean;
 }
 
-// Define the PlayableCharacter structure
-interface PlayableCharacter {
-  skin: ByteArrayField;
-  level: PrimitiveField<number>;
-  folder: ByteArrayField;
-  uid: PrimitiveField<number>;
-  mugshot: ByteArrayField;
-  special_attack: PrimitiveField<boolean>;
-  idle_sprite: ByteArrayField;
-  hit_sprite: ByteArrayField;
-  dash_sprite: ByteArrayField;
-  dodge_sprite: ByteArrayField;
-  attack_power: PrimitiveField<number>;
-  health: PrimitiveField<number>;
-  max_health: PrimitiveField<number>;
-  attack_sprite: ByteArrayField;
+export interface ByteArray {
+  type: "bytearray";
+  type_name: "ByteArray";
+  value: string;
+  key: boolean;
 }
 
-// Define the Player structure
-export interface LuttePlayer {
-  demeanor: PrimitiveField<number>;
-  health: PrimitiveField<number>;
-  skin_id: PrimitiveField<number>;
-  special_attack: PrimitiveField<boolean>;
-  last_attack: PrimitiveField<boolean>;
-  attack_power: PrimitiveField<number>;
-  address: ContractAddressField; // ContractAddress (key)
-  current_enemy: StructField<UEnemy>; // Struct: UEnemy
-  character: StructField<PlayableCharacter>; // Struct: PlayableCharacter
+export interface SelectedEnemy {
+  gid: Primitive<u32>;
+  health: Primitive<u32>;
+  dash_sprite: ByteArray;
+  hit_sprite: ByteArray;
+  level: Primitive<u8>;
+  idle_sprite: ByteArray;
+  mugshot: ByteArray;
+  max_health: Primitive<u32>;
+  special_attack: Primitive<boolean>;
+  attack_sprite: ByteArray;
+  dodge_sprite: ByteArray;
+  uid: Primitive<u32>;
+  skin: ByteArray;
+  folder: ByteArray;
+  attack_power: Primitive<u8>;
 }
 
-// Define the root object structure for the `lutte-Player`
-export type ILuttePlayerData = LuttePlayer;
+export interface SelectedCharacter {
+  mugshot: ByteArray;
+  uid: Primitive<u32>;
+  attack_power: Primitive<u8>;
+  gid: Primitive<u32>;
+  special_attack: Primitive<boolean>;
+  folder: ByteArray;
+  hit_sprite: ByteArray;
+  idle_sprite: ByteArray;
+  attack_sprite: ByteArray;
+  max_health: Primitive<u32>;
+  dodge_sprite: ByteArray;
+  skin: ByteArray;
+  dash_sprite: ByteArray;
+  level: Primitive<u8>;
+  health: Primitive<u32>;
+}
+
+// Type aliases for readability
+type u8 = number;
+type u32 = number;
+
+// // Generic metadata structure for a field
+// interface MetadataField<T> {
+//   type: string;
+//   type_name: string;
+//   value: T;
+//   key: boolean;
+// }
+
+// // Specific field types
+// type PrimitiveField<T> = MetadataField<T>;
+// type ContractAddressField = MetadataField<string>;
+// type StructField<T> = MetadataField<T>;
+// type ByteArrayField = MetadataField<string>; // For `skin`, `mugshot`, `sprites`
+
+// // Define the UEnemy structure
+// interface UEnemy {
+//   idle_sprite: ByteArrayField;
+//   mugshot: ByteArrayField;
+//   special_attack: PrimitiveField<boolean>;
+//   attack_sprite: ByteArrayField;
+//   hit_sprite: ByteArrayField;
+//   dash_sprite: ByteArrayField;
+//   dodge_sprite: ByteArrayField;
+//   max_health: PrimitiveField<number>;
+//   level: PrimitiveField<number>;
+//   uid: PrimitiveField<number>;
+//   health: PrimitiveField<number>;
+//   attack_power: PrimitiveField<number>;
+//   skin: ByteArrayField;
+//   folder: ByteArrayField;
+// }
+
+// // Define the PlayableCharacter structure
+// interface PlayableCharacter {
+//   skin: ByteArrayField;
+//   level: PrimitiveField<number>;
+//   folder: ByteArrayField;
+//   uid: PrimitiveField<number>;
+//   mugshot: ByteArrayField;
+//   special_attack: PrimitiveField<boolean>;
+//   idle_sprite: ByteArrayField;
+//   hit_sprite: ByteArrayField;
+//   dash_sprite: ByteArrayField;
+//   dodge_sprite: ByteArrayField;
+//   attack_power: PrimitiveField<number>;
+//   health: PrimitiveField<number>;
+//   max_health: PrimitiveField<number>;
+//   attack_sprite: ByteArrayField;
+// }
+
+// // Define the Player structure
+// export interface LuttePlayer {
+//   demeanor: PrimitiveField<number>;
+//   health: PrimitiveField<number>;
+//   skin_id: PrimitiveField<number>;
+//   special_attack: PrimitiveField<boolean>;
+//   last_attack: PrimitiveField<boolean>;
+//   attack_power: PrimitiveField<number>;
+//   address: ContractAddressField; // ContractAddress (key)
+//   current_enemy: StructField<UEnemy>; // Struct: UEnemy
+//   character: StructField<PlayableCharacter>; // Struct: PlayableCharacter
+// }
+
+// // Define the root object structure for the `lutte-Player`
+// export type ILuttePlayerData = LuttePlayer;
