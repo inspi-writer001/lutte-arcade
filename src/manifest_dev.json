@@ -1,8 +1,8 @@
 {
   "world": {
     "class_hash": "0x4b767fda48530353c2e44e4b9433f4d75c6c9974aaff43ecc00de9455eb71b8",
-    "address": "0x64e29a145323abf40af43fc64c2f76077d9646ef6840b46bee305209a743f0b",
-    "seed": "lutte-arcade-i",
+    "address": "0x7fd2cbd824da3181cd7343397f1212550f51c6769f888f3e3c3e9a0e782e9e5",
+    "seed": "lutte-arcade-o",
     "name": "lutte",
     "entrypoints": [
       "uuid",
@@ -1252,8 +1252,8 @@
   },
   "contracts": [
     {
-      "address": "0xff1e5275bd2ef506877a9af4f14e16894fded834d414b0e04e19b0bfd5a70e",
-      "class_hash": "0x64c417bc3aea7311f065599f32d27f8290aaedca017b1c6d19e9194c98ab610",
+      "address": "0x3138900dce47a166d2ad01d1f61c0bf8f2e92e14e2cb4f3c9b1ceca499691fe",
+      "class_hash": "0x14a5e1f81d5a34c82203d7ce2947c36631aa43b3edbb4939d37077cb38dee9f",
       "abi": [
         {
           "type": "impl",

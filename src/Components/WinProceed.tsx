@@ -9,7 +9,7 @@ import { dojoConfig } from "../dojoConfig";
 
 import { useNavigate } from "react-router-dom";
 import defeated_first from "/background/defeated_hammer.jpg";
-import defeated_second from "/background/defeated_beast.jpg";
+// import defeated_second from "/background/defeated_beast.jpg";
 import defeated_third from "/background/defeated_shadow.jpg";
 import defeated_fourth from "/background/defeated_skeleton.jpg";
 import final_image from "/background/defeated_final.jpg";
@@ -24,12 +24,13 @@ interface IEnemIndex {
 const WinProceed: FC<IEnemIndex> = ({ enemy_level }) => {
   const { account, address } = useAccount();
   const [showFinal, setShowFinal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const id = 1;
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (enemy_level == 4) {
+    if (enemy_level == 3) {
       const timer = setTimeout(() => {
         setShowFinal(true);
       }, 4000); // 4 seconds
@@ -94,8 +95,6 @@ const WinProceed: FC<IEnemIndex> = ({ enemy_level }) => {
             enemy_level == 1
               ? `url(${defeated_first})`
               : enemy_level == 2
-              ? `url(${defeated_second})`
-              : enemy_level == 3
               ? `url(${defeated_third})`
               : `url(${defeated_fourth})`,
           backgroundSize: "cover",
@@ -107,14 +106,18 @@ const WinProceed: FC<IEnemIndex> = ({ enemy_level }) => {
           Victory Secured Champion
         </div>
         <div className="__button_container mt-9">
-          <button
-            className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center "
-            onClick={async () => {
-              await nextMist(account);
-            }}
-          >
-            Proceed to Next Mist
-          </button>
+          {enemy_level < 3 && (
+            <button
+              className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center disabled:bg-gray-500"
+              disabled={isLoading}
+              onClick={async () => {
+                setIsLoading(true);
+                await nextMist(account);
+              }}
+            >
+              {isLoading ? "Loading..." : "Proceed to Next Mist"}
+            </button>
+          )}
         </div>
       </div>
       {showFinal && (
