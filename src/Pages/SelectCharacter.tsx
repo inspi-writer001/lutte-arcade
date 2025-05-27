@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 import bgImage from "../assets/select_screen_bg.png";
 import header from "../assets/select_screen_header.png";
 import "../styles/cards.css";
@@ -10,8 +10,16 @@ import { useDojoSDK } from "@dojoengine/sdk/react";
 import ch1 from "../assets/placeholders/ch1.png";
 import ch3 from "../assets/placeholders/ch3.png";
 import { useGameStore } from "../store/GameStore";
+// import { BackgroundMusicHandle } from "../App";
 
-const SelectCharacter = () => {
+interface SelectCharacterProps {
+  bgMusicRef: RefObject<{
+    playMusic: () => void;
+    stopMusic: () => void;
+  }>;
+}
+
+const SelectCharacter = ({ bgMusicRef }: SelectCharacterProps) => {
   const { sdk } = useDojoSDK();
   const { setTransitionTrigger } = useGameStore();
 
@@ -39,6 +47,10 @@ const SelectCharacter = () => {
   //        .build()
   //    )
   //    .build();
+
+  const startMusic = () => {
+    bgMusicRef.current?.playMusic();
+  };
 
   useEffect(() => {
     async function fetchToriiClause() {
@@ -123,6 +135,7 @@ const SelectCharacter = () => {
                         }
                       }
                       onClick={() => {
+                        startMusic();
                         account
                           ?.execute([
                             {

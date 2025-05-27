@@ -9,6 +9,7 @@ import { dojoConfig } from "../dojoConfig";
 
 import { useNavigate } from "react-router-dom";
 import defeated_first from "/background/defeated_hammer.jpg";
+import defeated_second from "/background/defeated_beast.jpg";
 import defeated_third from "/background/defeated_shadow.jpg";
 import defeated_fourth from "/background/defeated_skeleton.jpg";
 import final_image from "/background/defeated_final.jpg";
@@ -93,7 +94,7 @@ const WinProceed: FC<IEnemIndex> = ({ enemy_level }) => {
             enemy_level == 1
               ? `url(${defeated_first})`
               : enemy_level == 2
-              ? "black"
+              ? `url(${defeated_second})`
               : enemy_level == 3
               ? `url(${defeated_third})`
               : `url(${defeated_fourth})`,

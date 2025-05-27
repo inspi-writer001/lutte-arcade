@@ -94,10 +94,15 @@ const provider = new jsonRpcProvider({
   }
 });
 
+export type BackgroundMusicHandle = {
+  playMusic: () => void;
+  stopMusic: () => void;
+};
+
 function App() {
   const { transitionTrigger, setTransitionTrigger, setGlobalMusic } =
     useGameStore();
-  const bgMusicRef = useRef<any>(null);
+  const bgMusicRef = useRef<BackgroundMusicHandle>(null);
   // setGlobalMusic(true);
   return (
     <div className="aspect-wrapper relative">
@@ -106,12 +111,10 @@ function App() {
         <Router>
           <Routes>
             <Route path="/" Component={() => <HomePage />} />
-
             <Route path="/bunny" Component={() => <PixiBunny />} />
-
             <Route
               path="/character-shop"
-              Component={() => <SelectCharacter />}
+              Component={() => <SelectCharacter bgMusicRef={bgMusicRef} />}
             />
             <Route path="/fight" Component={() => <Fight />} />
           </Routes>
