@@ -9,17 +9,14 @@ import { ToriiQueryBuilder } from "@dojoengine/sdk";
 import { useDojoSDK } from "@dojoengine/sdk/react";
 import ch1 from "../assets/placeholders/ch1.png";
 import ch3 from "../assets/placeholders/ch3.png";
-
-import IntroScene from "../Components/IntroScene";
+import { useGameStore } from "../store/GameStore";
 
 const SelectCharacter = () => {
   const { sdk } = useDojoSDK();
-  // const { setTransitionTrigger } = useGameStore();
+  const { setTransitionTrigger } = useGameStore();
 
   const [data, setData] = useState<Array<IPlayableCharacter>>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [cutScene, setCutScene] = useState(false);
-  const [introFinished, setIntroFinished] = useState(false);
 
   // let [error, setError] = useState();
   // const [isSuccess, setIsSuccess] = useState(false);
@@ -70,15 +67,15 @@ const SelectCharacter = () => {
   // let id: PrimitiveField<number>;
   // let address: string;
 
-  const [id, setId] = useState<PrimitiveField<number> | null>(null);
-  const [address, setAddress] = useState<string>("");
-  useEffect(() => {
-    if (introFinished) {
-      navigate("/fight", {
-        state: { id, address }
-      });
-    }
-  }, [introFinished, navigate]);
+  // const [id, setId] = useState<PrimitiveField<number> | null>(null);
+  // const [address, setAddress] = useState<string>("");
+  // useEffect(() => {
+  //   if (introFinished) {
+  //     navigate("/fight", {
+  //       state: { id, address }
+  //     });
+  //   }
+  // }, [introFinished, navigate]);
 
   return (
     <div
@@ -90,15 +87,6 @@ const SelectCharacter = () => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      {cutScene && (
-        <div className="cutscene absolute h-full w-full z-50 self-center flex">
-          <IntroScene
-            onFinish={() => {
-              setIntroFinished(true);
-            }}
-          />
-        </div>
-      )}
       <div className="__upper_text text-center text-8xl mb-7 unifrakturmaguntia text-red-700 large-stroke absolute top-[5vh]">
         <img src={header} />
       </div>
@@ -164,19 +152,19 @@ const SelectCharacter = () => {
                           .then((e) => {
                             console.log(e.transaction_hash);
                             console.log("spawn successful");
-                            setCutScene(true);
+                            // setCutScene(true);
 
-                            setId(player.uid);
-                            setAddress(account.address);
-                            // setTransitionTrigger(true);
-                            // setTimeout(() => {
-                            //   navigate("/fight", {
-                            //     state: {
-                            //       id: player.uid,
-                            //       address: account.address
-                            //     }
-                            //   });
-                            // }, 500);
+                            // setId(player.uid);
+                            // setAddress(account.address);
+                            setTransitionTrigger(true);
+                            setTimeout(() => {
+                              navigate("/fight", {
+                                state: {
+                                  id: player.uid,
+                                  address: account.address
+                                }
+                              });
+                            }, 500);
                           })
                           .catch((error) => {
                             console.log("error spawning character");

@@ -8,16 +8,34 @@ import { useAccount } from "@starknet-react/core";
 import { dojoConfig } from "../dojoConfig";
 
 import { useNavigate } from "react-router-dom";
+import defeated_first from "/background/defeated_hammer.jpg";
+import defeated_third from "/background/defeated_shadow.jpg";
+import defeated_fourth from "/background/defeated_skeleton.jpg";
+import final_image from "/background/defeated_final.jpg";
+import { FC, useEffect, useState } from "react";
 
 const provider = new RpcProvider({
   nodeUrl: dojoConfig.rpcUrl as string
 });
-
-const WinProceed = () => {
+interface IEnemIndex {
+  enemy_level: number;
+}
+const WinProceed: FC<IEnemIndex> = ({ enemy_level }) => {
   const { account, address } = useAccount();
+  const [showFinal, setShowFinal] = useState(false);
 
   const id = 1;
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (enemy_level == 4) {
+      const timer = setTimeout(() => {
+        setShowFinal(true);
+      }, 4000); // 4 seconds
+
+      return () => clearTimeout(timer); // cleanup
+    }
+  }, []);
 
   const nextMist = async (account: AccountInterface | undefined) => {
     if (!account) return;
@@ -64,22 +82,63 @@ const WinProceed = () => {
       throw error;
     }
   };
+
+  // console.log("enemyy level", enemy_level);
   return (
-    <div className="flex flex-col w-full h-full justify-center items-center pirata-one text-center">
-      <div className="__text_container unifrakturmaguntia large-stroe text-white text-6xl">
-        Victory Secured Champion
+    <>
+      <div
+        className="absolute flex flex-col w-screen h-screen justify-center items-center bg-black pirata-one text-center"
+        style={{
+          background:
+            enemy_level == 1
+              ? `url(${defeated_first})`
+              : enemy_level == 2
+              ? "black"
+              : enemy_level == 3
+              ? `url(${defeated_third})`
+              : `url(${defeated_fourth})`,
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center center"
+        }}
+      >
+        <div className="__text_container unifrakturmaguntia large-stroe text-white text-6xl">
+          Victory Secured Champion
+        </div>
+        <div className="__button_container mt-9">
+          <button
+            className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center "
+            onClick={async () => {
+              await nextMist(account);
+            }}
+          >
+            Proceed to Next Mist
+          </button>
+        </div>
       </div>
-      <div className="__button_container mt-9">
-        <button
-          className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center "
-          onClick={async () => {
-            await nextMist(account);
+      {showFinal && (
+        <div
+          className="final_note fixed h-screen w-screen z-50 bg-black"
+          style={{
+            backgroundImage: `url(${final_image})`,
+            backgroundSize: "",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "center center"
           }}
         >
-          Proceed to Next Mist
-        </button>
-      </div>
-    </div>
+          <div className="__button_container absolute z-60 bottom-[10dvh] right-0 left-0 flex justify-center items-center">
+            <button
+              className=" pirata-one font-bold text-4xl hover:cursor-pointer bg-gray-950 py-3 px-12 rounded-md text-center "
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              Get some Rest Champion
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

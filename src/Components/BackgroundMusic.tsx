@@ -60,7 +60,7 @@ const BackgroundMusic = forwardRef((_, ref) => {
           onMouseLeave={() => setIsHovered(false)}
           style={{
             position: "absolute",
-            top: "170px",
+            top: "30dvh",
             right: "100px",
             height: "50px",
             width: isHovered ? "160px" : "50px",

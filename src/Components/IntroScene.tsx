@@ -46,15 +46,15 @@ const IntroScene = ({ onFinish }: { onFinish: () => void }) => {
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center bg-black relative overflow-hidden">
+    <div className="w-full h-full flex justify-center items-center bg-black relative overflow-hidden ">
       {/* Image Layers */}
-      <div className="absolute inset-0 w-full h-full">
+      <div className="relative inset-0 w-full h-full">
         {scenes.map((scene, index) => (
           <img
             key={index}
             src={scene.src}
             alt={`Scene ${index}`}
-            className={`absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-1000 ${
+            className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ${
               index === currentIndex ? "opacity-100 z-30" : "opacity-0 z-10"
             }`}
           />

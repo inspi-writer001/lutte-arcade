@@ -31,7 +31,14 @@ import { padHexTo66 } from "../Helpers/converters";
 import { Assets, Texture, Spritesheet, TextureSource } from "pixi.js";
 import PixiBunny from "./PixiBunny";
 
-import { attack_1, attack_3, death, dodge, playSound } from "../Helpers/audio";
+import {
+  attack_1,
+  attack_2,
+  attack_3,
+  death,
+  dodge,
+  playSound
+} from "../Helpers/audio";
 // import { provider } from "../App";
 import { dojoConfig } from "../dojoConfig";
 import WinProceed from "../Components/WinProceed";
@@ -120,6 +127,9 @@ const Fight = () => {
   const provider = new RpcProvider({
     nodeUrl: dojoConfig.rpcUrl as string
   });
+
+  const attacks = [attack_1, attack_2, attack_3];
+  const randomAttack = attacks[Math.floor(Math.random() * attacks.length)];
 
   // ✅ Preload all images to prevent jank
   useEffect(() => {
@@ -486,7 +496,9 @@ const Fight = () => {
   }
 
   if (showGameWon) {
-    return <WinProceed />;
+    return (
+      <WinProceed enemy_level={playerDetails.current_enemy.value.level.value} />
+    );
   }
 
   if (!assetsLoaded) {
@@ -834,11 +846,7 @@ const Fight = () => {
                 console.log(diff.user_health_diff);
 
                 if (diff.user_health_diff > 0) {
-                  if (diff.user_health_diff > 20) {
-                    playSound(attack_3);
-                  } else {
-                    playSound(attack_1);
-                  }
+                  playSound(randomAttack);
                   setPlayerMovement("hit");
                 } else {
                   setPlayerMovement("dodge");
@@ -880,11 +888,7 @@ const Fight = () => {
                 console.log(diff.enemy_health_dif);
 
                 if (diff.enemy_health_dif > 0) {
-                  if (diff.enemy_health_dif > 20) {
-                    playSound(attack_3);
-                  } else {
-                    playSound(attack_1);
-                  }
+                  playSound(randomAttack);
                   setEnemyMovement("hit");
                 } else {
                   setEnemyMovement("dodge");
