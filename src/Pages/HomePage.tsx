@@ -40,18 +40,12 @@ const HomePage = () => {
     if (!address) {
       try {
         connect({ connector });
-        console.log("Wallet connected:", address);
 
         if (address) {
-          console.log(address);
-
           return address;
         }
-        // const username = `User_${address?.slice(-4)}`;
-        // setUsername(username);
       } catch (error) {
         console.error("Failed to connect wallet:", error);
-        // setError(error?.toString() || "Couldn't connect wallet");
       }
     }
   };

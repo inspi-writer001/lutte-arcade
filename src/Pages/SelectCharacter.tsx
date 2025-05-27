@@ -50,32 +50,14 @@ const SelectCharacter = () => {
       return res;
     }
     fetchToriiClause().then((result) => {
-      console.log(result);
-      // console.log(result["0x1"]["lutte-PlayableCharacter"]);
-
       const array_characters = Object.values(result).map(
         (entry) => entry["lutte-PlayableCharacter"]
       );
 
-      console.log(array_characters);
       setData(array_characters as unknown as Array<IPlayableCharacter>);
       setIsLoading(false);
-      console.log(data);
     });
   }, []);
-
-  // let id: PrimitiveField<number>;
-  // let address: string;
-
-  // const [id, setId] = useState<PrimitiveField<number> | null>(null);
-  // const [address, setAddress] = useState<string>("");
-  // useEffect(() => {
-  //   if (introFinished) {
-  //     navigate("/fight", {
-  //       state: { id, address }
-  //     });
-  //   }
-  // }, [introFinished, navigate]);
 
   return (
     <div
@@ -149,13 +131,7 @@ const SelectCharacter = () => {
                               calldata: [player.uid.value.toString()]
                             }
                           ])
-                          .then((e) => {
-                            console.log(e.transaction_hash);
-                            console.log("spawn successful");
-                            // setCutScene(true);
-
-                            // setId(player.uid);
-                            // setAddress(account.address);
+                          .then((_e) => {
                             setTransitionTrigger(true);
                             setTimeout(() => {
                               navigate("/fight", {

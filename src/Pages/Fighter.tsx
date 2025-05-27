@@ -57,7 +57,6 @@ interface IEntity {
 
 const Fight = () => {
   async function fetchUser(address: string) {
-    console.log("address: ", address);
     const res = await sdk.client.getEntities(
       new ToriiQueryBuilder()
         .withClause(
@@ -68,7 +67,6 @@ const Fight = () => {
         .build()
     );
 
-    console.log(res);
     return res;
   }
   const { account } = useAccount();
@@ -114,8 +112,6 @@ const Fight = () => {
 
   useEffect(() => {
     fetchUser(state.address).then((response) => {
-      console.log("account user");
-      console.log(response);
       setPlayerDetails(
         response["0x0"]["lutte-Player"] as unknown as LuttePlayer
       );
@@ -335,15 +331,6 @@ const Fight = () => {
     const user_health_diff = user_previous_health - user_new_health;
     const enemy_health_dif = enemy_previous_health - enemy_new_health;
 
-    console.log({
-      player_prev: user_previous_health,
-      player_new: user_new_health,
-      enemy_prev: enemy_previous_health,
-      enemy_new: enemy_new_health,
-      user_health_diff,
-      enemy_health_dif
-    });
-
     return {
       enemy_health_dif,
       user_health_diff
@@ -368,15 +355,12 @@ const Fight = () => {
       ]);
       const txHash = result.transaction_hash;
 
-      console.log("Waiting for tx to be accepted: ", txHash);
-
       await provider.waitForTransaction(txHash, {
         retryInterval: 500,
         successStates: [TransactionExecutionStatus.SUCCEEDED]
         // retryTimeout: 60000 // timeout in ms
       });
 
-      console.log("Transaction accepted!");
       setIsResolveClickable(true);
       return txHash;
     } catch (error) {
@@ -388,9 +372,6 @@ const Fight = () => {
 
   const resolveAction = async (): Promise<LuttePlayer> => {
     return fetchUser(state.address).then((response) => {
-      console.log("account user");
-      console.log(response);
-
       let typed_response = response["0x0"][
         "lutte-Player"
       ] as unknown as LuttePlayer;
@@ -430,24 +411,8 @@ const Fight = () => {
       setIsResolveClickable(true);
       return txHash;
     } catch (error) {
-      console.log("error defending character");
-      console.log(error);
       throw error;
     }
-
-    // .then((e) => {
-    //   console.log(e.transaction_hash);
-    //   console.log("defebnse successful");
-
-    //   setIsResolveClickable(true);
-
-    //   return e.transaction_hash;
-    // })
-    // .catch((error) => {
-    //   console.log("error defending character");
-    //   console.log(error);
-    //   throw error;
-    // });
   };
 
   const getSpriteImage = (
@@ -843,8 +808,6 @@ const Fight = () => {
                 const diff = compareCache(e, cacheUser);
                 if (!diff) return;
 
-                console.log(diff.user_health_diff);
-
                 if (diff.user_health_diff > 0) {
                   playSound(randomAttack);
                   setPlayerMovement("hit");
@@ -884,8 +847,6 @@ const Fight = () => {
                 const e = await resolveAction();
                 const diff = compareCache(e, cacheUser);
                 if (!diff) return;
-
-                console.log(diff.enemy_health_dif);
 
                 if (diff.enemy_health_dif > 0) {
                   playSound(randomAttack);
