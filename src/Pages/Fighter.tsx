@@ -775,7 +775,7 @@ const Fight = () => {
             </div>
           )}
           {
-            <div className="__phase pirata-one flex self-center text-2xl mr-0">
+            <div className="__phase pirata-one flex self-center text-4xl mr-0">
               {playerTurn == true && playerState == "attack"
                 ? "Attack Phase"
                 : "Defensive Phase"}
