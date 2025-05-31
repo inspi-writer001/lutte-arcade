@@ -152,8 +152,9 @@ const SelectCharacter = ({ bgMusicRef }: SelectCharacterProps) => {
                           ])
                           .then((_e) => {
                             setTransitionTrigger(true);
+
                             setTimeout(() => {
-                              navigate("/fight", {
+                              navigate(`/fight?uid=${crypto.randomUUID()}`, {
                                 state: {
                                   id: player.uid,
                                   address: account.address

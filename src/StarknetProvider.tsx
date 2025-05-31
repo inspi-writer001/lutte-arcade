@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import { sepolia } from "@starknet-react/chains";
+import { mainnet } from "@starknet-react/chains";
 import { jsonRpcProvider, StarknetConfig, voyager } from "@starknet-react/core";
 import { dojoConfig } from "./dojoConfig";
 import { ControllerConnector } from "@cartridge/connector";
@@ -44,14 +44,14 @@ const policies: SessionPolicies = {
   }
 };
 const sepoliaWithRpc = {
-  ...sepolia,
-  rpcUrl: "https://api.cartridge.gg/x/starknet/sepolia"
+  ...mainnet,
+  rpcUrl: "https://api.cartridge.gg/x/starknet/mainnet"
 };
 
 export const connector = new ControllerConnector({
   policies,
   chains: [sepoliaWithRpc],
-  defaultChainId: constants.StarknetChainId.SN_SEPOLIA
+  defaultChainId: constants.StarknetChainId.SN_MAIN
 });
 
 export default function StarknetProvider({ children }: PropsWithChildren) {
@@ -61,7 +61,7 @@ export default function StarknetProvider({ children }: PropsWithChildren) {
 
   return (
     <StarknetConfig
-      chains={[sepolia]}
+      chains={[mainnet]}
       provider={provider}
       connectors={[connector]}
       explorer={voyager}

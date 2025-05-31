@@ -18,7 +18,7 @@ import {
 import ControllerConnector from "@cartridge/connector/controller";
 import { SessionPolicies } from "@cartridge/controller";
 
-const rpc = "https://api.cartridge.gg/x/starknet/sepolia";
+// const rpc = "https://api.cartridge.gg/x/starknet/sepolia";
 
 import { CONTRACT_ADDRESS } from "./constants";
 import StarknetProvider from "./StarknetProvider";
