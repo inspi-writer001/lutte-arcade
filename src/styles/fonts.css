@@ -10,3 +10,8 @@
   -webkit-text-stroke: 2px black;
   font-weight: 700;
 }
+
+.new-rocker {
+  font-family: "New Rocker", system-ui;
+  font-style: normal;
+}

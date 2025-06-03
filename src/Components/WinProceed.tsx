@@ -102,7 +102,7 @@ const WinProceed: FC<IEnemIndex> = ({ enemy_level }) => {
           backgroundPosition: "center center"
         }}
       >
-        <div className="__text_container unifrakturmaguntia large-stroe text-white text-6xl">
+        <div className="__text_container new-rocker large-stroe text-white text-6xl">
           Victory Secured Champion
         </div>
         <div className="__button_container mt-9">

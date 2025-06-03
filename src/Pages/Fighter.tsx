@@ -68,6 +68,7 @@ const Fight = () => {
     );
 
     // console.log(res);
+    await new Promise((resolve) => setTimeout(resolve, 700));
 
     // return res;
     return res.items?.[0]?.models[
@@ -345,8 +346,20 @@ const Fight = () => {
     id: number
   ) => {
     setIsActionClickable(false);
+    // console.log(
+    //   "player last attack",
+    //   playerDetails?.last_attack.value,
+    //   playerDetails?.last_attack_state.value
+    // );
 
     if (!account) return;
+    // if (playerDetails?.last_attack.value === true) {
+    //   setIsResolveClickable(true);
+    //   setIsActionClickable(false);
+
+    //   // setPlayerState("defense");
+    //   return;
+    // }
 
     try {
       const result = await account.execute([
@@ -356,11 +369,13 @@ const Fight = () => {
           calldata: [id]
         }
       ]);
+
+      // console.log(result);
       const txHash = result.transaction_hash;
 
       // console.log("Waiting for tx to be accepted: ", txHash);
 
-      await provider.waitForTransaction(txHash, {
+      const txStatus = await provider.waitForTransaction(txHash, {
         retryInterval: 500,
         successStates: [TransactionExecutionStatus.SUCCEEDED]
         // retryTimeout: 60000 // timeout in ms
@@ -368,22 +383,37 @@ const Fight = () => {
 
       // console.log("Transaction accepted!");
       // setIsResolveClickable(true);
+      if (!txStatus.isSuccess) {
+        // console.log("transcation was reverted");
+        setIsResolveClickable(true);
+        return;
+      }
 
       setIsResolveClickable(true);
       return txHash;
     } catch (error) {
       console.error("Fight failed: ", error);
       setPlayerMovement("idle");
-      throw error;
+      setIsResolveClickable(true);
+      // throw error;
     }
   };
 
   const resolveAction = async (): Promise<LuttePlayerWrapper> => {
+    // await new Promise((resolve) => setTimeout(resolve, 500));
     return fetchUser(state.address).then((response) => {
       setPlayerDetails(response);
       setPlayerTurn(!Boolean(response.last_attack.value));
       setIsActionClickable(true);
       setIsResolveClickable(false);
+
+      if (playerState == "attack") {
+        setPlayerState("defense");
+        setPlayerTurn(false);
+      } else {
+        setPlayerState("attack");
+        setPlayerTurn(true);
+      }
       return response;
     });
   };
@@ -391,6 +421,7 @@ const Fight = () => {
     account: AccountInterface | undefined,
     id: number
   ): Promise<string | undefined> => {
+    // await new Promise((resolve) => setTimeout(resolve, 500));
     setIsActionClickable(false);
     if (!account) return;
 
@@ -404,15 +435,22 @@ const Fight = () => {
       ]);
       const txHash = result.transaction_hash;
 
-      await provider.waitForTransaction(txHash, {
+      const txStatus = await provider.waitForTransaction(txHash, {
         retryInterval: 500,
         successStates: [TransactionExecutionStatus.SUCCEEDED]
         // retryTimeout: 60000 // timeout in ms
       });
 
+      if (!txStatus.isSuccess) {
+        // console.log("transcation was reverted");
+        setIsResolveClickable(true);
+        return;
+      }
       setIsResolveClickable(true);
       return txHash;
     } catch (error) {
+      setIsResolveClickable(true);
+      console.log(error);
       throw error;
     }
   };
@@ -539,7 +577,7 @@ const Fight = () => {
                 flex items-center justify-center
                 relative self-end
                 transition-transform duration-500
-                overflow-hidden
+                overflow-hidden -mb-5
                 ${
                   playerMovement == "dash" || playerMovement == "attack"
                     ? "translate-x-[77%] z-20"
@@ -617,7 +655,7 @@ const Fight = () => {
                   alt="profile picture"
                   className="ml-2 p-3 pirata-one"
                 />
-                <div className="__excitement text-amber-300 self-end mb-3 unifrakturmaguntia">
+                <div className="__excitement text-amber-300 self-end mb-3 new-rocker">
                   {playerDetails?.demeanor?.value != null &&
                     (playerDetails?.demeanor.value > neutral
                       ? "Motivated"
@@ -715,7 +753,7 @@ const Fight = () => {
                   alt="profile picture"
                   className="ml-2 p-3 pirata-one"
                 />
-                <div className="__excitement text-amber-300 self-end mb-3 unifrakturmaguntia">
+                <div className="__excitement text-amber-300 self-end mb-3 new-rocker">
                   {playerDetails?.demeanor?.value != null &&
                     (playerDetails?.demeanor.value > neutral
                       ? "Motivated"
@@ -803,7 +841,7 @@ const Fight = () => {
                 setEnemyMovement("attack");
 
                 // Allow attack animation to play before resolving action
-                await new Promise((resolve) => setTimeout(resolve, 150));
+                await new Promise((resolve) => setTimeout(resolve, 250));
 
                 // Resolve action and calculate health difference
                 const e = await resolveAction();
@@ -821,7 +859,7 @@ const Fight = () => {
                 setCacheUser(e);
 
                 // Wait for player reaction animation to finish
-                await new Promise((resolve) => setTimeout(resolve, 1200));
+                await new Promise((resolve) => setTimeout(resolve, 1400));
 
                 // Reset both to idle
                 setEnemyMovement("idle");
@@ -843,7 +881,7 @@ const Fight = () => {
                 setPlayerMovement("attack");
 
                 // Wait for the attack animation to complete
-                await new Promise((resolve) => setTimeout(resolve, 150));
+                await new Promise((resolve) => setTimeout(resolve, 250));
 
                 // Resolve the action
                 const e = await resolveAction();
@@ -861,7 +899,7 @@ const Fight = () => {
                 setCacheUser(e);
 
                 // Wait for the reaction animation (hit/dodge)
-                await new Promise((resolve) => setTimeout(resolve, 1200));
+                await new Promise((resolve) => setTimeout(resolve, 1400));
 
                 // Return both to idle
                 setPlayerMovement("idle");

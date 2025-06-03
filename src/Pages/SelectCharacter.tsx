@@ -87,7 +87,7 @@ const SelectCharacter = ({ bgMusicRef }: SelectCharacterProps) => {
         backgroundRepeat: "no-repeat"
       }}
     >
-      <div className="__upper_text text-center text-8xl mb-7 unifrakturmaguntia text-red-700 large-stroke absolute top-[5vh]">
+      <div className="__upper_text text-center text-8xl mb-7 new-rocker text-red-700 large-stroke absolute top-[5vh]">
         <img src={header} />
       </div>
 
