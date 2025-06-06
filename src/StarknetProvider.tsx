@@ -5,7 +5,7 @@ import { dojoConfig } from "./dojoConfig";
 import { ControllerConnector } from "@cartridge/connector";
 
 import { CONTRACT_ADDRESS } from "./constants";
-import { SessionPolicies } from "@cartridge/controller";
+// import { toSessionPolicies } from "@cartridge/controller";
 import { constants } from "starknet";
 
 // let pa = new ControllerConnector({
@@ -19,7 +19,7 @@ import { constants } from "starknet";
 //   name: "sepolia"
 // }).then((p) => (pa = p));
 
-const policies: SessionPolicies = {
+const policies = {
   contracts: {
     [CONTRACT_ADDRESS]: {
       methods: [
